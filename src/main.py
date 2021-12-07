@@ -1,241 +1,143 @@
-import tensorflow as tf
-from tensorflow import keras
-from keras import backend as K
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
 
-from tensorflow.keras.applications import VGG16
-from keras.applications.vgg16 import preprocess_input
-
-from tensorflow.keras.layers import Dense, AveragePooling2D, Input, Flatten, Dropout
-from tensorflow.keras.models import Model
-from tensorflow.keras.optimizers import Adam
-
-
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelBinarizer
-from tensorflow.keras.utils import to_categorical
+import sys
+# Add src directory to path
+sys.path.append('src')
 
 import numpy as np
-import cv2
-import os
 
 import csv
 
-try:
-    tpu = tf.distribute.cluster_resolver.TPUClusterResolver()  # TPU detection
-    print('Running on TPU ', tpu.cluster_spec().as_dict()['worker'])
-    tf.config.experimental_connect_to_cluster(tpu)
-    tf.tpu.experimental.initialize_tpu_system(tpu)
-    tpu_strategy = tf.distribute.TPUStrategy(tpu)
-except ValueError:
-  raise BaseException('ERROR: Not connected to a TPU runtime; please see the previous cell in this notebook for instructions!')
 
-def categorical_focal_loss(alpha, gamma=2.):
-    """
-    Softmax version of focal loss.
-    When there is a skew between different categories/labels in your data set, you can try to apply this function as a
-    loss.
-           m
-      FL = ∑  -alpha * (1 - p_o,c)^gamma * y_o,c * log(p_o,c)
-          c=1
-      where m = number of classes, c = class and o = observation
-    Parameters:
-      alpha -- the same as weighing factor in balanced cross entropy. Alpha is used to specify the weight of different
-      categories/labels, the size of the array needs to be consistent with the number of classes.
-      gamma -- focusing parameter for modulating factor (1-p)
-    Default value:
-      gamma -- 2.0 as mentioned in the paper
-      alpha -- 0.25 as mentioned in the paper
-    References:
-        Official paper: https://arxiv.org/pdf/1708.02002.pdf
-        https://www.tensorflow.org/api_docs/python/tf/keras/backend/categorical_crossentropy
-    Usage:
-     model.compile(loss=[categorical_focal_loss(alpha=[[.25, .25, .25]], gamma=2)], metrics=["accuracy"], optimizer=adam)
-    """
+# https://github.com/zubairsamo/Object-Detection-With-Tensorflow-Using-VGG16/blob/main/Object_Detection_Using_VGG16_With_Tensorflow.ipynb
 
-    alpha = np.array(alpha, dtype=np.float32)
+from sklearn.model_selection import train_test_split
+import cv2
 
-    def categorical_focal_loss_fixed(y_true, y_pred):
-        """
-        :param y_true: A tensor of the same shape as `y_pred`
-        :param y_pred: A tensor resulting from a softmax
-        :return: Output tensor.
-        """
+from tensorflow.keras.applications import VGG16
+from tensorflow.keras.layers import Input, Flatten, Dense
+from tensorflow.keras.models import Model
+from tensorflow.keras.callbacks import EarlyStopping, TensorBoard
 
-        # Clip the prediction value to prevent NaN's and Inf's
-        epsilon = K.epsilon()
-        y_pred = K.clip(y_pred, epsilon, 1. - epsilon)
+from tensorflow.keras.preprocessing.image import load_img
+from tensorflow.keras.preprocessing.image import img_to_array
+from sklearn.preprocessing import LabelBinarizer
 
-        # Calculate Cross Entropy
-        cross_entropy = -y_true * K.log(y_pred)
-
-        # Calculate Focal Loss
-        loss = alpha * K.pow(1 - y_pred, gamma) * cross_entropy
-
-        # Compute mean loss in mini_batch
-        return K.mean(K.sum(loss, axis=-1))
-
-    return categorical_focal_loss_fixed
-
-
-# Create a model VGG16
-def create_model(classes = 2): 
-    vgg = VGG16(weights=None, include_top=True, input_shape=(224, 224, 3), classes=classes)
-    # vgg = VGG16(weights='imagenet', include_top=False, input_shape=(224, 224, 3))
-    out = vgg.output
-
-    # out = AveragePooling2D(pool_size=(2, 2))(out)
-    out = Flatten()(out)
-    
-    bboxHead = Dense(128, activation="relu")(out)
-    bboxHead = Dense(64, activation="relu")(bboxHead)
-    bboxHead = Dense(32, activation="relu")(bboxHead)
-    bboxHead = Dense(4, name="bounding_box")(bboxHead)
-
-    classHead = Dense(512, activation="relu")(out)
-    classHead = Dropout(0.2)(classHead)
-    classHead = Dense(512, activation="relu")(classHead)
-    classHead = Dropout(0.2)(classHead)
-    classHead = Dense(classes, activation="softmax",  name="class_label")(classHead)
-
-    model = Model(inputs=vgg.input, outputs=(bboxHead, classHead))
-
-    losses = {
-	"class_label": [categorical_focal_loss(alpha=[[.25, .25, .25, .25]], gamma=2)],
-	"bounding_box": "mean_squared_error",
-    }
-
-    model.compile(loss=losses, optimizer='adam', metrics=["accuracy"])
-
-    
-    return model
-
+from loss import categorical_focal_loss
 
 # Open and read CSV with images and labels
-def read_csv(csv_path, skip = 'valid'):
-    images = []
-    labels = []
-    bbox = []
+def load_data(csv_path):
+    data = []
+    classes = []
+    targets =  []
+    i = 0
     with open(csv_path) as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
+        next(csv_reader, None)
         for row in csv_reader:
-            if skip in row[0]:
-                continue
-            images.append(row[0])
-            labels.append(row[1])
-            bbox.append(row[2:])
+
+            filename, label, startX, startY, w, h = row
             
-    return images[1:], labels[1:], bbox[1:]
+            endX = float(startX) + float(w)
+            endY = float(startY) + float(h)
+
+            image = cv2.imread(filename)
+            (h,w)=image.shape[:2]
+            
+            startX = float(startX) / w
+            startY = float(startY) / h
+            endX = float(endX) / w
+            endY = float(endY) / h
+
+            image = load_img(filename, target_size=(224, 224))
+            image = img_to_array(image)
+            
+            data.append(image)
+            classes.append(label)
+            targets.append((startX, startY, endX, endY))
+            # Just testing on my pc remove for colab
+            if i > 10:
+                # break
+                pass
+            i += 1
+    data = np.array(data, dtype="float32") / 255.
+    classes = np.array(classes)
+    targets = np.array(targets, dtype="float32")
 
 
-# Convert BBOX to double coordinates
-def convert_bbox(bbox):
-    new_bb = [bbox[0], bbox[1], bbox[0] + bbox[2], bbox[1] + bbox[3]]
-    new_bb = [int(i) for i in new_bb]
-    return new_bb
+    return data, classes, targets
 
-# Convert Cooridantes to relative coordinates
-# def convert_coor(bbox, h, w):
-#     new_bb = (bbox[0] / w, bbox[1] / h, bbox[2] / w, bbox[3] / h)
-#     return new_bb
+data, classes, targets = load_data('data/data.csv')
 
-image_path, labels, bbox = read_csv('data/data.csv')
-
-
-images = []
-for i in image_path:
-    images.append(preprocess_input(cv2.imread(i)))
-
-bboxes = []
-for i, box in enumerate(bbox):
-    new_bbox = [int(i) for i in box]
-    new_bbox = convert_bbox(new_bbox)
-    # new_bbox = convert_coor(new_bbox, images[i].shape[0], images[i].shape[1])
-    bboxes.append(new_bbox)
-# resize images
-# for i, img in enumerate(images):
-#     images[i] = cv2.resize(img, (MH_HEIGHT, MH_WIDTH), interpolation = cv2.INTER_AREA)
-
-# Convert images to numpy array and normilze 
-# images = np.array(images, dtype="float32") / 255.0
-# Convert labels to numpy array
-labels = np.array(labels)
-# Convert bboxes to numpy array to float32 
-bboxes = np.array(bboxes, dtype="float32")
-
-
-# Perform one hot encoder on labels
+# transfrom classes to one-hot encoding with keras
+# transform classes to one-hot encoding
+print(np.unique(classes))
 lb = LabelBinarizer()
-labels = lb.fit_transform(labels)
-# transfrom to float32
-labels = labels.astype("float32")
+classes = lb.fit_transform(classes)
+classes = np.array(classes, dtype = 'float32')
+
+X_train, X_test, y1_train, y1_test, y2_train, y2_test = train_test_split(data, classes, targets, test_size=0.3)
+X_test, X_valid, y1_test, y1_valid, y2_test, y2_valid  = train_test_split(X_test, y1_test, y2_test, test_size=0.35)
 
 
-# train test split  
-split = train_test_split(images, labels, bboxes, test_size=0.10, random_state=42)
-# unpack the data split
-(trainImages, testImages) = split[:2]
-(trainLabels, testLabels) = split[2:4]
-(trainBBoxes, testBBoxes) = split[4:6]
+
+vgg=VGG16(weights='imagenet',include_top=False,input_tensor=Input(shape=(224,224,3)))
+flatten = vgg.output
+
+flatten = Flatten()(flatten)
+
+bboxhead = Dense(128,activation="relu")(flatten)
+bboxhead = Dense(64,activation="relu")(bboxhead)
+bboxhead = Dense(32,activation="relu")(bboxhead)
+bboxhead = Dense(4,activation="sigmoid", name = 'bounding_box')(bboxhead)
 
 
-with tpu_strategy.scope(): # creating the model in the TPUStrategy scope means we will train the model on the TPU
-    model = create_model(len(lb.classes_))
-print(model.summary())
+classhead = Dense(128,activation="relu")(flatten)
+classhead = Dense(64,activation="relu")(classhead)
+classhead = Dense(32,activation="relu")(classhead)
+classhead = Dense(4,activation="softmax", name = 'class_label')(classhead)
 
+model = Model(inputs = vgg.input,outputs = [classhead, bboxhead])
+
+losses = {
+	"class_label": [categorical_focal_loss(alpha=[[.25, .25, .25, .25]], gamma=2)],
+	# "class_label": "categorical_crossentropy",
+	"bounding_box": "mse",
+    }
+
+model.compile(optimizer="adam", loss=losses, metrics=["accuracy"])
+# model.compile(optimizer="ftrl", loss=losses, metrics=["accuracy"])
+# model.compile(optimizer="", loss=losses, metrics=["accuracy"])
 
 
 trainTargets = {
-	"class_label": trainLabels,
-	"bounding_box": trainBBoxes
+    "class_label": y1_train,
+    "bounding_box": y2_train
 }
 
-# construct a second dictionary, this one for our target testing
 testTargets = {
-	"class_label": testLabels,
-	"bounding_box": testBBoxes
+    "class_label": y1_test,
+    "bounding_box": y2_test
 }
 
-# Add early stopping
-early_stopping_patience = 70
-early_stopping = keras.callbacks.EarlyStopping(
-    monitor="class_label_loss", 
+early_stopping_patience = 17
+early_stopping = EarlyStopping(
+    monitor="loss", 
     patience=early_stopping_patience, 
     restore_best_weights=True
 )
 
-try:
-    # Load model
-    model = keras.models.load_model("model.h5")
-    print("Model loaded")
-except:
+tensorboard = TensorBoard(
+    histogram_freq=1, 
+    write_images=True,
+)
 
-    H = model.fit(
-        trainImages, trainTargets,
-        validation_data=(testImages, testTargets),
-        batch_size=BATCH_SIZE,
-        epochs=EPOCHS,
-        # verbose=1,
-        callbacks=[early_stopping])
+model.fit(X_train, trainTargets,
+         epochs=256, 
+         batch_size=64, 
+         validation_data=(X_test, testTargets),
+         callbacks = [early_stopping, tensorboard]
+         )
 
 model.save('model.h5')
-
-# lb.inverse_transform()
-def load_image(path):
-    from keras.preprocessing.image import load_img
-    from keras.preprocessing.image import img_to_array
-
-    img = load_img(path, target_size=(256, 256))
-    img = img_to_array(img)
-    img = img.reshape((1, img.shape[0], img.shape[1], img.shape[2]))
-    img = preprocess_input(img)
-    return img
-
-# load valid data
-valid_images, valid_labels, valid_bbox = read_csv('data/data.csv', skip = 'train')
-i = np.random.randint(0, len(valid_images))
-image = load_image(image_path[i-1])
-
-
-# predict
-bbox_prediction, class_prediction = model.predict(image)
-print(lb.inverse_transform(class_prediction), ' == ', valid_labels[i-1])

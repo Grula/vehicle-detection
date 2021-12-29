@@ -120,13 +120,13 @@ def generate(images, data_folder, label, image_generate_size = 10):
 # Bus and Truck
 data_folder = Path("data/synthetic/")
 if __name__ == '__main__':
-    label = "truck"
+    label = "bus"
     # Check if folder data_folder exists if not create it
     images = load_data('data/data.csv', label)
     if not (data_folder/label).exists():
         (data_folder/label).mkdir()
     print(len(images))
-    out = generate(images,data_folder, label, 17)
+    out = generate(images,data_folder, label, 100)
 
     # Write csv file to synthetic
     with open(data_folder / 'data.csv', 'a') as csv_file:

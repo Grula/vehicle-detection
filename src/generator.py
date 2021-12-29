@@ -124,7 +124,7 @@ if __name__ == '__main__':
     if not (data_folder/label).exists():
         (data_folder/label).mkdir()
     print(len(images))
-    out = generate(images,data_folder, label, 1)
+    out = generate(images,data_folder, label, 17)
 
     # Write csv file to synthetic
     with open(data_folder / 'data.csv', 'a') as csv_file:

@@ -68,7 +68,54 @@ def load_data(csv_path):
 
     return data, classes, targets
 
-data, classes, targets = load_data('data/data.csv')
+def load_data(paths, undersamples = []):
+    data = []
+    classes = []
+    targets =  []
+    i = 0
+    for csv_path in paths:
+        with open(csv_path) as csv_file:
+            csv_reader = csv.reader(csv_file, delimiter=',')
+            next(csv_reader, None)
+            for row in csv_reader:
+
+                filename, label, startX, startY, w, h = row
+                
+                # check if lavel is in undersample list
+                # if label in undersamples:
+                #     continue
+
+                endX = float(startX) + float(w)
+                endY = float(startY) + float(h)
+
+                image = cv2.imread(filename)
+                (h,w)=image.shape[:2]
+                
+                startX = float(startX) / w
+                startY = float(startY) / h
+                endX = float(endX) / w
+                endY = float(endY) / h
+
+                image = load_img(filename, target_size=(224, 224))
+                image = img_to_array(image)
+                
+                data.append(image)
+                classes.append(label)
+                targets.append((startX, startY, endX, endY))
+                # Just testing on my pc remove for colab
+                if i > 10:
+                    # break
+                    pass
+                i += 1
+    data = np.array(data, dtype="float32") / 255.
+    classes = np.array(classes)
+    targets = np.array(targets, dtype="float32")
+
+
+    return data, classes, targets
+
+
+data, classes, targets = load_data(['data/data.csv','data/synthetic/data.csv' ])
 
 # transfrom classes to one-hot encoding with keras
 # transform classes to one-hot encoding
@@ -77,8 +124,9 @@ lb = LabelBinarizer()
 classes = lb.fit_transform(classes)
 classes = np.array(classes, dtype = 'float32')
 
-X_train, X_test, y1_train, y1_test, y2_train, y2_test = train_test_split(data, classes, targets, test_size=0.3)
-X_test, X_valid, y1_test, y1_valid, y2_test, y2_valid  = train_test_split(X_test, y1_test, y2_test, test_size=0.35)
+
+X_train, X_test, y1_train, y1_test, y2_train, y2_test = train_test_split(data, classes, targets, test_size=0.3, random_state=42)
+X_test, X_valid, y1_test, y1_valid, y2_test, y2_valid  = train_test_split(X_test, y1_test, y2_test, test_size=0.35, random_state=42)
 
 
 
@@ -101,8 +149,8 @@ classhead = Dense(4,activation="softmax", name = 'class_label')(classhead)
 model = Model(inputs = vgg.input,outputs = [classhead, bboxhead])
 
 losses = {
-	"class_label": [categorical_focal_loss(alpha=[[.25, .25, .25, .25]], gamma=2)],
-	# "class_label": "categorical_crossentropy",
+	# "class_label": [categorical_focal_loss(alpha=[[.25, .25, .25, .25]], gamma=2)],
+	"class_label": "categorical_crossentropy",
 	"bounding_box": "mse",
     }
 
@@ -121,7 +169,7 @@ testTargets = {
     "bounding_box": y2_test
 }
 
-early_stopping_patience = 17
+early_stopping_patience = 7
 early_stopping = EarlyStopping(
     monitor="loss", 
     patience=early_stopping_patience, 
@@ -134,10 +182,10 @@ tensorboard = TensorBoard(
 )
 
 model.fit(X_train, trainTargets,
-         epochs=256, 
-         batch_size=64, 
+         epochs=45, 
+         batch_size=32, 
          validation_data=(X_test, testTargets),
          callbacks = [early_stopping, tensorboard]
          )
 
-model.save('model.h5')
+model.save('adam-cre-model.h5')

@@ -53,6 +53,8 @@ def load_data(csv_path, target = "bus"):
         next(csv_reader, None)
         for row in csv_reader:
             filename, label, startX, startY, w, h = row
+            if 'valid' in filename:
+                continue
             if label != target : continue
             image = cv2.imread(filename)
             images.append(image)

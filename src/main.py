@@ -27,46 +27,6 @@ from sklearn.preprocessing import LabelBinarizer
 from loss import categorical_focal_loss
 
 # Open and read CSV with images and labels
-def load_data(csv_path):
-    data = []
-    classes = []
-    targets =  []
-    i = 0
-    with open(csv_path) as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter=',')
-        next(csv_reader, None)
-        for row in csv_reader:
-
-            filename, label, startX, startY, w, h = row
-            
-            endX = float(startX) + float(w)
-            endY = float(startY) + float(h)
-
-            image = cv2.imread(filename)
-            (h,w)=image.shape[:2]
-            
-            startX = float(startX) / w
-            startY = float(startY) / h
-            endX = float(endX) / w
-            endY = float(endY) / h
-
-            image = load_img(filename, target_size=(224, 224))
-            image = img_to_array(image)
-            
-            data.append(image)
-            classes.append(label)
-            targets.append((startX, startY, endX, endY))
-            # Just testing on my pc remove for colab
-            if i > 10:
-                # break
-                pass
-            i += 1
-    data = np.array(data, dtype="float32") / 255.
-    classes = np.array(classes)
-    targets = np.array(targets, dtype="float32")
-
-
-    return data, classes, targets
 
 def load_data(paths, undersamples = []):
     data = []
@@ -78,6 +38,10 @@ def load_data(paths, undersamples = []):
             csv_reader = csv.reader(csv_file, delimiter=',')
             next(csv_reader, None)
             for row in csv_reader:
+                
+                # Skip validation set
+                if 'valid' in filename:
+                    continue
 
                 filename, label, startX, startY, w, h = row
                 

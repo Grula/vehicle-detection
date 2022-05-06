@@ -136,4 +136,6 @@ dmypy.json
 *.csv
 *.ipynb
 
+# models 
+*.h5
 

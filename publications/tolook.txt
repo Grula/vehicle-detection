@@ -1,6 +1,0 @@
-K. He, X. Zhang, S. Ren, and J. Sun. Spatial pyramid pooling
-in deep convolutional networks for visual recognition. In
-ECCV, 2014. 1,
-
-https://github.com/rbgirshick/fast-rcnn
-

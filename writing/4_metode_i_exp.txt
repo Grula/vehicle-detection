@@ -1,0 +1,29 @@
+
+
+4.1 Vgg16
+Koriscenem mreze vgg16 postizemo rezultate koa i ocekivano. Mreza zbog nedostatka podataka nije naucila nista, konvergira nakon 37 epoha ucenja i daje sledece rezultate:
+	car:  car
+	truck:  car
+	bus:  car
+	motorcycle:  car
+kao i slike:
+ SLIKE KEKW
+
+Kao sto mozemo videti zbog najvece kolicine podataka kola, mreze je overfitovana. Za okvire smo koristili
+
+Treniramo vgg16 sa transfer learning metodom od tezina IMAGENET-a
+
+...
+
+
+4.2 YOLO - transfer learning
+Za pocetnnu predikciju mreze koristimo Yolo v3, mreza daje solidne rezultate pri detekciji kamiona i motorcikala na slikama za validaciju, ali pravi gresku sa na automobilima sa verovatnocom >90% a autobus se uopste ne detektuje. Kao pocetne tezine koristili smo od COCO dataseta. Sam dataset sadrzi 80 klasa, ali smo mi spustili na 4 i malo modifikovali mrezu na ordedjenim izlazima.
+Za metod transfernog ucenja koristicemo mrezu yolo v4. Razlike u odnosu na v3 su sitna poboljsanja i funkcija gubitka.
+Funkcija gubitka je .... (treba nabubati ovo cudo) .... .
+Slike su trenirane na rezoluciji 416x416, sveukupno 150epoha. Na njima se vrsi bazicna augmentacija tokom treniranja. Rezultati su sledeci,
+
+Grafikoni koji ce doci uskoro jer se mreza jso trenira
+
+4.3 Metode prosirivanja podataka
+
+opistati kada se kod ganova desi mode collapse sa slikamaa

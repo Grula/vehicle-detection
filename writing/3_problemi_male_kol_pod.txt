@@ -1,0 +1,83 @@
+
+
+3.1 Problem malog skupa podataka
+Kako bi nasli savrsen model za detekciju objekata moramo da balansiramo pristrasnost i varijansu.
+
+Pristrasnost je razlika između predviđanja modela i prave vrednosti. Modeli sa velikom pristrasnošću previše pojednostavljuju odnos između prediktora i ciljne varijable i pokazuju veliku grešku i na podacima za trening i na podacima za test.
+
+Varijanca odražava varijabilnost predviđanja modela. Modeli sa velikom varijansom obraćaju previše pažnje na podatke za trening i ne generalizuju se dobro na test skupu podataka. Kao rezultat toga, ovi modeli pokazuju veoma malu grešku na skupu za trening i veoma visoku grešku na test skupu.
+
+Modeli sa niskom pristrasnošću i visokom varijansom preklapaju se sa podacima,
+ dok modeli sa velikom pristrasnošću i niskom varijansom ne odgovaraju podacima.
+
+Modeli obučeni na malom skupu podataka imaju veću verovatnoću da vide karakteristike koje ne postoje, što rezultira velikom varijansom i veoma velikom greškom na test skupu. Ovo su uobičajeni znaci preprilagodjavanja.
+
+U ovom radu koristicemo dva principa da izbegnemo ovakvo ponasanje. Podatke alterujemo pomocu raznih baznih metoda, pomocu neuronskih mrezi i koriscenjem transfernog učenja. 
+
+3.2 Prosirivanje skupa podataka 
+Ideja koja stoji iza prosirenja skupa podataka je jednostavna: promeniti ulaze na takav način da se obezbede novi podaci, a da se pritom ne izmene vrednost pripadnosti skupa(label).
+Kreiranje sitentickog skupa podataka; Koristicemo bazne videove augmenatcije, kao sto su translacija rotacija, etc za prosirenje naseg skupa podataka. Takodje koristimo
+novije metode GAN mrezi za porsirenje samog skupa
+
+3.2.1 Bazne augmentacije 
+1. Flip
+Slike okrecemo horizontalno i vertikalno. Na ovakav nacic postizemo praveljenje novih slika, ali moramo biti opazrivi u zavnisti gde mozemo primenti ovakve operacije. Na primer koristeci vertikalno
+okretanje nece imati mnogo smisla kod nase detekcije kako svi ucesnici u saobracaju su isto orjentisani.
+
+2. Rotacija
+Jedna ključna stvar koju treba napomenuti u vezi sa ovom operacijom je da dimenzije slike možda neće biti sačuvane nakon rotacije. Ako jeslika kvadrat, rotiranje pod pravim uglom će sačuvati veličinu slike. Ako je pravougaonik, rotiranjem za 180 stepeni sačuvala bi se veličina. Rotiranje slike za finije uglove takođe će promeniti konačnu veličinu slike. Ispod su primeri rotacije nekih slika. 
+(PRIMER)
+
+3. Skaliranje
+Slika se može skalirati prema spolja ili prema unutra. Prilikom skaliranja prema spolja, konačna veličina slike će biti veća od originalne veličine slike. Većina okvira za slike iseče deo iz nove slike, veličine jednake originalnoj slici. Ispod su primeri ili slike koje se skaliraju.
+
+4. Seckanje slike
+Za razliku od skaliranja, mi samo nasumično uzorkujemo deo sa originalne slike. Zatim menjamo veličinu ovog odeljka na originalnu veličinu slike. Ova metoda je popularno poznata kao nasumično seckanje. 
+
+5. Translacija
+Translacija samo uključuje pomeranje slike u pravcu Ks ili I (ili oba). Ovaj metod je veoma koristan jer se većina objekata može nalaziti na skoro bilo kom mestu na slici. Ovo primorava konvolucionu neuronsku mrežu da gleda celu sliku.
+
+6. Gausov šum
+Predprilagodjavanje se obično dešava kada  neuronska mreža pokušava da nauči karakteristike (karakteristike koje se često javljaju) koje možda nisu korisne. Gausov šum, koji ima nultu srednju vrednost, u suštini ima tačke podataka na svim frekvencijama, efektivno distortuje karakteristike visoke frekvencije. Ovo takođe znači da su komponente niže frekvencije takođe distortirane, ali neuronska mreža može naučiti da gleda kroz to. Dodavanje prave količine buke može poboljšati učenje.
+
+Ublažena verzija ovoga je šum soli i bibera, koji se predstavlja kao nasumični crno-beli pikseli koji se šire kroz sliku. Ovo je slično efektu koji se dobija dodavanjem Gausovog šuma na sliku, ali može imati niži distorziju informacija.
+
+3.2.2 Neurnske Mreze
+
+Generativne adversarijske mreže (GAN) su donekle nova teorija u mašinskom učenju, predložena po prvi put 2014. Njihova svrha je da sintetizuju veštačke primere, kao što su slike koje su nejasne sa autentičnih fotografija. Tipičan primer GAN aplikacije je pravljenje veštačkih slika lica učenjem iz skupa podataka značajnih lica.
+
+Style Generative Adversarial Network, ili skraćeno StyleGAN, je dodatak GAN arhitekturi koji uvodi značajne modifikacije u model generatora. StyleGAN proizvodi simuliranu sliku sekvencijalno, polazeći od jednostavne rezolucije i povećavajući do ogromne rezolucije (1024×1024).
+Transformisanjem unosa svakog nivoa pojedinačno, ispituje vizuelne karakteristike koje se manifestuju na tom nivou, od standardnih osobina do sitnih detalja, bez menjanja drugih nivoa.
+Dobijeni model je vešt u proizvodnji impresivno fotorealističnih visokokvalitetnih fotografija i daje kontrolu nad karakteristikama kreirane slike na različitim nivoima specifikacije promenom vektora stila i šuma.
+
+StileGAN je nastavak progresivnog, razvijajućeg GAN-a koji je predlog za obuku modela generatora da sintetišu ogromne fotografije visokog kvaliteta putem postepenog razvoja modela diskriminatora i generatora od minuta do obimnih slika.
+
+Generator StyleGAN-a više ne uzima funkciju iz opsega potencijala kao ulaz; umesto toga, koristi dve nove reference nasumičnosti za proizvodnju sintetičke slike: samostalne kanale za mapiranje i slojeve šuma.
+Proizvodnja iz mreže mapiranja je vektor koji definiše tehnike integrisane u određenoj tački u modelu generatora kroz novi sloj koji se naziva adaptivna normalizacija instance. Prednost ovog vektora stila daje kontrolu nad karakteristikama generisane slike.
+Stohastička varijacija se predlaže kroz turbulenciju koja se dodaje u određenoj tački u modelu generatora. Šum je fiksiran na čitave mape karakteristika koje omogućavaju modelu da razume stil na fin način, po pikselu.
+Ovaj po bloku koji uključuje vektor stila i šum obezbeđuje svaki blok da ograniči razumevanje stila i stohastičku modifikaciju na adresirani nivo detalja.
+
+ STYLEGAN2
+
+
+Međutim, uspeh iza GAN modela dolazi po cenu računanja i podataka. GAN modeli su željni podataka i u velikoj meri se oslanjaju na ogromne količine raznovrsnih i visokokvalitetnih primera obuke kako bi generisali prirodne slike visoke vernosti različitih kategorija.
+
+Da bi se ublažio takav problem, uveden je DiffAugment metod koji primenjuje isto diferencirano povećanje i na stvarne i na lažne slike za obuku generatora i diskriminatora.
+
+Istraživači su predstavili DiffAugment za GAN obuku sa efikasnom upotrebom podataka. Metoda koristi različite tipove diferencijabilnih povećanja i na stvarnim i na lažnim uzorcima. Omogućava da se gradijenti propagiraju kroz povećanje nazad do generatora, reguliše diskriminator bez manipulisanja ciljnom distribucijom i održava ravnotežu dinamike treninga.
+
+Oni su koristili uobičajene metrike evaluacije, a to su Frechet Inception Distance (FID), što je metrika učinka za procenu sličnosti između dva skupa podataka slika i Inception Score (IS), koja je popularna metrika za procenu izlaznih slika generativnih suparničkih mreža. . Pored toga, istraživači su primenili metod na generaciju sa nekoliko hitaca, i sa i bez prethodne obuke.
+
+Ova tehnika je omogućena da usvoji diferencibilno povećanje za generisane uzorke, efikasno stabilizuje trening i dovodi do bolje konvergencije. Može se koristiti za značajno poboljšanje efikasnosti podataka za GAN obuku. Naveli su da metoda može da generiše slike visoke vernosti koristeći samo 100 slika bez prethodne obuke.
+
+3.3 Metod tranfernog učenja
+
+Metod tranfernog učenje za mašinsko učenje se često koristi kada bi obuka sistema za rešavanje novog zadatka zahtevala ogromnu količinu resursa. Proces uzima relevantne delove postojećeg modela mašinskog učenja i primenjuje ga za rešavanje novog, ali sličnog problema. Ključni deo transfernog učenja je generalizacija. To znači da se prenosi samo ono znanje koje može koristiti drugi model u različitim scenarijima ili uslovima. Umesto da modeli budu čvrsto vezani za skup podataka za obuku, modeli koji se koriste u transfernom učenju biće generalizovaniji. Modeli razvijeni na ovaj način mogu se koristiti u promenljivim uslovima i sa različitim skupovima podataka.
+
+Model mašinskog učenja koji identifikuje određeni predmet unutar skupa slika je glavni kandidat za transferno učenje. Najveći deo modela koji se bavi prepoznavanjem različitih predmeta može se zadržati. Deo algoritma koji ističe određeni predmet za kategorizaciju je element koji će biti ponovo obučen. U ovom slučaju, nema potrebe da se ponovo izgradi i obuči algoritam mašinskog učenja od nule.
+
+U nadgledanom mašinskom učenju, modeli se obučavaju da završe specifične zadatke iz označenih podataka tokom procesa razvoja. Ulaz i željeni izlaz su jasno mapirani i uneti u algoritam. Model zatim može da primeni naučene trendove i prepoznavanje obrazaca na nove podatke. Modeli razvijeni na ovaj način biće veoma tačni kada rešavaju zadatke u istom okruženju kao i podaci za obuku. To će postati mnogo manje tačno ako se uslovi ili okruženje promene u primeni u stvarnom svetu mimo podataka o obuci. Možda će biti potrebna potreba za novim modelom zasnovanim na novim podacima o obuci, čak i ako su zadaci slični.
+
+Transfer učenje je tehnika koja pomaže u rešavanju ovog problema. Kao koncept, funkcioniše tako što prenosi što je moguće više znanja sa postojećeg modela na novi model dizajniran za sličan zadatak. Na primer, prenošenje opštijih aspekata modela koji čine glavne procese za završetak zadatka. Ovo bi mogao biti proces koji stoji iza toga kako se objekti ili slike identifikuju ili kategorišu. Dodatni slojevi specifičnijeg znanja mogu se zatim dodati novom modelu, omogućavajući mu da obavlja svoj zadatak u novim okruženjima.
+
+Transfer učenje donosi niz prednosti u procesu razvoja modela mašinskog učenja. Glavne prednosti transfernog učenja uključuju uštedu resursa i poboljšanu efikasnost prilikom obuke novih modela. Takođe može pomoći u modelima za obuku kada su dostupni samo neoznačeni skupovi podataka, jer će većina modela biti prethodno obučena.

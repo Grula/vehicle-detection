@@ -1,0 +1,39 @@
+Razvojni put detekcije objekata
+
+
+1.1 Detekcija Objekata
+    U današnje vreme, detekcija objekata veoma je vazan zadatak kompjuterske
+    vizije (computer vision). Kompjuterska vizija se bavi otkrivanjem sličajeva vizuelnih
+    objekata odredjene vrste (kao što su ljudi, životinje ili automobili) pomoću digitalnih
+    slika (Zou et all., 2019). Za potrebe detekcije objekata (koji su objekti i gde se
+    nalaze), dolazi do razvoja računarskih modela i tehnika (Kang et all., 2017), koje
+    obezbeđuju najosnovnije informacije aplikacijama za kompjuterske vizije.
+    U poslednje dve decenije, opšte je prihvaceno da je napredak u detekciji objekata
+    generalno prošao kroz dva istorijska perioda (Zou et all., 2019): tradicionalni period
+    otkrivanja objekata (pre 2014.), i duboki Period detekcije zasnovan na učenju (posle
+    2014.). Poslednjih godina, došlo je do brzog razvoj tehnika dubokog učenja (deep
+    learning), za detekciju objekata (LeCun et all., 2015), što je dovelo do izuzetnih
+    otkrica. Detekcija objekata je sada naširoko korišcena u mnogim aplikacijama u
+    stvarnom svetu, kao što su autonomna vožnja, robotski vid, video nadzor, itd (Zou
+    et all., 2019).
+    Takodje, u poslednjih nekoliko godina učinak detekcije objekata je značajno po-
+    boljšan zahvaljujući dubokoj konvolucionoj neuronskoj mreži (Convolutional Neural
+    Networks, CNN), kao i okvira za otkrivanje objekata (Girshick et all., 2014; Ren et
+    all., 2015; Kang et all., 2017; Amit et all., 2020).
+1.2 Augmentacija podataka
+    Kompjuterska vizija je izuzetno mocna altka koja ima visoke primene, kao i celo masinsko ucenje
+    zahteva ogromnu kolicinu podataka. Nekada je ne moguce nabaviti doboljnu kolicinu podatka kako bi se
+    modeli ispravno naucili i to predstavlja veliku prepreku. Razvijanjem Masinskog ucenja razvijen je koncept
+    Generative Adversarial Nets ( GANs). Koncept je prost, mreza se sastoji od 2 modela Generator i Diskriminator.
+    Generator za zadatak ima da generise slike a Diskriminator da razlikuje generisane slike generatora od
+    pravih slika. Oni nasumicno uce i mozemo kazati da je rezultat zadovoljavajuci kada diskirminator ima preciznost
+    oko 50%, tacnije nagadja da li je slika prava ili ne.
+
+    Tokom razvijanja GAN-ova mnogo se vise fokusiralo na poboljsanje samog Diskriminatora, sto je dovodilo boljim rezultatima.
+    NVIDI-ni istrazivaci su uzeli da se krecu drugim putem, te poboljsavaju sam generator (STYLEGAN2). Zasniva se na principu 
+    da ulaz bude povezana mreza i pre samog ulaska u generator, time nam je omoguceno da se 'krecemo' po latentom prostoru i sami 
+    biramo ( zab sam rec )....
+
+    Takodje styleGan nam omogucavaju da 'spojimo' 2 slike u jednu ( pistati o tome)
+
+    

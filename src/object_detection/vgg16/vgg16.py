@@ -77,7 +77,7 @@ def create_model(weights = False):
         weights = 'imagenet'
     else:
         weights = None
-    vgg=VGG16(weights=None, include_top=False,input_tensor=Input(shape=(224,224,3)))
+    vgg=VGG16(weights=weights, include_top=False,input_tensor=Input(shape=(224,224,3)))
     flatten = vgg.output
     flatten = Flatten()(flatten)
 

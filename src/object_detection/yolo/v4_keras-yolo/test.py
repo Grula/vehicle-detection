@@ -31,9 +31,16 @@ def get_anchors(anchors_path):
 
 if __name__ == '__main__':
 
-    model_path = 'model_data/yolo4_weight.h5'
-    anchors_path = 'model_data/yolo4_anchors.txt'
+    model_path = 'model_data/custom_trained_weights.h5'
     classes_path = 'model_data/custom_classes.txt'
+    model_image_size = (416, 416)
+    
+    # model_path = 'model_data/yolo4_weight.h5'
+    # classes_path = 'model_data/coco_classes.txt'
+    # model_image_size = (608, 608)
+    
+    
+    anchors_path = 'model_data/yolo4_anchors.txt'
 
     class_names = get_class(classes_path)
     anchors = get_anchors(anchors_path)
@@ -41,10 +48,9 @@ if __name__ == '__main__':
     num_anchors = len(anchors)
     num_classes = len(class_names)
 
-    model_image_size = (416, 416)
 
-    conf_thresh = 0.2
-    nms_thresh = 0.45
+    conf_thresh = 0.8
+    nms_thresh = 0.7
 
     yolo4_model = yolo4_body(Input(shape=model_image_size+(3,)), num_anchors//3, num_classes)
 
@@ -55,17 +61,13 @@ if __name__ == '__main__':
 
     _decode = Decode(conf_thresh, nms_thresh, model_image_size, yolo4_model, class_names)
 
-    while True:
-        img = input('Input image filename:')
-        try:
-            image = cv2.imread(img)
-        except:
-            print('Open Error! Try again!')
-            continue
-        else:
-            image, boxes, scores, classes = _decode.detect_image(image, True)
-            cv2.imshow('image', image)
-            cv2.waitKey(0)
-            cv2.destroyAllWindows()
-
-    yolo4_model.close_session()
+    images_path = 'images'
+    # detect images in test floder.
+    for (root, dirs, files) in os.walk(images_path):
+        if files:
+            for f in files:
+                path = os.path.join(root, f)
+                image = cv2.imread(path)
+                image, boxes, scores, classes = _decode.detect_image(image, True)
+                print("Detecing image: {}".format(path))
+                cv2.imwrite('pred_images/' + f, image)

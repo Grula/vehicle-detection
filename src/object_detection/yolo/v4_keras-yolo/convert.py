@@ -37,6 +37,9 @@ def unique_config_sections(config_file):
 def main():
     config_path = "custom_yolov4.cfg"
     output_path = 'model_data/yolo4_weight.h5'
+    
+    # config_path = "yolov4.cfg"
+    # output_path = 'model_data/yolo4_weight.h5'
     weights_path = 'model_data/yolov4.weights'
     weights_only = False
 

@@ -1,26 +1,68 @@
 
 
 4.1 Vgg16
-Koriscenem mreze vgg16 postizemo rezultate koa i ocekivano. Mreza zbog nedostatka podataka nije naucila nista, konvergira nakon 37 epoha ucenja i daje sledece rezultate:
+VGG16 je vrsta modela Konvolutivne neuronske mreze. Arhitektura je data na slici, sluzi za nalazenje karakteristika. U nasem slucaju potrebno je klasifikovati slike (4 klase) i
+pronaci Okvire objekta na slici. Koristimo mrezu kao jednostepeni model, izlaz VGG16 mreze ce se racvati u 2 duboko povezana nivoa. Prvi nivo ce sluziti za pronalazenje okvira i  izlaz mreze ce biti sa 4 neurona sa sigmoidnom aktivacionom funkcjom, dok drugi deo mreze ce takodje imati izlaz od 4 neurona sa softmax funkcijom za klasifikaciju objekta.  
+Koriscenem mreze vgg16 postizemo rezultate koa i ocekivano. Mreza zbog nedostatka podataka ne uci nista, konvergira u lokalni min nakon 37 epoha i daje sledece rezultate:
 	car:  car
 	truck:  car
 	bus:  car
 	motorcycle:  car
 kao i slike:
- SLIKE KEKW
 
-Kao sto mozemo videti zbog najvece kolicine podataka kola, mreze je overfitovana. Za okvire smo koristili
+	#########
+	#########
+	#########
+
+iz rezultata mozemo da zakljucimo da je regresivnom metodom skoro pa nemoguce dobiti dobre rezultate kako su skoro svi okviri isto pozicionirani. Nedovoljna kolicina podataka
+drasticno doprinosi time. Takodje predikcija se svodi na kola kako je ta klasa najzastupljenija u nasim podacima.
 
 Treniramo vgg16 sa transfer learning metodom od tezina IMAGENET-a
 
+TODO: imam poteskoca sa memorijom graficke karte, in progress 
 ...
 
 
 4.2 YOLO - transfer learning
-Za pocetnnu predikciju mreze koristimo Yolo v3, mreza daje solidne rezultate pri detekciji kamiona i motorcikala na slikama za validaciju, ali pravi gresku sa na automobilima sa verovatnocom >90% a autobus se uopste ne detektuje. Kao pocetne tezine koristili smo od COCO dataseta. Sam dataset sadrzi 80 klasa, ali smo mi spustili na 4 i malo modifikovali mrezu na ordedjenim izlazima.
-Za metod transfernog ucenja koristicemo mrezu yolo v4. Razlike u odnosu na v3 su sitna poboljsanja i funkcija gubitka.
-Funkcija gubitka je .... (treba nabubati ovo cudo) .... .
-Slike su trenirane na rezoluciji 416x416, sveukupno 150epoha. Na njima se vrsi bazicna augmentacija tokom treniranja. Rezultati su sledeci,
+Kako je YOLO jedan od boljih standarda, pokusavamo da izvrsimo predikciju na slikama bez ikakvog dodatnoh ucenja. Tezine preuzimamo od oficijalnog rada koji je 
+treniran na COCO datasetu koji sadrzi 80 klasa i 328 hiljada slika. Detekcija objekta je vrsena na sledecim slikama i dobijeni rezultati su:
+
+\begin{center}
+\begin{tabular}{c c}
+\hline class & prediction \\
+\hline\hline
+ car_0 & truck \\ 
+ car_1 & car \\ 
+ truck & truck  \\  
+ bus & None \\   
+ motorbike_0 & None \\  
+ motorbike_1 & motorbike \\  
+\end{tabular}
+\end{center}
+
+Iz rezultata, pa i iz samih slika mozemo da vidimo da mreza daje solidne rezultate pri detekciji kamiona i motor na slikama za validaciju. Pravi gresku  automobilima sa verovatnocom >90%, a autobus i jedan motor se uopste ne detektuje.
+
+
+Kako bi smo poboljsali rezultat, pomocu transfernog ucenja doucavamo model na nasim slikama. Za metod transfernog ucenja koristicemo mrezu Yolo v4. Razlike u odnosu na YOLO v3 su sitna poboljsanja i malo modifikovana funkcija gubitka.
+Funkcija gubitka je .... (Iskodirati sume...) .... .
+Slike su trenirane na rezoluciji 416x416, sveukupno 150epoha, dok nakon 50 epoha stepen ucenja se postepeno smanjuje kako bi smo se priblizili globalnom minimumu.
+Dobijeni rezultati su sledeci
+
+\begin{center}
+\begin{tabular}{c c}
+\hline class & prediction \\
+\hline\hline
+ car_0 & car \\ 
+ car_1 & car \\ 
+ truck & car  \\  
+ bus & car \\   
+ motorbike_0 & motorbike \\  
+ motorbike_1 & motorbike \\  
+\end{tabular}
+\end{center}
+
+Iz rezultata mozemo odmah da zakljucimo da kolicina podataka koja je koriscena za klase BUS i TRUCK je nedovoljna, pa ih model ne klasifikuje dovoljno. Sa slika mozemo da vidimo da okviri pristojno gadjaju same objekte.
+Tokom ucenja fje gubitka i preciznosti izgledaju ovako 
 
 Grafikoni koji ce doci uskoro jer se mreza jso trenira
 

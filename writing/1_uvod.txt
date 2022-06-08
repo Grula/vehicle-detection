@@ -1,3 +1,10 @@
+0.0 Abstrakt 
+    U danasnje vreme detekcija objekta dostize veoma visok znacaj, stim prikupljanje samih podataka, i snaga potrebna za njihovo obradjivanje. Sta se desava
+    kada nije dostupna kompijuterska snaga za njihovu obradu, ako takodje nije dostupna dovoljna kolicina podataka, ali iz samih podataka mozemo izvuci dovoljno informacija?
+    U ovom radu se bavimo takvim pitanjem, sa ogranicenom procerskorom snagom, memorijom i kolicinom podataka. Primenjujemo metode transfernog ucenja, dopunjavanja podataka GAN-ovima
+    i bazicnim augmentacijama.
+
+
 Razvojni put detekcije objekata
 
 

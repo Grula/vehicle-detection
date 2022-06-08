@@ -21,7 +21,8 @@ from training import misc
 # ----------------------------------------------------------------------------
 
 
-def run(dataset, resolution, result_dir, DiffAugment, num_gpus, batch_size, total_kimg, ema_kimg, num_samples, gamma, fmap_base, fmap_max, latent_size, mirror_augment, impl, metrics, resume, resume_kimg, num_repeats, eval):
+def run(dataset, resolution, result_dir, DiffAugment, num_gpus, batch_size, total_kimg, ema_kimg, num_samples, 
+        gamma, fmap_base, fmap_max, latent_size, mirror_augment, impl, metrics, resume, resume_kimg, num_repeats, eval):
     train = EasyDict(run_func_name='training.training_loop.training_loop')  # Options for training loop.
     G = EasyDict(func_name='training.networks_stylegan2.G_main')       # Options for generator network.
     D = EasyDict(func_name='training.networks_stylegan2.D_stylegan2')  # Options for discriminator network.
@@ -128,7 +129,7 @@ def _parse_comma_sep(s):
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Train StyleGAN2 + DiffAugment.',
+        description='Train StyleGAN2 + DiffAugment + Custom augmentation by Nikola :).',
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
     parser.add_argument('--dataset', help='Training dataset path', required=True)
@@ -150,7 +151,7 @@ def main():
     parser.add_argument('--resume', help='Resume checkpoint path', default=None)
     parser.add_argument('--resume-kimg', help='Resume training length', default=0, type=int)
     parser.add_argument('--num-repeats', help='Repeats of evaluation runs (default: %(default)s)', default=1, type=int, metavar='N')
-    
+
     parser.add_argument('--eval', help='Evalulate mode?', action='store_true')
 
     args = parser.parse_args()

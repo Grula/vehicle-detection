@@ -36,7 +36,7 @@ class Trainer(object):
         self.max_steps = int(np.ceil(self.n_total_image / self.global_batch_size))
         self.n_samples = min(t_params['batch_size'], t_params['n_samples'])
         self.train_res = t_params['train_res']
-        self.print_step = 10
+        self.print_step = 1
         self.save_step = 100
         self.image_summary_step = 100
         self.reached_max_steps = False

@@ -404,7 +404,6 @@ def main():
     with strategy.scope():
         # distribute dataset
         dist_ds = strategy.experimental_distribute_dataset(ds)
-        print(dist_ds)
         # training parameters
         training_parameters = {
             # global params
@@ -420,7 +419,7 @@ def main():
             'g_opt': {'learning_rate': 0.002, 'beta1': 0.0, 'beta2': 0.99, 'epsilon': 1e-08, 'reg_interval': 8},
             'd_opt': {'learning_rate': 0.002, 'beta1': 0.0, 'beta2': 0.99, 'epsilon': 1e-08, 'reg_interval': 16},
             'batch_size': global_batch_size,
-            'n_total_image': 25000000,
+            'n_total_image': 10*1000,
             'n_samples': 3,
             'train_res': args['train_res'],
         }

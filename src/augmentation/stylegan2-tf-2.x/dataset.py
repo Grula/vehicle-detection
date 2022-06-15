@@ -2,19 +2,18 @@ import os
 import numpy as np
 import tensorflow as tf
 
-res = (64, 64)
 
-def _parse_file(filename):
+def _parse_file(filename, res = 256):
     image_string = tf.io.read_file(filename)
     image = tf.image.decode_jpeg(image_string, channels=3)
 
-    image = tf.image.resize(image, res)
+    image = tf.image.resize(image, (res, res))
     image = tf.cast(image, tf.float32)
     image = image / 127.5 - 1.0
     image = tf.transpose(image, perm=[2, 0, 1])
     return image
 
-def create_dataset(data_base_dir, batch_size, epochs=None,):
+def create_dataset(data_base_dir, batch_size, resolution = 256, epochs=None,):
     # creating absolute path
     data_base_dir = os.path.abspath(data_base_dir)
     
@@ -26,7 +25,7 @@ def create_dataset(data_base_dir, batch_size, epochs=None,):
     filenames = tf.constant(filenames)
     dataset = tf.data.Dataset.from_tensor_slices(filenames)
    
-    dataset = dataset.map(_parse_file)
+    dataset = dataset.map(lambda x: _parse_file(x, resolution))
     dataset = dataset.shuffle(buffer_size=1000)
     dataset = dataset.repeat(epochs)
     dataset = dataset.batch(batch_size)

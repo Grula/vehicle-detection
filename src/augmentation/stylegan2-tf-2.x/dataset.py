@@ -8,8 +8,7 @@ def _parse_file(filename):
     image_string = tf.io.read_file(filename)
     image = tf.image.decode_jpeg(image_string, channels=3)
 
-    # image = tf.image.resize(image, RES)
-
+    image = tf.image.resize(image, RES)
     image = tf.transpose(image, perm=[1, 2, 0])
     image = tf.cast(image, tf.float32)
     image = image / 127.5 - 1.0
@@ -17,6 +16,13 @@ def _parse_file(filename):
     return image
 
 def create_dataset(data_base_dir, batch_size, epochs=None,):
+    # creating absolute path
+    data_base_dir = os.path.abspath(data_base_dir)
+    
+    filenames = os.listdir(data_base_dir)
+    # add absolute path to each file
+    filenames = [os.path.join(data_base_dir, filename) for filename in filenames]
+
     filenames = tf.constant(os.listdir(data_base_dir))
     dataset = tf.data.Dataset.from_tensor_slices(filenames)
    

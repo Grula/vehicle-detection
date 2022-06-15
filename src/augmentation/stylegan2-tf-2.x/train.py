@@ -403,8 +403,8 @@ def main():
 
     with strategy.scope():
         # distribute dataset
-        dist_dataset = strategy.experimental_distribute_dataset(ds)
-
+        dist_ds = strategy.experimental_distribute_dataset(ds)
+        print(dist_ds)
         # training parameters
         training_parameters = {
             # global params
@@ -425,8 +425,8 @@ def main():
             'train_res': args['train_res'],
         }
 
-        trainer = Trainer(training_parameters, name=f'stylegan2-ffhq-{args["train_res"]}x{args["train_res"]}')
-        trainer.train(dist_dataset, strategy)
+        trainer = Trainer(training_parameters, name=f'stylegan2-vehicles-{args["train_res"]}x{args["train_res"]}')
+        trainer.train(dist_ds, strategy)
     return
 
 

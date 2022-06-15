@@ -398,7 +398,7 @@ def main():
     global_batch_size = args['batch_size_per_replica'] * strategy.num_replicas_in_sync
 
     # Creating dataset from folder
-    ds = create_dataset(args['images_dir'], batch_size=global_batch_size, epochs=None)
+    ds = create_dataset(args['images_dir'], batch_size=global_batch_size, resolution = args['train_res'], epochs=None)
 
 
     with strategy.scope():

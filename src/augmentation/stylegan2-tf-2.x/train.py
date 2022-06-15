@@ -356,6 +356,7 @@ def main():
     parser.add_argument('--model_base_dir', default='./models', type=str)
     # parser.add_argument('--tfrecord_dir', default='./tfrecords', type=str)
     parser.add_argument('--images_dir', default='./data', nargs='?', type=str)
+    parser.add_argument('--kimages', default=250000, nargs='?', type=int)
 
     parser.add_argument('--train_res', default=256, type=int)
     parser.add_argument('--shuffle_buffer_size', default=1000, type=int)
@@ -386,15 +387,17 @@ def main():
         'featuremaps': train_featuremaps,
     }
 
-    # Using TPU
-    # resolver = tf.distribute.cluster_resolver.TPUClusterResolver(tpu='')
-    # tf.config.experimental_connect_to_cluster(resolver)
-    # tf.tpu.experimental.initialize_tpu_system(resolver)
-    # strategy = tf.distribute.TPUStrategy(resolver)
+    
+    if tf.config.experimental.list_physical_devices('TPU'):
+        # Prepare TPU strategy
+        resolver = tf.distribute.cluster_resolver.TPUClusterResolver(tpu='')
+        tf.config.experimental_connect_to_cluster(resolver)
+        tf.tpu.experimental.initialize_tpu_system(resolver)
+        strategy = tf.distribute.TPUStrategy(resolver)
+    elif tf.config.experimental.list_physical_devices('GPU'):
+        # prepare distribute strategy
+        strategy = tf.distribute.MirroredStrategy()
 
-
-    # prepare distribute strategy
-    strategy = tf.distribute.MirroredStrategy()
     global_batch_size = args['batch_size_per_replica'] * strategy.num_replicas_in_sync
 
     # Creating dataset from folder
@@ -419,7 +422,7 @@ def main():
             'g_opt': {'learning_rate': 0.002, 'beta1': 0.0, 'beta2': 0.99, 'epsilon': 1e-08, 'reg_interval': 8},
             'd_opt': {'learning_rate': 0.002, 'beta1': 0.0, 'beta2': 0.99, 'epsilon': 1e-08, 'reg_interval': 16},
             'batch_size': global_batch_size,
-            'n_total_image': 10*1000,
+            'n_total_image': args['kimages'],
             'n_samples': 3,
             'train_res': args['train_res'],
         }

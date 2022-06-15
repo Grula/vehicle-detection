@@ -9,7 +9,6 @@ def _parse_file(filename):
     image = tf.image.decode_jpeg(image_string, channels=3)
 
     image = tf.image.resize(image, res)
-    image = tf.transpose(image, perm=[1, 2, 0])
     image = tf.cast(image, tf.float32)
     image = image / 127.5 - 1.0
     image = tf.transpose(image, perm=[2, 0, 1])

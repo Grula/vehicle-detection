@@ -44,21 +44,8 @@ def main():
     res = 64
     batch_size = 4
     epochs = 1
-    tfrecord_dir = './tfrecords'
 
-    # dataset = get_ffhq_dataset(tfrecord_dir, res, batch_size, epochs)
-
-    # for real_images in dataset.take(4):
-    #     # real_images: [batch_size, 3, res, res] (-1.0 ~ 1.0) float32
-    #     print(real_images.shape)
-
-    #     images = real_images.numpy()
-    #     images = np.transpose(images, axes=(0, 2, 3, 1))
-    #     images = (images + 1.0) * 127.5
-    #     images = images.astype(np.uint8)
-    #     image = Image.fromarray(images[0])
-    #     image.show()
-    # return
+    
 
 
 if __name__ == '__main__':

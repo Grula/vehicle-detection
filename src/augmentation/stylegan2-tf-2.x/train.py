@@ -354,7 +354,6 @@ def main():
     parser.add_argument('--use_custom_cuda', type=str_to_bool, nargs='?', const=True, default=True)
 
     parser.add_argument('--model_base_dir', default='./models', type=str)
-    # parser.add_argument('--tfrecord_dir', default='./tfrecords', type=str)
     parser.add_argument('--images_dir', default='./data', nargs='?', type=str)
     parser.add_argument('--kimages', default=250000, nargs='?', type=int)
 

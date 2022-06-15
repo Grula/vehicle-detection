@@ -24,6 +24,7 @@ def d_logistic_r1_reg(real_images, generator, discriminator, z_dim, labels=None)
     if labels is None:
         labels = tf.random.normal(shape=[batch_size, 0], dtype=tf.float32)
 
+    # !!! missing implementation of diff augmentations !!! 
     # forward pass
     fake_images = generator([z, labels], training=True)
     real_scores = discriminator([real_images, labels], training=True)

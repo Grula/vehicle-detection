@@ -117,7 +117,7 @@ def get_plugin(cuda_file):
                             ln = ln.replace(bad_file_str, good_file_str)
                             md5.update(ln)
                     md5.update(b'\n')
-
+        
         # Select compiler options.
         compile_opts = ''
         if os.name == 'nt':
@@ -136,6 +136,8 @@ def get_plugin(cuda_file):
         md5.update(('tf.VERSION: ' + tf.version.VERSION).encode('utf-8') + b'\n')
         md5.update(('cuda_cache_version_tag: ' + cuda_cache_version_tag).encode('utf-8') + b'\n')
 
+        # Ingoring my old card 
+
         # Compile if not already compiled.
         bin_file_ext = '.dll' if os.name == 'nt' else '.so'
         bin_file = os.path.join(cuda_cache_path, cuda_file_name + '_' + md5.hexdigest() + bin_file_ext)
@@ -144,7 +146,8 @@ def get_plugin(cuda_file):
                 print('Compiling... ', end='', flush=True)
             with tempfile.TemporaryDirectory() as tmp_dir:
                 tmp_file = os.path.join(tmp_dir, cuda_file_name + '_tmp' + bin_file_ext)
-                _run_cmd(nvcc_cmd + ' "%s" --shared -o "%s" --keep --keep-dir "%s"' % (cuda_file, tmp_file, tmp_dir))
+                # -Wno-deprecated-gpu-targets - just ignoring that my GPU is old af
+                _run_cmd(nvcc_cmd + ' "%s" --shared -o "%s" --keep --keep-dir "%s" -Wno-deprecated-gpu-targets' % (cuda_file, tmp_file, tmp_dir))
                 os.makedirs(cuda_cache_path, exist_ok=True)
                 intermediate_file = os.path.join(cuda_cache_path, cuda_file_name + '_' + uuid.uuid4().hex + '_tmp' + bin_file_ext)
                 shutil.copyfile(tmp_file, intermediate_file)

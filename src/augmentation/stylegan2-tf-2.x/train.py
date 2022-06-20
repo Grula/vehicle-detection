@@ -359,7 +359,6 @@ def main():
     parser.add_argument('--kimages', default=250, nargs='?', type=int)
 
     parser.add_argument('--train_res', default=256, type=int)
-    parser.add_argument('--shuffle_buffer_size', default=1000, type=int)
     parser.add_argument('--batch_size_per_replica', default=4, type=int)
     args = vars(parser.parse_args())
 
@@ -367,7 +366,7 @@ def main():
     if args['allow_memory_growth']:
         allow_memory_growth()
     if args['debug_split_gpu']:
-        split_gpu_for_testing(mem_in_gb=4.5)
+        split_gpu_for_testing(mem_in_gb=2)
 
     # network params
     resolutions = [4, 8, 16, 32, 64, 128, 256, 512, 1024]
@@ -388,20 +387,20 @@ def main():
     }
 
     
-    if tf.config.experimental.list_physical_devices('TPU'):
+    try:
         # Prepare TPU strategy
-        resolver = tf.distribute.cluster_resolver.TPUClusterResolver(tpu='')
+        resolver = tf.distribute.cluster_resolver.TPUClusterResolver()
         tf.config.experimental_connect_to_cluster(resolver)
         tf.tpu.experimental.initialize_tpu_system(resolver)
         strategy = tf.distribute.TPUStrategy(resolver)
-    elif tf.config.experimental.list_physical_devices('GPU'):
-        # prepare distribute strategy
-        strategy = tf.distribute.MirroredStrategy()
-    else:
-        raise ValueError('No GPU/TPU devices found.')
+    except:
+        if tf.config.experimental.list_physical_devices('GPU'):
+            # prepare distribute strategy
+            strategy = tf.distribute.MirroredStrategy()
+        else:
+            raise ValueError('No GPU/TPU devices found.')
 
     global_batch_size = args['batch_size_per_replica'] * strategy.num_replicas_in_sync
-
     # Creating dataset from folder
     ds = create_dataset(args['images_dir'], batch_size=global_batch_size, resolution = args['train_res'], epochs=None)
 

@@ -1,5 +1,8 @@
 import tensorflow as tf
 
+from DiffAugment_tf2 import DiffAugment
+
+
 
 def d_logistic(real_images, generator, discriminator, z_dim, labels=None):
     batch_size = tf.shape(real_images)[0]

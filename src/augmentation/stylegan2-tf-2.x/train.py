@@ -296,6 +296,7 @@ class Trainer(object):
                 with train_summary_writer.as_default():
                     tf.summary.image('images', summary_image, step=step)
 
+
             # print every self.print_steps
             if step % self.print_step == 0:
                 elapsed = time.time() - t_start
@@ -355,7 +356,7 @@ def main():
 
     parser.add_argument('--model_base_dir', default='./models', type=str)
     parser.add_argument('--images_dir', default='./data', nargs='?', type=str)
-    parser.add_argument('--kimages', default=250000, nargs='?', type=int)
+    parser.add_argument('--kimages', default=250, nargs='?', type=int)
 
     parser.add_argument('--train_res', default=256, type=int)
     parser.add_argument('--shuffle_buffer_size', default=1000, type=int)
@@ -396,6 +397,8 @@ def main():
     elif tf.config.experimental.list_physical_devices('GPU'):
         # prepare distribute strategy
         strategy = tf.distribute.MirroredStrategy()
+    else:
+        raise ValueError('No GPU/TPU devices found.')
 
     global_batch_size = args['batch_size_per_replica'] * strategy.num_replicas_in_sync
 
@@ -421,7 +424,7 @@ def main():
             'g_opt': {'learning_rate': 0.002, 'beta1': 0.0, 'beta2': 0.99, 'epsilon': 1e-08, 'reg_interval': 8},
             'd_opt': {'learning_rate': 0.002, 'beta1': 0.0, 'beta2': 0.99, 'epsilon': 1e-08, 'reg_interval': 16},
             'batch_size': global_batch_size,
-            'n_total_image': args['kimages'],
+            'n_total_image': args['kimages']*1000,
             'n_samples': 3,
             'train_res': args['train_res'],
         }

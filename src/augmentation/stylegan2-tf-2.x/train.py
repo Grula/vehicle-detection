@@ -387,18 +387,17 @@ def main():
     }
 
     
-    try:
+    if tf.config.experimental.list_physical_devices('TPU'):
         # Prepare TPU strategy
         resolver = tf.distribute.cluster_resolver.TPUClusterResolver()
         tf.config.experimental_connect_to_cluster(resolver)
         tf.tpu.experimental.initialize_tpu_system(resolver)
         strategy = tf.distribute.TPUStrategy(resolver)
-    except:
-        if tf.config.experimental.list_physical_devices('GPU'):
-            # prepare distribute strategy
-            strategy = tf.distribute.MirroredStrategy()
-        else:
-            raise ValueError('No GPU/TPU devices found.')
+    elif tf.config.experimental.list_physical_devices('GPU'):
+        # prepare distribute strategy
+        strategy = tf.distribute.MirroredStrategy()
+    else:
+        raise ValueError('No GPU/TPU devices found.')
 
     global_batch_size = args['batch_size_per_replica'] * strategy.num_replicas_in_sync
     # Creating dataset from folder

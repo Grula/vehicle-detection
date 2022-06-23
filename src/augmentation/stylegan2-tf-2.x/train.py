@@ -181,7 +181,7 @@ class Trainer(object):
 
     def train(self, dist_datasets, strategy):
         def dist_d_train_step(inputs):
-            per_replica_losses = tf.function(strategy.run(fn=self.d_train_step, args=(inputs,)))
+            per_replica_losses = strategy.run(fn=self.d_train_step, args=(inputs,))
             mean_d_loss = strategy.reduce(tf.distribute.ReduceOp.SUM, per_replica_losses, axis=None)
             return mean_d_loss
 

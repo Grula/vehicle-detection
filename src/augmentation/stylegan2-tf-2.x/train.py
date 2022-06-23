@@ -36,8 +36,8 @@ class Trainer(object):
         self.max_steps = int(np.ceil(self.n_total_image / self.global_batch_size))
         self.n_samples = min(t_params['batch_size'], t_params['n_samples'])
         self.train_res = t_params['train_res']
-        self.print_step = 1
-        self.save_step = 100
+        self.print_step = 10
+        self.save_step = 1000
         self.image_summary_step = 100
         self.reached_max_steps = False
         self.log_template = '{:s}, {:s}, {:s}'.format(
@@ -181,7 +181,7 @@ class Trainer(object):
 
     def train(self, dist_datasets, strategy):
         def dist_d_train_step(inputs):
-            per_replica_losses = strategy.run(fn=self.d_train_step, args=(inputs,))
+            per_replica_losses = tf.function(strategy.run(fn=self.d_train_step, args=(inputs,)))
             mean_d_loss = strategy.reduce(tf.distribute.ReduceOp.SUM, per_replica_losses, axis=None)
             return mean_d_loss
 
@@ -392,7 +392,7 @@ def main():
         resolver = tf.distribute.cluster_resolver.TPUClusterResolver()
         tf.config.experimental_connect_to_cluster(resolver)
         tf.tpu.experimental.initialize_tpu_system(resolver)
-        strategy = tf.distribute.TPUStrategy(resolver)
+        strategy = tf.distribute.TPUStrategy(resolver) 
     elif tf.config.experimental.list_physical_devices('GPU'):
         # prepare distribute strategy
         strategy = tf.distribute.MirroredStrategy()

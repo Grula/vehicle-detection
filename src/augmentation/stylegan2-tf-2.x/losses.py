@@ -13,8 +13,8 @@ def d_logistic(real_images, generator, discriminator, z_dim, labels=None):
     # forward pass
     fake_images = generator([z, labels], training=True)
     
-    # real_images = DiffAugment(real_images)
-    # fake_images = DiffAugment(fake_images)
+    real_images = DiffAugment(real_images)
+    fake_images = DiffAugment(fake_images)
 
     real_scores = discriminator([real_images, labels], training=True)
     fake_scores = discriminator([fake_images, labels], training=True)

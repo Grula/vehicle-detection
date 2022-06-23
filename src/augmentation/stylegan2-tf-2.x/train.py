@@ -41,7 +41,7 @@ class Trainer(object):
         self.image_summary_step = 100
         self.reached_max_steps = False
         self.log_template = '{:s}, {:s}, {:s}'.format(
-            'step {}/{self.max_steps}: elapsed: {:.2f}s, d_loss: {:.3f}, g_loss: {:.3f}',
+            'step {}/{}: elapsed: {:.2f}s, d_loss: {:.3f}, g_loss: {:.3f}',
             'd_gan_loss: {:.3f}, g_gan_loss: {:.3f}',
             'r1_penalty: {:.3f}, pl_penalty: {:.3f}')
 
@@ -300,7 +300,7 @@ class Trainer(object):
             # print every self.print_steps
             if step % self.print_step == 0:
                 elapsed = time.time() - t_start
-                print(self.log_template.format(step, elapsed, d_loss.numpy(), g_loss.numpy(),
+                print(self.log_template.format(step, self.max_steps, elapsed, d_loss.numpy(), g_loss.numpy(),
                                                d_gan_loss.numpy(), g_gan_loss.numpy(),
                                                r1_penalty.numpy(), pl_penalty.numpy()))
 

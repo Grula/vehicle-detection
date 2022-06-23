@@ -1,0 +1,6 @@
+# Exprot for CUDA error
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CONDA_PREFIX/lib/
+
+# Running code
+python train.py --use_custom_cuda 0 --train_res 64 --kimages 1 
+

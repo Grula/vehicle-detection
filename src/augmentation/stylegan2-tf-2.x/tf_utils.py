@@ -5,11 +5,11 @@ from distutils.version import StrictVersion
 
 def allow_memory_growth():
     gpus = tf.config.experimental.list_physical_devices('GPU')
-    print("Current GPUs: ", gpus if gpus else "None")
+    print("Found GPUs: ", gpus if gpus else "None")
 
     # Preparing for future use instead of GPU
     tpus = tf.config.experimental.list_physical_devices('TPU')
-    print("Current TPUs: ", tpus if tpus else "None")
+    print("Found TPUs: ", tpus if tpus else "None")
 
     if gpus:
         try:

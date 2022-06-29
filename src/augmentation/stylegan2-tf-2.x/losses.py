@@ -13,8 +13,8 @@ def d_logistic(real_images, generator, discriminator, z_dim, labels=None):
     # forward pass
     fake_images = generator([z, labels], training=True)
     
-    real_images = DiffAugment(real_images)
-    fake_images = DiffAugment(fake_images)
+    # real_images = DiffAugment(real_images, policy='color_shift')
+    # fake_images = DiffAugment(fake_images, policy='color_shift')
 
     real_scores = discriminator([real_images, labels], training=True)
     fake_scores = discriminator([fake_images, labels], training=True)
@@ -31,7 +31,6 @@ def d_logistic_r1_reg(real_images, generator, discriminator, z_dim, labels=None)
     if labels is None:
         labels = tf.random.normal(shape=[batch_size, 0], dtype=tf.float32)
 
-    # !!! missing implementation of diff augmentations !!! 
     # forward pass
     fake_images = generator([z, labels], training=True)
     real_scores = discriminator([real_images, labels], training=True)

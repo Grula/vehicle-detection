@@ -297,7 +297,7 @@ class Trainer(object):
 
                 with train_summary_writer.as_default():
                     saved_image_summary = tf.summary.image('images', summary_image, step=step)
-                    print('Saved image summary: ', saved_image_summary)
+                    print('Saved image summary: ', saved_image_summary[0])
 
             # print every self.print_steps
             if step % self.print_step == 0:

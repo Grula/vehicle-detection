@@ -33,6 +33,7 @@ class Trainer(object):
         self.model_base_dir = t_params['model_base_dir']
         self.global_batch_size = t_params['batch_size']
         self.n_total_image = t_params['n_total_image']
+        self.policy = t_params['policy']
         self.max_steps = int(np.ceil(self.n_total_image / self.global_batch_size))
         self.n_samples = min(t_params['batch_size'], t_params['n_samples'])
         self.train_res = t_params['train_res']
@@ -79,6 +80,7 @@ class Trainer(object):
 
         # setup saving locations (object based savings)
         self.ckpt_dir = os.path.join(self.model_base_dir, name)
+        self.log_dir = os.path.join(self.model_base_dir, 'logs')
         self.ckpt = tf.train.Checkpoint(d_optimizer=self.d_optimizer,
                                         g_optimizer=self.g_optimizer,
                                         discriminator=self.discriminator,
@@ -115,7 +117,7 @@ class Trainer(object):
 
         with tf.GradientTape() as d_tape:
             # compute losses
-            d_loss = d_logistic(real_images, self.generator, self.discriminator, self.g_params['z_dim'])
+            d_loss = d_logistic(real_images, self.generator, self.discriminator, self.g_params['z_dim'], self.policy)
 
             # scale loss
             d_loss = tf.reduce_sum(d_loss) * self.global_batch_scaler
@@ -130,7 +132,7 @@ class Trainer(object):
         with tf.GradientTape() as d_tape:
             # compute losses
             d_gan_loss, r1_penalty = d_logistic_r1_reg(real_images, self.generator, self.discriminator,
-                                                       self.g_params['z_dim'])
+                                                       self.g_params['z_dim'], self.policy)
             r1_penalty = r1_penalty * (0.5 * self.r1_gamma) * self.d_opt['reg_interval']
 
             # scale losses
@@ -149,7 +151,7 @@ class Trainer(object):
 
         with tf.GradientTape() as g_tape:
             # compute losses
-            g_loss = g_logistic_non_saturating(real_images, self.generator, self.discriminator, self.g_params['z_dim'])
+            g_loss = g_logistic_non_saturating(real_images, self.generator, self.discriminator, self.g_params['z_dim'], self.policy)
 
             # scale loss
             g_loss = tf.reduce_sum(g_loss) * self.global_batch_scaler
@@ -165,7 +167,7 @@ class Trainer(object):
             # compute losses
             g_gan_loss, pl_penalty = g_logistic_ns_pathreg(real_images, self.generator, self.discriminator,
                                                            self.g_params['z_dim'], self.pl_mean,
-                                                           self.pl_minibatch_shrink, self.pl_denorm, self.pl_decay)
+                                                           self.pl_minibatch_shrink, self.pl_denorm, self.pl_decay, self.policy)
             pl_penalty = pl_penalty * self.pl_weight * self.g_opt['reg_interval']
 
             # scale loss
@@ -223,7 +225,7 @@ class Trainer(object):
         print('Start Training')
 
         # setup tensorboards
-        train_summary_writer = tf.summary.create_file_writer(self.ckpt_dir)
+        train_summary_writer = tf.summary.create_file_writer(self.log_dir)
 
         # loss metrics
         metric_d_loss = tf.keras.metrics.Mean('d_loss', dtype=tf.float32)
@@ -294,8 +296,8 @@ class Trainer(object):
                 summary_image = self.convert_per_replica_image(summary_image, strategy)
 
                 with train_summary_writer.as_default():
-                    tf.summary.image('images', summary_image, step=step)
-
+                    saved_image_summary = tf.summary.image('images', summary_image, step=step)
+                    print('Saved image summary: ', saved_image_summary)
 
             # print every self.print_steps
             if step % self.print_step == 0:
@@ -350,6 +352,7 @@ def main():
     # Doesnt allocate whole physical memory on physucal device 
     parser.add_argument('--allow_memory_growth', type=str_to_bool, nargs='?', const=True, default=True)
 
+
     parser.add_argument('--debug_split_gpu', type=str_to_bool, nargs='?', const=True, default=False)
     parser.add_argument('--use_tf_function', type=str_to_bool, nargs='?', const=True, default=True)
     parser.add_argument('--use_custom_cuda', type=str_to_bool, nargs='?', const=True, default=True)
@@ -357,6 +360,7 @@ def main():
     parser.add_argument('--model_base_dir', default='./models', type=str)
     parser.add_argument('--images_dir', default='./data', nargs='?', type=str)
     parser.add_argument('--kimages', default=50, nargs='?', type=int)
+    parser.add_argument('--policy', default='color,translation,cutout,color_shift', nargs='?', const=True, default=True)
 
     parser.add_argument('--train_res', default=256, type=int)
     parser.add_argument('--batch_size_per_replica', default=4, type=int)
@@ -413,6 +417,7 @@ def main():
             'use_tf_function': args['use_tf_function'],
             'use_custom_cuda': args['use_custom_cuda'],
             'model_base_dir': args['model_base_dir'],
+            'policy': args['policy'],
 
             # network params
             'g_params': g_params,

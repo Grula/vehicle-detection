@@ -4,7 +4,7 @@ from DiffAugment_tf2 import DiffAugment
 
 
 
-def d_logistic(real_images, generator, discriminator, z_dim, labels=None):
+def d_logistic(real_images, generator, discriminator, z_dim, policy, labels=None):
     batch_size = tf.shape(real_images)[0]
     z = tf.random.normal(shape=[batch_size, z_dim], dtype=tf.float32)
     if labels is None:
@@ -13,8 +13,8 @@ def d_logistic(real_images, generator, discriminator, z_dim, labels=None):
     # forward pass
     fake_images = generator([z, labels], training=True)
     
-    # real_images = DiffAugment(real_images, policy='color_shift')
-    # fake_images = DiffAugment(fake_images, policy='color_shift')
+    real_images = DiffAugment(real_images, policy=policy)
+    fake_images = DiffAugment(fake_images, policy=policy)
 
     real_scores = discriminator([real_images, labels], training=True)
     fake_scores = discriminator([fake_images, labels], training=True)
@@ -25,7 +25,7 @@ def d_logistic(real_images, generator, discriminator, z_dim, labels=None):
     return d_loss
 
 
-def d_logistic_r1_reg(real_images, generator, discriminator, z_dim, labels=None):
+def d_logistic_r1_reg(real_images, generator, discriminator, z_dim, policy, labels=None):
     batch_size = tf.shape(real_images)[0]
     z = tf.random.normal(shape=[batch_size, z_dim], dtype=tf.float32)
     if labels is None:
@@ -33,6 +33,10 @@ def d_logistic_r1_reg(real_images, generator, discriminator, z_dim, labels=None)
 
     # forward pass
     fake_images = generator([z, labels], training=True)
+
+    real_images = DiffAugment(real_images, policy=policy)
+    fake_images = DiffAugment(fake_images, policy=policy)
+
     real_scores = discriminator([real_images, labels], training=True)
     fake_scores = discriminator([fake_images, labels], training=True)
 
@@ -51,7 +55,7 @@ def d_logistic_r1_reg(real_images, generator, discriminator, z_dim, labels=None)
     return d_loss, r1_penalty
 
 
-def g_logistic_non_saturating(real_images, generator, discriminator, z_dim, labels=None):
+def g_logistic_non_saturating(real_images, generator, discriminator, z_dim, policy, labels=None, ):
     batch_size = tf.shape(real_images)[0]
     z = tf.random.normal(shape=[batch_size, z_dim], dtype=tf.float32)
     if labels is None:
@@ -59,6 +63,8 @@ def g_logistic_non_saturating(real_images, generator, discriminator, z_dim, labe
 
     # forward pass
     fake_images = generator([z, labels], training=True)
+    fake_images = DiffAugment(fake_images)
+    
     fake_scores = discriminator([fake_images, labels], training=True)
 
     # gan loss
@@ -68,7 +74,7 @@ def g_logistic_non_saturating(real_images, generator, discriminator, z_dim, labe
 
 def g_logistic_ns_pathreg(real_images, generator, discriminator, z_dim,
                           pl_mean, pl_minibatch_shrink, pl_denorm, pl_decay,
-                          labels=None):
+                          policy, labels=None, ):
     batch_size = tf.shape(real_images)[0]
     z = tf.random.normal(shape=[batch_size, z_dim], dtype=tf.float32)
     if labels is None:
@@ -83,6 +89,8 @@ def g_logistic_ns_pathreg(real_images, generator, discriminator, z_dim,
 
     # forward pass
     fake_images, w_broadcasted = generator([z, labels], ret_w_broadcasted=True, training=True)
+    fake_images = DiffAugment(fake_images)
+    
     fake_scores = discriminator([fake_images, labels], training=True)
     g_loss = tf.math.softplus(-fake_scores)
 

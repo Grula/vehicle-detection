@@ -80,9 +80,15 @@ def rand_color_shift(x):
     return x
 
 
+def rand_color_change(x):
+    # Change all colors that are not gray to a random color
+    x_mean = tf.reduce_mean(x, axis=3, keepdims=True)
+    x = tf.where(tf.greater(x_mean, 0.5), x, tf.random.uniform(tf.shape(x), minval=0, maxval=1, dtype=tf.float32))
+    return x
+
 AUGMENT_FNS = {
     'color': [rand_brightness, rand_saturation, rand_contrast],
     'translation': [rand_translation],
     'cutout': [rand_cutout],
-    'color_shift': [rand_color_shift]
+    'color_shift': [rand_color_shift, rand_color_change]
 }

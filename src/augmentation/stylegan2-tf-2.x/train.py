@@ -360,7 +360,7 @@ def main():
     parser.add_argument('--model_base_dir', default='./models', type=str)
     parser.add_argument('--images_dir', default='./data', nargs='?', type=str)
     parser.add_argument('--kimages', default=50, nargs='?', type=int)
-    parser.add_argument('--policy', default='color,translation,cutout,color_shift', nargs='?', const=True, default=True)
+    parser.add_argument('--policy', default='color,translation,cutout,color_shift', nargs='?', default=True, type=str)
 
     parser.add_argument('--train_res', default=256, type=int)
     parser.add_argument('--batch_size_per_replica', default=4, type=int)

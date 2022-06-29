@@ -11,14 +11,14 @@ import tensorflow as tf
 def DiffAugment(images, policy='', channels_first=True):
     if policy:
         if channels_first:
-            x = tf.transpose(x, [0, 2, 3, 1])
+            images = tf.transpose(images, [0, 2, 3, 1])
         
         for p in policy.split(','):
             for f in AUGMENT_FNS[p]:
                 images = f(images)
         
         if channels_first:
-            x = tf.transpose(x, [0, 3, 1, 2])
+            images = tf.transpose(images, [0, 3, 1, 2])
     return images
 
 

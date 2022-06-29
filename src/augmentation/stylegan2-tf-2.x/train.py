@@ -352,15 +352,14 @@ def main():
     # Doesnt allocate whole physical memory on physucal device 
     parser.add_argument('--allow_memory_growth', type=str_to_bool, nargs='?', const=True, default=True)
 
-
     parser.add_argument('--debug_split_gpu', type=str_to_bool, nargs='?', const=True, default=False)
     parser.add_argument('--use_tf_function', type=str_to_bool, nargs='?', const=True, default=True)
     parser.add_argument('--use_custom_cuda', type=str_to_bool, nargs='?', const=True, default=True)
 
     parser.add_argument('--model_base_dir', default='./models', type=str)
     parser.add_argument('--images_dir', default='./data', nargs='?', type=str)
+    parser.add_argument('--policy', default='color,translation,cutout,color_shift', nargs='?', type=str)
     parser.add_argument('--kimages', default=50, nargs='?', type=int)
-    parser.add_argument('--policy', default='color,translation,cutout,color_shift', nargs='?', default=True, type=str)
 
     parser.add_argument('--train_res', default=256, type=int)
     parser.add_argument('--batch_size_per_replica', default=4, type=int)

@@ -40,7 +40,7 @@ class Trainer(object):
         self.train_res = t_params['train_res']
         self.print_step = 10
         self.save_step = 1000
-        self.image_summary_step = 10    
+        self.image_summary_step = 100    
         self.reached_max_steps = False
         self.log_template = '{:s}, {:s}, {:s}'.format(
             'step {}/{}: elapsed: {:.2f}s, d_loss: {:.3f}, g_loss: {:.3f}',
@@ -302,18 +302,9 @@ class Trainer(object):
                     print('Saved image summary: ', saved_image_summary)
 
                     # Take first image from tensor image
-                    summary_image = summary_image[0]
+                    summary_images = summary_images[0]
                     # Save image from tensor image
                     tf.keras.utils.save_img(f'{self.log_dir}/images-{step}.png',summary_image, data_format='channels_last')
-                    
-
-
-
-                    
-
-                    
-                    
-                    os._exit(1)
                     
 
             # print every self.print_steps

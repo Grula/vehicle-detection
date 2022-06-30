@@ -304,7 +304,7 @@ class Trainer(object):
                     # Take first image from tensor image
                     summary_images = summary_image[0]
                     # Save image from tensor image
-                    tf.keras.utils.save_img(f'{self.log_dir}/images-{step}.png',summary_image, data_format='channels_last')
+                    tf.keras.utils.save_img(f'{self.log_dir}/images-{step}.png',summary_images, data_format='channels_last')
                     
 
             # print every self.print_steps

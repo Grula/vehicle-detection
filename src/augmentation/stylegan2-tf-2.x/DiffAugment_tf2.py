@@ -7,7 +7,6 @@
 import tensorflow as tf
 
 
-
 def DiffAugment(images, policy='', channels_first=True):
     if policy:
         if channels_first:

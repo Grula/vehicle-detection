@@ -302,7 +302,7 @@ class Trainer(object):
                     print('Saved image summary: ', saved_image_summary)
 
                     # Take first image from tensor image
-                    summary_images = summary_images[0]
+                    summary_images = summary_image[0]
                     # Save image from tensor image
                     tf.keras.utils.save_img(f'{self.log_dir}/images-{step}.png',summary_image, data_format='channels_last')
                     

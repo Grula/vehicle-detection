@@ -39,7 +39,7 @@ class Trainer(object):
         self.train_res = t_params['train_res']
         self.print_step = 10
         self.save_step = 1000
-        self.image_summary_step = 10
+        self.image_summary_step = 10    
         self.reached_max_steps = False
         self.log_template = '{:s}, {:s}, {:s}'.format(
             'step {}/{}: elapsed: {:.2f}s, d_loss: {:.3f}, g_loss: {:.3f}',
@@ -297,8 +297,8 @@ class Trainer(object):
                     summary_image = self.convert_per_replica_image(summary_image, strategy)
 
                     # with train_summary_writer.as_default():
-                    saved_image_summary = tf.summary.image('images', summary_image, step=step)
-                    print('Saved image summary: ', saved_image_summary[0])
+                    saved_image_summary = tf.summary.image(f'images-{step}', summary_image, step=step)
+                    print('Saved image summary: ', saved_image_summary.numpy()[0])
 
             # print every self.print_steps
             if step % self.print_step == 0:

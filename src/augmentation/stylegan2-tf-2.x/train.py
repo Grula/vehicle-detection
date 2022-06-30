@@ -298,7 +298,18 @@ class Trainer(object):
 
                     # with train_summary_writer.as_default():
                     saved_image_summary = tf.summary.image(f'images-{step}', summary_image, step=step)
-                    print('Saved image summary: ', saved_image_summary.numpy()[0])
+                    print('Saved image summary: ', saved_image_summary)
+
+                    # Convert tensor and save as image
+                    summary_image = tf.cast(summary_image, tf.uint8)
+                    summary_image = tf.image.encode_jpeg(summary_image)
+
+                    # write image to disk
+                    with tf.io.gfile.GFile(f'{self.log_dir}/images-{step}.jpg', 'wb') as f:
+                        f.write(summary_image.numpy())
+
+                    os._exit(1)
+                    
 
             # print every self.print_steps
             if step % self.print_step == 0:

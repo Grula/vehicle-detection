@@ -39,7 +39,7 @@ class Trainer(object):
         self.train_res = t_params['train_res']
         self.print_step = 10
         self.save_step = 1000
-        self.image_summary_step = 100
+        self.image_summary_step = 10
         self.reached_max_steps = False
         self.log_template = '{:s}, {:s}, {:s}'.format(
             'step {}/{}: elapsed: {:.2f}s, d_loss: {:.3f}, g_loss: {:.3f}',
@@ -272,6 +272,11 @@ class Trainer(object):
             # get current step
             step = self.g_optimizer.iterations.numpy()
 
+            # save every self.save_step
+            if step % self.save_step == 0:
+                self.manager.save(checkpoint_number=step)
+
+
             # save to tensorboard
             with train_summary_writer.as_default():
                 tf.summary.scalar('d_loss', metric_d_loss.result(), step=step)
@@ -281,21 +286,17 @@ class Trainer(object):
                 tf.summary.scalar('r1_penalty', metric_r1_penalty.result(), step=step)
                 tf.summary.scalar('pl_penalty', metric_pl_penalty.result(), step=step)
 
-            # save every self.save_step
-            if step % self.save_step == 0:
-                self.manager.save(checkpoint_number=step)
+                # save every self.image_summary_step
+                if step % self.image_summary_step == 0:
+                    # add summary image
+                    test_z = tf.random.normal(shape=(self.n_samples, self.g_params['z_dim']), dtype=tf.dtypes.float32)
+                    test_labels = tf.ones((self.n_samples, self.g_params['labels_dim']), dtype=tf.dtypes.float32)
+                    summary_image = dist_gen_samples((test_z, test_labels))
 
-            # save every self.image_summary_step
-            if step % self.image_summary_step == 0:
-                # add summary image
-                test_z = tf.random.normal(shape=(self.n_samples, self.g_params['z_dim']), dtype=tf.dtypes.float32)
-                test_labels = tf.ones((self.n_samples, self.g_params['labels_dim']), dtype=tf.dtypes.float32)
-                summary_image = dist_gen_samples((test_z, test_labels))
+                    # convert to tensor image
+                    summary_image = self.convert_per_replica_image(summary_image, strategy)
 
-                # convert to tensor image
-                summary_image = self.convert_per_replica_image(summary_image, strategy)
-
-                with train_summary_writer.as_default():
+                    # with train_summary_writer.as_default():
                     saved_image_summary = tf.summary.image('images', summary_image, step=step)
                     print('Saved image summary: ', saved_image_summary[0])
 
@@ -314,6 +315,7 @@ class Trainer(object):
                 break
 
         # save last checkpoint
+        train_summary_writer.close()
         step = self.g_optimizer.iterations.numpy()
         self.manager.save(checkpoint_number=step)
         return

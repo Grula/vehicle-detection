@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
 
@@ -300,14 +301,16 @@ class Trainer(object):
                     saved_image_summary = tf.summary.image(f'images-{step}', summary_image, step=step)
                     print('Saved image summary: ', saved_image_summary)
 
-                    # Convert tensor and save as image
-                    summary_image = tf.cast(summary_image, tf.uint8)
-                    summary_image = tf.image.encode_jpeg(summary_image)
+                    # Save image from tensor image
+                    tf.keras.utils.save_img(summary_image, f'{self.log_dir}/images-{step}.png', data_format='channels_first')
+                    
 
-                    # write image to disk
-                    with tf.io.gfile.GFile(f'{self.log_dir}/images-{step}.jpg', 'wb') as f:
-                        f.write(summary_image.numpy())
 
+
+                    
+
+                    
+                    
                     os._exit(1)
                     
 

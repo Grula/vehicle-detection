@@ -78,9 +78,10 @@ def rand_color_shift(x):
     #TODO: 5. Convert back to RGB color space
     #TODO: 6. Normilize to -1,1 (for now)
 
+    print(x)
+    return x
 
     #TODO: 1. For each image in batch, convert values to 0:255 from -1:1
-    
     x = (x + 1) * 127.5
 
 

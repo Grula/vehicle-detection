@@ -71,11 +71,24 @@ def rand_cutout(x, ratio=0.5):
 
 
 def rand_color_shift(x):
-    batch_size = tf.shape(x)[0]
-    image_size = tf.shape(x)[1:3]
-    print(batch_size, image_size)
-    import os
-    os._exit(1)
+    #TODO: 1. For each image in batch, convert values to 0-255 (for now)
+    #TODO: 2. Each image will be converted to HSV color space
+    #TODO: 3. Create a mask for excluded area
+    #TODO: 4. Change color of excluded area
+    #TODO: 5. Convert back to RGB color space
+    #TODO: 6. Normilize to -1,1 (for now)
+
+
+    #TODO: 1. For each image in batch, convert values to 0:255 from -1:1
+    
+    x = (x + 1) * 127.5
+
+
+
+
+
+    # import os
+    # os._exit(1)
     # https://www.tensorflow.org/tutorials/images/segmentation
     return x
 

@@ -71,13 +71,16 @@ def rand_cutout(x, ratio=0.5):
 
 
 def rand_color_shift(x):
+    print(x)
+    import os
+    os._exit(1)
     # https://www.tensorflow.org/tutorials/images/segmentation
     return x
 
 
 AUGMENT_FNS = {
+    'color_shift': [rand_color_shift],
     'color': [rand_brightness, rand_saturation, rand_contrast],
     'translation': [rand_translation],
     'cutout': [rand_cutout],
-    'color_shift': [rand_color_shift]
 }

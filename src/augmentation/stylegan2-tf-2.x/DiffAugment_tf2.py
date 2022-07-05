@@ -71,7 +71,9 @@ def rand_cutout(x, ratio=0.5):
 
 
 def rand_color_shift(x):
-    print(x)
+    batch_size = tf.shape(x)[0]
+    image_size = tf.shape(x)[1:3]
+    print(batch_size, image_size)
     import os
     os._exit(1)
     # https://www.tensorflow.org/tutorials/images/segmentation

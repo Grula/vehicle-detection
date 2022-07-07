@@ -2,9 +2,13 @@
 # Shengyu Zhao, Zhijian Liu, Ji Lin, Jun-Yan Zhu, and Song Han
 # https://arxiv.org/pdf/2006.10738
 
+# suplemented by Nikola Grulovic
+import cv2
+import numpy as np
 
 
 import tensorflow as tf
+
 
 
 def DiffAugment(images, policy='', channels_first=True):
@@ -78,11 +82,23 @@ def rand_color_shift(x:tf.Tensor):
     #TODO: 5. Convert back to RGB color space
     #TODO: 6. Normilize to -1,1 (for now)
 
-    print(x.shape)
+    tmp = x.numpy()
 
-    print(x.numpy().shape)
-    print(x.numpy()[0])
-    assert False
+    # step 1:
+    # >>> convert values to 0-255 (for now)
+    # >>> for batch size apply to each image with np.map
+    for img in tmp:
+        print(img.shape)
+
+    # tmp = tmp.astype(np.uint8)
+
+
+
+
+
+
+    import os
+    os._exit(1)
     return x
 
     #TODO: 1. For each image in batch, convert values to 0:255 from -1:1

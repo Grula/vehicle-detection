@@ -103,7 +103,7 @@ def rand_color_shift(x:tf.Tensor):
         # >>> value will go from 0-45
         # H S V
         lower = (0,0,0)
-        upper = (359,10,45)
+        upper = (359,10,35)
         mask = cv2.inRange(img, lower, upper)
 
         # Save mask

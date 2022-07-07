@@ -79,6 +79,7 @@ def rand_color_shift(x:tf.Tensor):
     #TODO: 6. Normilize to -1,1 (for now)
 
     print(x.numpy().shape)
+    print(x.numpy()[0])
     assert False
     return x
 

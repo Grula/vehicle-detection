@@ -70,7 +70,7 @@ def rand_cutout(x, ratio=0.5):
     return x
 
 
-def rand_color_shift(x):
+def rand_color_shift(x:tf.Tensor):
     #TODO: 1. For each image in batch, convert values to 0-255 (for now)
     #TODO: 2. Each image will be converted to HSV color space
     #TODO: 3. Create a mask for excluded area
@@ -78,7 +78,7 @@ def rand_color_shift(x):
     #TODO: 5. Convert back to RGB color space
     #TODO: 6. Normilize to -1,1 (for now)
 
-    print(x)
+    print(x.numpy())
     return x
 
     #TODO: 1. For each image in batch, convert values to 0:255 from -1:1

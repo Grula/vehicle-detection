@@ -88,8 +88,14 @@ def rand_color_shift(x:tf.Tensor):
     # >>> convert values to 0-255 (for now)
     # >>> for batch size apply to each image with np.map
     for img in tmp:
-        print(img.shape)
-
+        # convert from -1,1 to 0,255
+        img = (img + 1) * 127.5
+        img = img.astype(np.uint8)
+        # convert to HSV
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+        # create a mask for excluded area
+        cv2.imwrite("test.jpg", img)
+        break
     # tmp = tmp.astype(np.uint8)
 
 

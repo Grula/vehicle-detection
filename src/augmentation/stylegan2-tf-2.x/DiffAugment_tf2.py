@@ -79,6 +79,7 @@ def rand_color_shift(x:tf.Tensor):
     #TODO: 6. Normilize to -1,1 (for now)
 
     print(x.numpy())
+    assert False
     return x
 
     #TODO: 1. For each image in batch, convert values to 0:255 from -1:1

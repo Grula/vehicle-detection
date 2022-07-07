@@ -106,8 +106,19 @@ def rand_color_shift(x:tf.Tensor):
         upper = (359,10,35)
         mask = cv2.inRange(img, lower, upper)
 
+        kernel = np.ones((5,1), np.uint8)
+        mask2 = cv2.morphologyEx(mask, cv2.MORPH_OPEN,  kernel)
+
+
         # Save mask
-        cv2.imwrite('mask.png', mask)
+        cv2.imwrite('mask.png', mask2)
+
+        ys, xs = np.nonzero(mask2)
+        ymin, ymax = ys.min(), ys.max()
+        xmin, xmax = xs.min(), xs.max()
+
+        croped = img[ymin:ymax, xmin:xmax]
+        cv2.imwrite('croped.png', croped)
 
         #STEP 4:
         # hue will be incremeted by in range from (0-180)

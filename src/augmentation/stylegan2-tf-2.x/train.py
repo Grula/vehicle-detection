@@ -440,7 +440,8 @@ def main():
             'train_res': args['train_res'],
         }
 
-        trainer = Trainer(training_parameters, name=f'stylegan2-vehicles-{args["train_res"]}x{args["train_res"]}')
+        # trainer = Trainer(training_parameters, name=f'stylegan2-vehicles-{args["train_res"]}x{args["train_res"]}')
+        trainer = Trainer(training_parameters, name=f'stylegan2-{args["images_dir"]}-{args["train_res"]}x{args["train_res"]}')
         trainer.train(dist_ds, strategy)
     return
 

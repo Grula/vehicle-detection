@@ -39,7 +39,7 @@ class Trainer(object):
         self.n_samples = min(t_params['batch_size'], t_params['n_samples'])
         self.train_res = t_params['train_res']
         self.print_step = 10
-        self.save_step = 100
+        self.save_step = 500
         self.image_summary_step = 100    
         self.reached_max_steps = False
         self.log_template = '{:s}, {:s}, {:s}'.format(
@@ -88,7 +88,7 @@ class Trainer(object):
                                         generator=self.generator,
                                         g_clone=self.g_clone,
                                         pl_mean=self.pl_mean)
-        self.manager = tf.train.CheckpointManager(self.ckpt, self.ckpt_dir, max_to_keep=2)
+        self.manager = tf.train.CheckpointManager(self.ckpt, self.ckpt_dir, max_to_keep=1)
 
         # try to restore
         self.ckpt.restore(self.manager.latest_checkpoint)

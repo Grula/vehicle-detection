@@ -57,17 +57,13 @@ class Creator(object):
         for idx in range(num_samples):
             test_z = tf.random.normal(shape=(1, self.g_params['z_dim']), dtype=tf.dtypes.float32)
             test_labels = tf.ones((1, self.g_params['labels_dim']), dtype=tf.dtypes.float32)
-            fake = self.generator([test_z, test_labels], training=False)
-            image = tf.transpose(fake, [0, 2, 3, 1])
-
-            # convert to numpy image
-            image = image.numpy()[0]
-            # convert to 0-255
-            image = (image + 1) * 127.5
-            # convert to uint8
-            image = image.astype(np.uint8)
+            
+            fake = self.generator([test_z, test_labels], truncation_psi=0.5, training=False)
+            as_tensor = tf.transpose(fake, [0, 2, 3, 1])[0]
+            as_tensor = (tf.clip_by_value(as_tensor, -1.0, 1.0) + 1.0) * 127.5
+            as_tensor = tf.cast(as_tensor, tf.uint8)
             # save image
-            tf.keras.utils.save_img(f'{self.output_dir}/image{idx}.png',image, data_format='channels_last')
+            tf.keras.utils.save_img(f'{self.output_dir}/image{idx}.png',as_tensor, data_format='channels_last')
 
 
 def filter_resolutions_featuremaps(resolutions, featuremaps, res):

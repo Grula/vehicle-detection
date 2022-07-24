@@ -137,7 +137,7 @@ dmypy.json
 *.ipynb
 
 # models
-models/ 
+models*/ 
 *.h5
 *.weights
 

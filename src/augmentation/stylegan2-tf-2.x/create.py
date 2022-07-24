@@ -99,8 +99,10 @@ def main():
         except:
             print('Invalid model index')
             continue
-
-    _, name, res = model_dir.split('-')
+    
+    splited_name = model_dir.split('-')
+    name = splited_name[1]
+    res = splited_name[2]
     res = int(res.split('x')[0])
 
     # network params

@@ -67,5 +67,23 @@ Tokom ucenja fje gubitka i preciznosti izgledaju ovako
 Grafikoni koji ce doci uskoro jer se mreza jso trenira
 
 4.3 Metode prosirivanja podataka
+Podatke prosirujemo naprednim augmentacijama koriscenjem StyleGAN2 arhitekture. Generisane slike su dimenzija 512x512.
+- trenirano 12h i 24h!
+- rezultati koje smo dobili i kratka prica o njima
 
-opistati kada se kod ganova desi mode collapse sa slikamaa
+4.3.1 StyleGan2
+
+4.3.2 Diff aug
+
+4.3.3 rezultati
+- dobijene slike i sledeci koraci
+
+
+4.4 Treniranje detekcije objekta sa augmentovanim podacima
+- Problem okvira i kako ga prevazici
+- Treniuranje mreza i novodibijeni rezultati
+- Poboljsanja koja smo dobili ovim korakom
+- Da li su poboljsanja dovoljno dobra ili i dalje treba vecinska kolicina podataka
+- Sta zakljucujemo iz dobijenih podataka i sta bi moglo dalje da se uradi
+
+Podatke prosirujem

@@ -4,3 +4,5 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CONDA_PREFIX/lib/
 # Running code
 python train.py --use_custom_cuda 0 --train_res 64 --kimages 1 
 
+# Creaing
+python create.py --model_dir models_512x512_200k --num_samples 1

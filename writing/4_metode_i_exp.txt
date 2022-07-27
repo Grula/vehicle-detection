@@ -71,11 +71,11 @@ Podatke prosirujemo naprednim augmentacijama koriscenjem StyleGAN2 arhitekture. 
 - trenirano 12h i 24h!
 - rezultati koje smo dobili i kratka prica o njima
 
-4.3.1 StyleGan2
-
-4.3.2 Diff aug
-
 4.3.3 rezultati
+Podaci koje dobijamo i koje covek moze da razazna na klase, uzimam u obzir. Slike koje imaju male artifakte i zamucneosti gledamo kao vrstu
+dodate regularizacije. Problem koji se javlja je stavljanje okvira na pojedinacne slike i takav problem prevazilazimo koriscenjem vec treniranog yolo modela
+kako on sam daje solidne rezultate kod stavljanja okvira.
+
 - dobijene slike i sledeci koraci
 
 

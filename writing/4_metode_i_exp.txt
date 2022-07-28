@@ -68,15 +68,17 @@ Grafikoni koji ce doci uskoro jer se mreza jso trenira
 
 4.3 Metode prosirivanja podataka
 Podatke prosirujemo naprednim augmentacijama koriscenjem StyleGAN2 arhitekture. Generisane slike su dimenzija 512x512.
-- trenirano 12h i 24h!
+- trenirano 12h i 24h i 48h
 - rezultati koje smo dobili i kratka prica o njima
 
 4.3.3 rezultati
 Podaci koje dobijamo i koje covek moze da razazna na klase, uzimam u obzir. Slike koje imaju male artifakte i zamucneosti gledamo kao vrstu
-dodate regularizacije. Problem koji se javlja je stavljanje okvira na pojedinacne slike i takav problem prevazilazimo koriscenjem vec treniranog yolo modela
-kako on sam daje solidne rezultate kod stavljanja okvira.
+dodate regularizacije. Problem koji se javlja je stavljanje okvira na pojedinacne slike i takav problem prevazilazimo koriscenjem vec treniranog V3 yolo modela
+kako on sam daje solidne rezultate kod stavljanja okvira, takodje taj model se razlikuje od v4 modela koji mi koristimo za nas trasnfer learning tako da nema curenja podataka izmedju modela. Modeli koirste slicnu arhitekturu ali funckije gubitka su promenjene te samim tim tezine koje se nalaze u samom modelu se razlikuju.
 
-- dobijene slike i sledeci koraci
+- Rezultati bez icega
+- Rezultati na najobicnijim augmenatcijama
+- Ganovi sa :100k, 200k, 300k?, 400k?
 
 
 4.4 Treniranje detekcije objekta sa augmentovanim podacima

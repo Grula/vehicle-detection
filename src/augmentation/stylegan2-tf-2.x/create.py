@@ -58,7 +58,10 @@ class Creator(object):
             test_z = tf.random.normal(shape=(1, self.g_params['z_dim']), dtype=tf.dtypes.float32)
             test_labels = tf.ones((1, self.g_params['labels_dim']), dtype=tf.dtypes.float32)
             
-            fake = self.generator([test_z, test_labels], truncation_psi=0.5, training=False)
+            # generate psi between 0 and 1
+            psi = tf.random.uniform(shape=(1, 1), minval=0, maxval=1, dtype=tf.dtypes.float32)
+
+            fake = self.generator([test_z, test_labels], truncation_psi=psi, training=False)
             as_tensor = tf.transpose(fake, [0, 2, 3, 1])[0]
             as_tensor = (tf.clip_by_value(as_tensor, -1.0, 1.0) + 1.0) * 127.5
             as_tensor = tf.cast(as_tensor, tf.uint8)
@@ -80,7 +83,7 @@ def main():
     parser.add_argument('--use_custom_cuda', type=str_to_bool, nargs='?', const=True, default=False)
     parser.add_argument('--model_dir', required=True, type=str)
     parser.add_argument('--output_dir', default='./output', nargs='?', type=str)
-    parser.add_argument('--num_samples', default=1, type=int)
+    parser.add_argument('--num_samples', type=int)
     args = vars(parser.parse_args())
 
 
@@ -96,9 +99,21 @@ def main():
             model_dir_index = int(input('Select model: '))
             model_dir = model_dir_list[model_dir_index]
             break
-        except:
+        except Exception as e:
             print('Invalid model index')
             continue
+
+
+    # Check if number of samples is provided
+    num_samples = args['num_samples']
+    if args['num_samples'] is None:
+        while True:
+            try:
+                num_samples = int(input('Number of samples: '))
+                break
+            except Exception as e:
+                print('Invalid number of samples')
+                continue
     
     splited_name = model_dir.split('-')
     name = splited_name[1]
@@ -134,7 +149,7 @@ def main():
     }
 
     trainer = Creator(parameters)
-    trainer.gen_sample(num_samples = args['num_samples'])
+    trainer.gen_sample(num_samples = num_samples)
 
     return
 

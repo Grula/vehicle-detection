@@ -71,7 +71,7 @@ Podatke prosirujemo naprednim augmentacijama koriscenjem StyleGAN2 arhitekture. 
 - trenirano 12h i 24h i 48h
 - rezultati koje smo dobili i kratka prica o njima
 
-4.3.3 rezultati
+4.3.3 dobijeni rezultati
 Podaci koje dobijamo i koje covek moze da razazna na klase, uzimam u obzir. Slike koje imaju male artifakte i zamucneosti gledamo kao vrstu
 dodate regularizacije. Problem koji se javlja je stavljanje okvira na pojedinacne slike i takav problem prevazilazimo koriscenjem vec treniranog V3 yolo modela
 kako on sam daje solidne rezultate kod stavljanja okvira, takodje taj model se razlikuje od v4 modela koji mi koristimo za nas trasnfer learning tako da nema curenja podataka izmedju modela. Modeli koirste slicnu arhitekturu ali funckije gubitka su promenjene te samim tim tezine koje se nalaze u samom modelu se razlikuju.
@@ -82,10 +82,11 @@ kako on sam daje solidne rezultate kod stavljanja okvira, takodje taj model se r
 
 
 4.4 Treniranje detekcije objekta sa augmentovanim podacima
-- Problem okvira i kako ga prevazici
 - Treniuranje mreza i novodibijeni rezultati
-- Poboljsanja koja smo dobili ovim korakom
+
+- Poboljsanja koja smo dobili ovim korakom i ako
+
 - Da li su poboljsanja dovoljno dobra ili i dalje treba vecinska kolicina podataka
+
 - Sta zakljucujemo iz dobijenih podataka i sta bi moglo dalje da se uradi
 
-Podatke prosirujem

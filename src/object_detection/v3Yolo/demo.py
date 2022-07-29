@@ -103,7 +103,7 @@ if __name__ == '__main__':
     file = 'coco_classes.txt'
     all_classes = get_classes(file)
 
-    images_path = 'augmented_gan/'
+    images_path = 'augmented_gan100k/'
     # detect images in test floder
     # create csv file
     f = open('data_augmented.csv', 'w')
@@ -144,8 +144,8 @@ if __name__ == '__main__':
                 # saving info to csv file 
                 f.write(f'{image_path},{current_label},{x},{y},{w},{h}\n')
 
-            cv2.imwrite(f'{destination_folder}/{image_file}', image)
-            print(f'Saved {image_file}')    
+                cv2.imwrite(f'{destination_folder}/{image_file}', image)
+                print(f'Saved {image_file}')    
 
     # yolo.train()
     # images_path = 'data/valid'

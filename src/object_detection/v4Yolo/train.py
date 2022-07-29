@@ -2,7 +2,7 @@
 Retrain the YOLO model for your own dataset.
 """
 import sys
-sys.path.append('src/object_detection/yolo/keras-yolo4')
+sys.path.append('src/object_detection/v4Yolo')
 import os
 
 import math

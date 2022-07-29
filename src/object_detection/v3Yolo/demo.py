@@ -103,7 +103,7 @@ if __name__ == '__main__':
     file = 'coco_classes.txt'
     all_classes = get_classes(file)
 
-    images_path = 'augmented_gan100k/'
+    images_path = 'valid/'
     # detect images in test floder
     # create csv file
     f = open('data_augmented.csv', 'w')
@@ -111,12 +111,12 @@ if __name__ == '__main__':
     f.write('im_path,label,x,y,w,h\n')
     subfolders = [ f.path for f in os.scandir(images_path) if f.is_dir() ]
     for subfolder in subfolders:
-        images = [f for f in os.listdir(subfolder) if f.endswith('.png')]
+        images = [f for f in os.listdir(subfolder) if f.endswith('.png') or f.endswith('.jpg')]
         current_label = subfolder.split('/')[-1]
         destination_folder = f'{subfolder}-PREDICTED'
         if not os.path.exists(destination_folder):
             os.makedirs(destination_folder)
-        for image_file in images:
+        for image_file in images[:10]:
             image_path = os.path.join(subfolder, image_file)
             image = cv2.imread(image_path)
 
@@ -144,8 +144,8 @@ if __name__ == '__main__':
                 # saving info to csv file 
                 f.write(f'{image_path},{current_label},{x},{y},{w},{h}\n')
 
-                cv2.imwrite(f'{destination_folder}/{image_file}', image)
-                print(f'Saved {image_file}')    
+            cv2.imwrite(f'{destination_folder}/{image_file}', image)
+            print(f'Saved {image_file}')    
 
     # yolo.train()
     # images_path = 'data/valid'

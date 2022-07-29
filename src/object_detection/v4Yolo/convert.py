@@ -35,8 +35,8 @@ def unique_config_sections(config_file):
 
 
 def main():
-    config_path = "custom_yolov4.cfg"
-    output_path = 'model_data/yolo4_weight.h5'
+    config_path = "yolov4_custom.cfg"
+    output_path = 'model_data/custom_yolo4_weight.h5'
     
     # config_path = "yolov4.cfg"
     # output_path = 'model_data/yolo4_weight.h5'
@@ -60,6 +60,7 @@ def main():
 
     print('Creating Keras model.')
     h, w = 416, 416
+    # h, w = 608, 608
     input_layer = Input(shape=(h, w, 3))
     prev_layer = input_layer
     all_layers = []

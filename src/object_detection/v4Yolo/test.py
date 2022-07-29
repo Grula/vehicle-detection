@@ -133,7 +133,7 @@ if __name__ == '__main__':
         destination_folder = get_relative_path(f'{subfolder}-PREDICTED')
         if not os.path.exists(destination_folder):
             os.makedirs(destination_folder)
-        for image_file in images:
+        for image_file in images[:10]:
             images_path = os.path.join(subfolder, image_file)
             image = cv2.imread(images_path)
 

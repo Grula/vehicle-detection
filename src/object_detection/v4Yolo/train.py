@@ -354,8 +354,8 @@ def data_generator(annotation_lines, batch_size, anchors, num_classes, max_bbox_
     '''data generator for fit_generator'''
     n = len(annotation_lines)
     i = 0
-    train_input_sizes = [320, 352, 384, 416, 448, 480, 512, 544, 576, 608]
-    # train_input_sizes = [128, 160, 192, 224, 256, 288, 320, 352, 384, 416]
+    # train_input_sizes = [320, 352, 384, 416, 448, 480, 512, 544, 576, 608]
+    train_input_sizes = [128, 160, 192, 224, 256, 288, 320, 352, 384, 416]
     strides = np.array([8, 16, 32])
 
     while True:

@@ -47,7 +47,7 @@ def _main():
     classes_path = os.path.join(args['model_data'], 'custom_classes.txt')
     anchors_path = os.path.join(args['model_data'], 'yolo4_anchors.txt')
 
-    weights_path = os.paht.join(args['model_data'],args['weights_path'])
+    weights_path = os.path.join(args['model_data'],args['weights_path'])
     # classes_path = get_relative_path('model_data/custom_classes.txt')
     # anchors_path = get_relative_path('model_data/yolo4_anchors.txt')
 

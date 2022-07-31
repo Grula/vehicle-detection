@@ -532,5 +532,6 @@ def yolo_loss(args, num_classes, iou_loss_thresh, anchors):
     prob_loss = sbbox_prob_loss + mbbox_prob_loss + lbbox_prob_loss
 
     loss = ciou_loss + conf_loss + prob_loss
+    print(loss)
 
     return loss

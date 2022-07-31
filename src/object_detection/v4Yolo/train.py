@@ -70,6 +70,7 @@ def _main():
     anchors_stride_base[2] /= 32
 
     input_shape = (416, 416) # multiple of 32, hw
+    input_shape = (608, 608) # multiple of 32, hw
 
     model, model_body = create_model(input_shape, anchors_stride_base, num_classes,
                                     load_pretrained=True, freeze_body=2,

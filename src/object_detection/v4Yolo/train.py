@@ -12,6 +12,7 @@ import cv2
 import argparse
 
 import numpy as np
+import keras
 import keras.backend as K
 from keras.layers import Input, Lambda
 from keras.models import Model
@@ -166,7 +167,7 @@ def load_model(input_shape, anchors_stride_base, num_classes, load_pretrained=Tr
     iou_loss_thresh = 0.7
 
     # model_body = yolo4_body(image_input, num_anchors, num_classes)
-    model_body = K.model.load_model(model_path)
+    model_body = keras.models.load_model(model_path)
     print('Create YOLOv4 model with {} anchors and {} classes.'.format(num_anchors*3, num_classes))
 
 

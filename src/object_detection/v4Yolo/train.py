@@ -76,7 +76,7 @@ def _main():
     # input_shape = (608, 608) # multiple of 32, hw
 
     model, model_body = create_model(input_shape, anchors_stride_base, num_classes,
-                                    load_pretrained=False, freeze_body=2,
+                                    load_pretrained=True, freeze_body=2,
                                     weights_path=weights_path)
 
     logging = TensorBoard(log_dir=log_dir)
@@ -155,7 +155,7 @@ def get_anchors(anchors_path):
 
 
 def create_model(input_shape, anchors_stride_base, num_classes, load_pretrained=True, freeze_body=2,
-            weights_path=get_relative_path('model_data/yolo4_weights.h5')):
+            weights_path=None):
     '''create the training model'''
     K.clear_session() # get a new session
     image_input = Input(shape=(None, None, 3))
@@ -185,6 +185,7 @@ def create_model(input_shape, anchors_stride_base, num_classes, load_pretrained=
         layers.Input(name='input_6', shape=(max_bbox_per_scale, 4)),             # true_mbboxes
         layers.Input(name='input_7', shape=(max_bbox_per_scale, 4))              # true_lbboxes
     ]
+
     loss_list = layers.Lambda(yolo_loss, name='yolo_loss',
                            arguments={'num_classes': num_classes, 'iou_loss_thresh': iou_loss_thresh,
                                       'anchors': anchors_stride_base})([*model_body.output, *y_true])

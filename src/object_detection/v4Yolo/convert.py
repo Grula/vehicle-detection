@@ -228,6 +228,10 @@ def main():
         model.save(output_path)
         print('Saved Keras model to {}'.format(output_path))
 
+    # write model summary to file
+    with open(output_path + '.summary.txt', 'w') as f:
+        f.write(model.summary())
+        
     # Check to see if all weights have been read.
     remaining_weights = len(weights_file.read()) / 4
     weights_file.close()
@@ -235,6 +239,7 @@ def main():
 
     if remaining_weights > 0:
         print('Warning: {} unused weights'.format(remaining_weights))
+    
 
 if __name__ == '__main__':
     main()

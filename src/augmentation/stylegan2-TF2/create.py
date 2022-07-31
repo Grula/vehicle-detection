@@ -61,7 +61,11 @@ class Creator(object):
             # generate psi between 0 and 1
             psi = tf.random.uniform(shape=(1, 1), minval=0, maxval=1, dtype=tf.dtypes.float32)
 
-            fake = self.generator([test_z, test_labels], truncation_psi=0.2, training=False, truncation_cutoff = None)
+            # pick a random number between 0.0 and 1.0 with step of 0.1
+            psi = tf.random.uniform(shape=(1, 1), minval=0.0, maxval=1.0, dtype=tf.dtypes.float32)
+
+
+            fake = self.generator([test_z, test_labels], truncation_psi=psi, training=False, truncation_cutoff = None)
 
             as_tensor = tf.transpose(fake, [0, 2, 3, 1])[0]
             as_tensor = (tf.clip_by_value(as_tensor, -1.0, 1.0) + 1.0) * 127.5

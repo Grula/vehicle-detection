@@ -32,7 +32,8 @@ def _main():
     parser = argparse.ArgumentParser(description='')
 
     parser.add_argument('--model_data', type=str , default='model_data/', help='path to model data')
-    parser.add_argument('--weights_name', type=str , default='yolo4_weights.h5', help='path to model weights')
+    parser.add_argument('--weights_name', type=str , default='yolo4_weights.h5', help='name of model weights')
+    parser.add_argument('--model_name', type=str , default='yolo4_model.h5', help='name of model')
 
 
     args = vars(parser.parse_args())
@@ -70,11 +71,14 @@ def _main():
     anchors_stride_base[2] /= 32
 
     input_shape = (416, 416) # multiple of 32, hw
-    input_shape = (608, 608) # multiple of 32, hw
+    # input_shape = (608, 608) # multiple of 32, hw
 
-    model, model_body = create_model(input_shape, anchors_stride_base, num_classes,
+    # model, model_body = create_model(input_shape, anchors_stride_base, num_classes,
+    #                                 load_pretrained=True, freeze_body=2,
+    #                                 weights_path=weights_path)
+    model, model_body = load_model(input_shape, anchors_stride_base, num_classes,
                                     load_pretrained=True, freeze_body=2,
-                                    weights_path=weights_path)
+                                    model_path=weights_path)
 
     logging = TensorBoard(log_dir=log_dir)
     checkpoint = ModelCheckpoint(log_dir + 'ep{epoch:03d}-loss{loss:.3f}.h5',
@@ -148,6 +152,46 @@ def get_anchors(anchors_path):
         anchors = f.readline()
     anchors = [float(x) for x in anchors.split(',')]
     return np.array(anchors).reshape(-1, 2)
+
+
+def load_model(input_shape, anchors_stride_base, num_classes, load_pretrained=True, freeze_body=2,
+            model_path=None):
+    '''loads the model'''
+    K.clear_session() # get a new session
+    image_input = Input(shape=(None, None, 3))
+    h, w = input_shape
+    num_anchors = len(anchors_stride_base)
+
+    max_bbox_per_scale = 2
+    iou_loss_thresh = 0.7
+
+    # model_body = yolo4_body(image_input, num_anchors, num_classes)
+    model_body = K.model.load_model(model_path)
+    print('Create YOLOv4 model with {} anchors and {} classes.'.format(num_anchors*3, num_classes))
+
+
+    if freeze_body in [1, 2]:
+        # Freeze darknet53 body or freeze all but 3 output layers.
+        num = (250, len(model_body.layers)-3)[freeze_body-1]
+        for i in range(num): model_body.layers[i].trainable = False
+        print('Freeze the first {} layers of total {} layers.'.format(num, len(model_body.layers)))
+
+    y_true = [
+        layers.Input(name='input_2', shape=(None, None, 3, (num_classes + 5))),  # label_sbbox
+        layers.Input(name='input_3', shape=(None, None, 3, (num_classes + 5))),  # label_mbbox
+        layers.Input(name='input_4', shape=(None, None, 3, (num_classes + 5))),  # label_lbbox
+        layers.Input(name='input_5', shape=(max_bbox_per_scale, 4)),             # true_sbboxes
+        layers.Input(name='input_6', shape=(max_bbox_per_scale, 4)),             # true_mbboxes
+        layers.Input(name='input_7', shape=(max_bbox_per_scale, 4))              # true_lbboxes
+    ]
+    loss_list = layers.Lambda(yolo_loss, name='yolo_loss',
+                           arguments={'num_classes': num_classes, 'iou_loss_thresh': iou_loss_thresh,
+                                      'anchors': anchors_stride_base})([*model_body.output, *y_true])
+    model = Model([model_body.input, *y_true], loss_list)
+    model.summary()
+
+    return model, model_body
+
 
 
 def create_model(input_shape, anchors_stride_base, num_classes, load_pretrained=True, freeze_body=2,

@@ -41,7 +41,7 @@ def _main():
     annotation_val_path = 'data/valid_data.txt'
     # annotation_train_path = '2012_train.txt'
     # annotation_val_path = '2012_val.txt'
-    log_dir = 'logs/000/'
+    log_dir = 'logs/'
 
 
     classes_path = os.path.join(args['model_data'], 'custom_classes.txt')
@@ -72,7 +72,7 @@ def _main():
     input_shape = (416, 416) # multiple of 32, hw
 
     model, model_body = create_model(input_shape, anchors_stride_base, num_classes,
-                                    load_pretrained=False, freeze_body=2,
+                                    load_pretrained=True, freeze_body=2,
                                     weights_path=weights_path)
 
     logging = TensorBoard(log_dir=log_dir)

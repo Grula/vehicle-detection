@@ -84,7 +84,6 @@ class Generator(tf.keras.Model):
         else:
             indices = tf.range(self.n_broadcast)
             truncation_coefs = tf.where(condition=tf.less(indices, truncation_cutoff), x=tpsi, y=ones)
-
         truncated_w_broadcasted = lerp(self.w_avg, w_broadcasted, truncation_coefs)
         return truncated_w_broadcasted
 

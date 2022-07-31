@@ -32,7 +32,7 @@ def _main():
     parser = argparse.ArgumentParser(description='')
 
     parser.add_argument('--model_data', type=str , default='model_data/', help='path to model data')
-    parser.add_argument('--weights_path', type=str , default='model_data/yolo4_weights.h5', help='path to model weights')
+    parser.add_argument('--weights_name', type=str , default='yolo4_weights.h5', help='path to model weights')
 
 
     args = vars(parser.parse_args())
@@ -47,7 +47,7 @@ def _main():
     classes_path = os.path.join(args['model_data'], 'custom_classes.txt')
     anchors_path = os.path.join(args['model_data'], 'yolo4_anchors.txt')
 
-    weights_path = args['weights_path']
+    weights_path = os.paht.join(args['model_data'],args['weights_path'])
     # classes_path = get_relative_path('model_data/custom_classes.txt')
     # anchors_path = get_relative_path('model_data/yolo4_anchors.txt')
 

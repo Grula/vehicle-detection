@@ -9,6 +9,7 @@ import math
 import random
 import os
 import cv2
+import argparse
 
 import numpy as np
 import keras.backend as K
@@ -27,14 +28,29 @@ def get_relative_path(path):
     return os.path.join(sys.path[-1], path)
 
 def _main():
+     # global program arguments parser
+    parser = argparse.ArgumentParser(description='')
+
+    parser.add_argument('--model_data', type=str , default='model_data/', help='path to model data')
+    parser.add_argument('--weights_path', type=str , default='model_data/yolo4_weights.h5', help='path to model weights')
+
+
+    args = vars(parser.parse_args())
 
     annotation_train_path = 'data/train_data.txt'
     annotation_val_path = 'data/valid_data.txt'
     # annotation_train_path = '2012_train.txt'
     # annotation_val_path = '2012_val.txt'
     log_dir = 'logs/000/'
-    classes_path = get_relative_path('model_data/custom_classes.txt')
-    anchors_path = get_relative_path('model_data/yolo4_anchors.txt')
+
+
+    classes_path = os.path.join(args['model_data'], 'custom_classes.txt')
+    anchors_path = os.path.join(args['model_data'], 'yolo4_anchors.txt')
+
+    weights_path = args['weights_path']
+    # classes_path = get_relative_path('model_data/custom_classes.txt')
+    # anchors_path = get_relative_path('model_data/yolo4_anchors.txt')
+
     class_names = get_classes(classes_path)
     num_classes = len(class_names)
     class_index = ['{}'.format(i) for i in range(num_classes)]
@@ -47,7 +63,7 @@ def _main():
         [[36, 75], [76, 55], [72, 146]],
         [[142, 110], [192, 243], [459, 401]]
     ])
-    # 一些预处理
+
     anchors_stride_base = anchors_stride_base.astype(np.float32)
     anchors_stride_base[0] /= 8
     anchors_stride_base[1] /= 16
@@ -55,14 +71,18 @@ def _main():
 
     input_shape = (416, 416) # multiple of 32, hw
 
-    model, model_body = create_model(input_shape, anchors_stride_base, num_classes, load_pretrained=False, freeze_body=2, weights_path='yolo4_weight.h5')
+    model, model_body = create_model(input_shape, anchors_stride_base, num_classes,
+                                    load_pretrained=False, freeze_body=2,
+                                    weights_path=weights_path)
 
     logging = TensorBoard(log_dir=log_dir)
     checkpoint = ModelCheckpoint(log_dir + 'ep{epoch:03d}-loss{loss:.3f}.h5',
-        monitor='loss', save_weights_only=True, save_best_only=True, save_freq=1)
+        monitor='loss', save_weights_only=True, save_best_only=True, save_freq=5)
     reduce_lr = ReduceLROnPlateau(monitor='loss', factor=0.1, patience=3, verbose=1)
     early_stopping = EarlyStopping(monitor='loss', min_delta=0, patience=10, verbose=1)
-    evaluation = Evaluate(model_body=model_body, anchors=anchors, class_names=class_index, score_threshold=0.05, tensorboard=logging, weighted_average=True, eval_file='2012_val.txt', log_dir=log_dir)
+
+    evaluation = Evaluate(model_body=model_body, anchors=anchors, class_names=class_index,
+         score_threshold=0.05, tensorboard=logging, weighted_average=True, eval_file=annotation_val_path, log_dir=log_dir)
 
     with open(annotation_train_path) as f:
         lines_train = f.readlines()

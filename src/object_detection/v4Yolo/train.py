@@ -81,7 +81,7 @@ def _main():
 
     logging = TensorBoard(log_dir=log_dir)
     checkpoint = ModelCheckpoint(log_dir + 'ep{epoch:03d}-loss{loss:.3f}.h5',
-        monitor='loss', save_weights_only=True, save_best_only=True, save_freq=5)
+        monitor='loss', save_weights_only=True, save_best_only=True, save_freq='epoch')
     reduce_lr = ReduceLROnPlateau(monitor='loss', factor=0.1, patience=3, verbose=1)
     early_stopping = EarlyStopping(monitor='loss', min_delta=0, patience=10, verbose=1)
 

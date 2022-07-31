@@ -36,12 +36,12 @@ def unique_config_sections(config_file):
 
 def main():
     config_path = "yolov4_custom.cfg"
-    output_path = 'model_data/custom_yolo4_weight.h5'
+    output_path = 'model_data/416_yolo4_weight.h5'
     
     # config_path = "yolov4.cfg"
     # output_path = 'model_data/yolo4_weight.h5'
     weights_path = 'model_data/yolov4.weights'
-    weights_only = False
+    weights_only = True
 
     print('Loading weights.')
     weights_file = open(weights_path, 'rb')

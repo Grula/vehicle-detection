@@ -50,6 +50,7 @@ def _main():
     anchors_path = os.path.join(args['model_data'], 'yolo4_anchors.txt')
 
     weights_path = os.path.join(args['model_data'],args['weights_name'])
+    model_path = os.path.join(args['model_data'],args['model_name'])
     # classes_path = get_relative_path('model_data/custom_classes.txt')
     # anchors_path = get_relative_path('model_data/yolo4_anchors.txt')
 
@@ -79,7 +80,7 @@ def _main():
     #                                 weights_path=weights_path)
     model, model_body = load_model(input_shape, anchors_stride_base, num_classes,
                                     load_pretrained=True, freeze_body=2,
-                                    model_path=weights_path)
+                                    model_path=model_path)
 
     logging = TensorBoard(log_dir=log_dir)
     checkpoint = ModelCheckpoint(log_dir + 'ep{epoch:03d}-loss{loss:.3f}.h5',

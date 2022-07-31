@@ -12,6 +12,8 @@ from tensorflow.keras.layers import BatchNormalization, LeakyReLU
 from tensorflow.keras.models import Model
 from tensorflow.keras.regularizers import l2
 
+import argparse
+
 from yolo4.model import Mish
 
 
@@ -35,13 +37,26 @@ def unique_config_sections(config_file):
 
 
 def main():
-    config_path = "yolov4_custom.cfg"
-    output_path = 'model_data/416_yolo4_model.h5'
+
+    parser = argparse.ArgumentParser(description='')
+
+    parser.add_argument('--image_size', type=int , default=608, help='size of images')
+    parser.add_argument('--cfg_path', type=str , default="yolov4.cfg", )
+    parser.add_argument('--type', type=str , default='weights', help='type of model')
+
+
+    args = vars(parser.parse_args())
+
+    # config_path = "yolov4_custom.cfg"
+    config_path = args['cfg_path']
+    output_path = f"model_data/{args['image_size']}_yolo4_{args['type']}.h5"
     
     # config_path = "yolov4.cfg"
     # output_path = 'model_data/yolo4_weight.h5'
     weights_path = 'model_data/yolov4.weights'
     weights_only = False
+    if args['type'] == 'weights':
+        weights_only = True
 
     print('Loading weights.')
     weights_file = open(weights_path, 'rb')

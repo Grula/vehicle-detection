@@ -20,7 +20,7 @@ from keras.optimizers import adam_v2
 from keras.callbacks import TensorBoard, ModelCheckpoint, ReduceLROnPlateau, EarlyStopping
 import keras.layers as layers
 
-from yolo4.model import preprocess_true_boxes, yolo4_body, yolo_loss
+from yolo4.model import preprocess_true_boxes, yolo4_body, yolo_loss, Mish
 from yolo4.utils import get_random_data
 
 from callback_eval import Evaluate
@@ -168,7 +168,7 @@ def load_model(input_shape, anchors_stride_base, num_classes, load_pretrained=Tr
     iou_loss_thresh = 0.7
 
     # model_body = yolo4_body(image_input, num_anchors, num_classes)
-    model_body = keras.models.load_model(model_path)
+    model_body = keras.models.load_model(model_path, custom_objects={"Mish": Mish})
     print('Create YOLOv4 model with {} anchors and {} classes.'.format(num_anchors*3, num_classes))
 
 

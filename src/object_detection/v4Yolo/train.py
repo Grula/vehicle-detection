@@ -120,7 +120,7 @@ def _main():
                 steps_per_epoch=max(1, num_train//batch_size),
                 epochs=50,
                 initial_epoch=0,
-                callbacks=[logging])
+                callbacks=[logging, checkpoint])
 
     # Unfreeze and continue training, to fine-tune.
     # Train longer if the result is not good.
@@ -136,7 +136,7 @@ def _main():
             steps_per_epoch=max(1, num_train//batch_size),
             epochs=1000,
             initial_epoch=0,
-            callbacks=[logging, reduce_lr, early_stopping, evaluation])
+            callbacks=[logging, checkpoint, reduce_lr, early_stopping, evaluation])
 
     # Further training if needed.
 
@@ -356,6 +356,7 @@ def data_generator(annotation_lines, batch_size, anchors, num_classes, max_bbox_
     i = 0
     # train_input_sizes = [320, 352, 384, 416, 448, 480, 512, 544, 576, 608]
     train_input_sizes = [128, 160, 192, 224, 256, 288, 320, 352, 384, 416]
+    train_input_sizes = [128, 160, 192, 224, 256, 288, 320, 352, 384]
     strides = np.array([8, 16, 32])
 
     while True:

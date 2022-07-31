@@ -67,7 +67,7 @@ Tokom ucenja fje gubitka i preciznosti izgledaju ovako
 Grafikoni koji ce doci uskoro jer se mreza jso trenira
 
 4.3 Metode prosirivanja podataka
-Podatke prosirujemo naprednim augmentacijama koriscenjem StyleGAN2 arhitekture. Generisane slike su dimenzija 512x512.
+Podatke prosirujemo naprednim augmentacijama koriscenjem StyleGAN2 arhitekture. Generisane slike su dimenzija 512x512. Model je treniran na NVIDIA Tesla P100-PCIE GPU 12h, 24h i 48h.
 - trenirano 12h i 24h i 48h
 - rezultati koje smo dobili i kratka prica o njima
 

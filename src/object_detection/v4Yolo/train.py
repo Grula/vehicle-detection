@@ -66,16 +66,20 @@ def _main():
 
     with open(annotation_train_path) as f:
         lines_train = f.readlines()
+
     np.random.seed(42)
     np.random.shuffle(lines_train)
     np.random.seed(None)
+
     num_train = len(lines_train)
 
     with open(annotation_val_path) as f:
         lines_val = f.readlines()
+
     np.random.seed(42)
     np.random.shuffle(lines_val)
     np.random.seed(None)
+    
     num_val = len(lines_val)
 
     # Train with frozen layers first, to get a stable loss.

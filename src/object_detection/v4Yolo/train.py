@@ -120,7 +120,7 @@ def _main():
                 steps_per_epoch=max(1, num_train//batch_size),
                 epochs=50,
                 initial_epoch=0,
-                callbacks=[logging, checkpoint])
+                callbacks=[logging])
 
     # Unfreeze and continue training, to fine-tune.
     # Train longer if the result is not good.
@@ -136,7 +136,7 @@ def _main():
             steps_per_epoch=max(1, num_train//batch_size),
             epochs=1000,
             initial_epoch=0,
-            callbacks=[logging, checkpoint, reduce_lr, early_stopping, evaluation])
+            callbacks=[logging, reduce_lr, early_stopping, evaluation])
 
     # Further training if needed.
 

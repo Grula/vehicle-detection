@@ -42,28 +42,28 @@ def load_data(paths, undersamples = [], set = 'train'):
                 # if label in undersamples:
                 #     continue
 
-                endX = float(startX) + float(w)
-                endY = float(startY) + float(h)
+                # endX = float(startX) + float(w)
+                # endY = float(startY) + float(h)
 
-                image = cv2.imread(filename)
-                (h,w)=image.shape[:2]
+                # image = cv2.imread(filename)
+                # (h,w)=image.shape[:2]
                 
-                startX = float(startX) / w
-                startY = float(startY) / h
-                endX = float(endX) / w
-                endY = float(endY) / h
+                # startX = float(startX) / w
+                # startY = float(startY) / h
+                # endX = float(endX) / w
+                # endY = float(endY) / h
 
-                image = load_img(filename, target_size=(224, 224))
-                image = img_to_array(image)
+                # image = load_img(filename)
+                # image = img_to_array(image)
                 
-                data.append(image)
+                data.append(filename)
                 labels.append(label)
-                bboxes.append((startX, startY, endX, endY))
+                bboxes.append((startX, startY, w, h))
                 # Just testing on my pc remove for colab
                 # if i > 10:
                 #     break
                 # i += 1
-    data = np.array(data, dtype=np.float64)# / 255.
+    data = np.array(data)
     labels = np.array(labels)
     bboxes = np.array(bboxes, dtype=np.float64)
 
@@ -103,7 +103,7 @@ for i in unique:
         os.makedirs(augmented_folder+str(i))
 
 # Open csv for appending synthetic images
-csv_data = open('data/data_augmented.csv','w')
+csv_data = open('data/augmented.csv','w')
 csv_data.write('im_path,label,x,y,w,h\n')
 
 
@@ -127,59 +127,49 @@ for key in data_dict.keys():
     # select that one label and based on label create that many images
     img_count = count[key]
     img_idx = 0
+    print("working on label: ", key)
     while img_count > 0:
         aug_path = augmented_folder+str(key)+'/'+str(img_idx)+'.png'
         
         # select random image from that label
-        img, bbox = random.choice(data_dict[key])
-        
+        filename, bbox = random.choice(data_dict[key])
+
+        # load image
+        img = load_img(filename)
+        img = img_to_array(img)
+        w, h = img.shape[:2]
+
         # Image Augmentation (rotation, zoom, brightness)
         aug_img  = datagen.random_transform(img)
         
-        # Add noise to BBOXes
-        noisy_bbox = bbox + np.random.normal(0, 0.02, bbox.shape)
-
         # Add noise to image 25% chnace
-        if np.random.rand() > 0.75:
+        if np.random.rand() < 0.25:
             aug_img = add_noise(aug_img)
           
         # Flip the image 25% chance
-        if np.random.rand() > 0.75:
+        if np.random.rand() > 0.25:
             aug_img = cv2.flip(aug_img, 1)
-            # Flip coordinates
-            noisy_bbox = 1 - noisy_bbox
+            # Flip coordinates of bbox
+            bbox[0] = w - bbox[0]            
+
 
         # Change colorspace 5% chance
-        if np.random.rand() > 0.95:
+        if np.random.rand() > 0.05:
             # Pick 2 numbers out of 0,1,2
             a, b = random.sample([0, 1, 2], 2)
             aug_img[[a,b]] = aug_img[[b,a]]
 
         # Add blur 15% chance
-        if np.random.rand() > 0.85:
+        if np.random.rand() < 0.15:
             dst = cv2.GaussianBlur(aug_img, (3,3), cv2.BORDER_DEFAULT)
 
             
-        # Coorect bbox if its out of image bounds
-        noisy_bbox[0] = min(1.,max(0., noisy_bbox[0]))
-        noisy_bbox[1] = min(1.,max(0., noisy_bbox[1]))
-        noisy_bbox[2] = min(1.,max(0., noisy_bbox[2]))
-        noisy_bbox[3] = min(1.,max(0., noisy_bbox[3]))
-
-        h, w = aug_img.shape[:2]
-
-        startX = int(noisy_bbox[0] * w)
-        startY = int(noisy_bbox[1] * h)
-
-        w = abs(startX - int(noisy_bbox[2] * w))
-        h = abs(startY - int(noisy_bbox[3] * h))
-
         # cv2.rectangle(current_img, (startX, startY), (int(noisy_bbox[2]*w), int(noisy_bbox[3]*h)), (0, 255, 0), 2)
         cv2.imwrite(aug_path, aug_img)
 
         # Write to csv
-        csv_data.write(aug_path+','+str(key)+','+str(startX)+','+str(startY)+','+str(w)+','+str(h)+'\n')
-        
+        # csv_data.write(aug_path+','+str(key)+','+str(startX)+','+str(startY)+','+str(w)+','+str(h)+'\n')
+        csv_data.write('{},{},{},{},{},{}\n'.format(aug_path, key, int(bbox[0]), int(bbox[1]), int(bbox[2]), int(bbox[3])))
         # Updated index and count
         img_idx += 1
         img_count -= 1

@@ -122,9 +122,15 @@ def yolo4_body(inputs, num_anchors, num_classes):
     y19 = DarknetConv2D_BN_Leaky(512, (1,1))(darknet.output)
     y19 = DarknetConv2D_BN_Leaky(1024, (3,3))(y19)
     y19 = DarknetConv2D_BN_Leaky(512, (1,1))(y19)
-    maxpool1 = MaxPooling2D(pool_size=(13,13), strides=(1,1), padding='same')(y19)
-    maxpool2 = MaxPooling2D(pool_size=(9,9), strides=(1,1), padding='same')(y19)
+
+    #! it was flipped in original weights
     maxpool3 = MaxPooling2D(pool_size=(5,5), strides=(1,1), padding='same')(y19)
+    maxpool2 = MaxPooling2D(pool_size=(9,9), strides=(1,1), padding='same')(y19)
+    maxpool1 = MaxPooling2D(pool_size=(13,13), strides=(1,1), padding='same')(y19)
+    # maxpool1 = MaxPooling2D(pool_size=(13,13), strides=(1,1), padding='same')(y19)
+    # maxpool2 = MaxPooling2D(pool_size=(9,9), strides=(1,1), padding='same')(y19)
+    # maxpool3 = MaxPooling2D(pool_size=(5,5), strides=(1,1), padding='same')(y19)
+
     y19 = Concatenate()([maxpool1, maxpool2, maxpool3, y19])
     y19 = DarknetConv2D_BN_Leaky(512, (1,1))(y19)
     y19 = DarknetConv2D_BN_Leaky(1024, (3,3))(y19)
@@ -181,8 +187,10 @@ def yolo4_body(inputs, num_anchors, num_classes):
 
     y19_output = DarknetConv2D_BN_Leaky(1024, (3,3))(y19)
     y19_output = DarknetConv2D(num_anchors*(num_classes+5), (1,1))(y19_output)
-
-    yolo4_model = Model(inputs, [y19_output, y38_output, y76_output])
+    
+    #! it was flipped in original weights
+    # yolo4_model = Model(inputs, [y19_output, y38_output, y76_output])
+    yolo4_model = Model(inputs, [y76_output, y38_output, y19_output])
 
     return yolo4_model
 
@@ -307,8 +315,7 @@ def bbox_iou_data(boxes1, boxes2):
     return inter_area / union_area
 
 def preprocess_true_boxes(bboxes, train_output_sizes, strides, num_classes, max_bbox_per_scale, anchors):
-    label = [np.zeros((train_output_sizes[i], train_output_sizes[i], 3,
-                       5 + num_classes)) for i in range(3)]
+    label = [np.zeros((train_output_sizes[i], train_output_sizes[i], 3, 5 + num_classes)) for i in range(3)]
     bboxes_xywh = [np.zeros((max_bbox_per_scale, 4)) for _ in range(3)]
     bbox_count = np.zeros((3,))
     for bbox in bboxes:
@@ -329,7 +336,7 @@ def preprocess_true_boxes(bboxes, train_output_sizes, strides, num_classes, max_
         best_detect = int(best_anchor_ind / 3)
         best_anchor = int(best_anchor_ind % 3)
         xind, yind = np.floor(bbox_xywh_scaled[best_detect, 0:2]).astype(np.int32)
-        # 防止越界
+        # prevent cross-border
         grid_r = label[best_detect].shape[0]
         grid_c = label[best_detect].shape[1]
         xind = max(0, xind)
@@ -355,7 +362,7 @@ def bbox_ciou(boxes1, boxes2):
     :param boxes2: (8, 13, 13, 3, 4)   label_xywh
     :return:
 
-    举例时假设pred_xywh和label_xywh的shape都是(1, 4)
+    For example, assume that the shapes of pred_xywh and label_xywh are (1, 4)
     '''
 
     # 变成左上角坐标、右下角坐标
@@ -485,7 +492,6 @@ def loss_layer(conv, pred, label, bboxes, stride, num_class, iou_loss_thresh):
     ciou_loss = tf.reduce_mean(tf.reduce_sum(ciou_loss, axis=[1, 2, 3, 4]))  # 每个样本单独计算自己的ciou_loss，再求平均值
     conf_loss = tf.reduce_mean(tf.reduce_sum(conf_loss, axis=[1, 2, 3, 4]))  # 每个样本单独计算自己的conf_loss，再求平均值
     prob_loss = tf.reduce_mean(tf.reduce_sum(prob_loss, axis=[1, 2, 3, 4]))  # 每个样本单独计算自己的prob_loss，再求平均值
-
     return ciou_loss, conf_loss, prob_loss
 
 def decode(conv_output, anchors, stride, num_class):

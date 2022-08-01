@@ -544,14 +544,9 @@ def yolo_loss(args, num_classes, iou_loss_thresh, anchors):
     true_lbboxes = args[8]   # (?, 150, 4)
 
     #HACK: all NaN values in arrays are replaced with 0.0
-    tf.print("\nconv  sbbox:{} --- mbbox:{} --- lbbox{}".format(
-        K.eval(tf.math.is_nan(conv_sbbox)),\
-        K.eval(tf.math.is_nan(conv_mbbox)),\
-        K.eval(tf.math.is_nan(conv_lbbox))))
-        
-    conv_sbbox = tf.where(tf.math.is_nan(conv_sbbox), K.epsilon(), conv_sbbox)
-    conv_mbbox = tf.where(tf.math.is_nan(conv_mbbox), K.epsilon(), conv_mbbox)
-    conv_lbbox = tf.where(tf.math.is_nan(conv_lbbox), K.epsilon(), conv_lbbox)
+    # conv_sbbox = tf.where(tf.math.is_nan(conv_sbbox), K.epsilon(), conv_sbbox)
+    # conv_mbbox = tf.where(tf.math.is_nan(conv_mbbox), K.epsilon(), conv_mbbox)
+    # conv_lbbox = tf.where(tf.math.is_nan(conv_lbbox), K.epsilon(), conv_lbbox)
 
 
     pred_sbbox = decode(conv_sbbox, anchors[0], 8, num_classes)

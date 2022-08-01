@@ -157,7 +157,8 @@ def create_model(input_shape, anchors_stride_base, num_classes, load_pretrained=
             weights_path=None):
     '''create the training model'''
     K.clear_session() # get a new session
-    image_input = Input(shape=(None, None, 3))
+    # image_input = Input(shape=(None, None, 3))
+    image_input = Input(shape=input_shape+(3,))
     h, w = input_shape
     num_anchors = len(anchors_stride_base)
 

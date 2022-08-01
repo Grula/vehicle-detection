@@ -6,11 +6,13 @@ import configparser
 from collections import defaultdict
 from keras import backend as K
 
-from tensorflow.keras.layers import Input
-from tensorflow.keras.layers import Conv2D, Input, ZeroPadding2D, Add, UpSampling2D, MaxPooling2D, Concatenate
-from tensorflow.keras.layers import BatchNormalization, LeakyReLU
-from tensorflow.keras.models import Model
-from tensorflow.keras.regularizers import l2
+from tensorflow import keras
+
+from keras.layers import Input
+from keras.layers import Conv2D, Input, ZeroPadding2D, Add, UpSampling2D, MaxPooling2D, Concatenate
+from keras.layers import BatchNormalization, LeakyReLU
+from keras.models import Model
+from keras.regularizers import l2
 
 import argparse
 
@@ -40,16 +42,16 @@ def main():
 
     parser = argparse.ArgumentParser(description='')
 
-    parser.add_argument('--image_size', type=int , default=416, help='size of images')
-    parser.add_argument('--cfg_path', type=str , default="yolov4_custom.cfg", )
+    parser.add_argument('--img_size', type=int , default=416, help='size of images')
+    parser.add_argument('--cfg', type=str , default="yolov4_custom.cfg", )
     parser.add_argument('--type', type=str , default='weights', help='type of model')
 
 
     args = vars(parser.parse_args())
 
     # config_path = "yolov4_custom.cfg"
-    config_path = args['cfg_path']
-    output_path = f"model_data/{args['image_size']}_yolo4_{args['type']}.h5"
+    config_path = args['cfg']
+    output_path = f"model_data/{args['img_size']}_yolo4_{args['type']}.h5"
     
     # config_path = "yolov4.cfg"
     # output_path = 'model_data/yolo4_weight.h5'
@@ -74,7 +76,7 @@ def main():
     cfg_parser.read_file(unique_config_file)
 
     print('Creating Keras model.')
-    h, w = 416, 416
+    h, w = args['img_size'], args['img_size']
     # h, w = 608, 608
     input_layer = Input(shape=(h, w, 3))
     prev_layer = input_layer
@@ -89,7 +91,7 @@ def main():
         print(i)
         i += 1
         print('Parsing section {}'.format(section))
-        # convolutiona
+        # convolutional
         if section.startswith('convolutional'):
             filters = int(cfg_parser[section]['filters'])
             size = int(cfg_parser[section]['size'])

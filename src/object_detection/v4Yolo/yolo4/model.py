@@ -543,7 +543,7 @@ def yolo_loss(args, num_classes, iou_loss_thresh, anchors):
     true_mbboxes = args[7]   # (?, 150, 4)
     true_lbboxes = args[8]   # (?, 150, 4)
 
-    #HACK: all NaN values in arrays are replaced with 0.0
+    #HACK: all NaN values in arrays are replaced with K.epsilon()
     conv_sbbox = tf.where(tf.math.is_nan(conv_sbbox), K.epsilon(), conv_sbbox)
     conv_mbbox = tf.where(tf.math.is_nan(conv_mbbox), K.epsilon(), conv_mbbox)
     conv_lbbox = tf.where(tf.math.is_nan(conv_lbbox), K.epsilon(), conv_lbbox)

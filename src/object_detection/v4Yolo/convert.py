@@ -219,8 +219,11 @@ def main():
         out_index.append(len(all_layers) - 1)
 
     model = Model(inputs=input_layer, outputs=[all_layers[i] for i in out_index])
-    model.summary()
-
+    
+    # write model summary to file
+    with open("summary.txt", 'w') as f:
+        model.summary()
+        
     if weights_only:
         model.save_weights(output_path)
         print('Saved Keras weights to {}'.format(output_path))
@@ -228,10 +231,7 @@ def main():
         model.save(output_path)
         print('Saved Keras model to {}'.format(output_path))
 
-    # write model summary to file
-    with open(output_path + '.summary.txt', 'w') as f:
-        f.write(model.summary())
-        
+    
     # Check to see if all weights have been read.
     remaining_weights = len(weights_file.read()) / 4
     weights_file.close()

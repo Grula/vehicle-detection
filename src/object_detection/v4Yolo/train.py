@@ -10,12 +10,13 @@ import os
 import cv2
 import argparse
 
+import tensorflow as tf
 import numpy as np
 import keras
 import keras.backend as K
 from keras.layers import Input, Lambda
 from keras.models import Model
-from keras.optimizers import adam_v2
+from keras.optimizers import adam_v2, Adam
 from keras.callbacks import TensorBoard, ModelCheckpoint, ReduceLROnPlateau, EarlyStopping
 import keras.layers as layers
 
@@ -58,7 +59,7 @@ def _main():
     class_index = ['{}'.format(i) for i in range(num_classes)]
     anchors = get_anchors(anchors_path)
 
-    max_bbox_per_scale = 2
+    max_bbox_per_scale = 4
 
     anchors_stride_base = np.array([
         [[12, 16], [19, 36], [40, 28]],
@@ -71,8 +72,8 @@ def _main():
     anchors_stride_base[1] /= 16
     anchors_stride_base[2] /= 32
 
+    # input_shape = (608, 608) # multiple of 32, hw
     # input_shape = (416, 416) #/ multiple of 32, hw
-    input_shape = (608, 608) # multiple of 32, hw
     input_shape = (512, 512) # multiple of 32, hw
 
     model, model_body = create_model(input_shape, anchors_stride_base, num_classes,
@@ -109,13 +110,12 @@ def _main():
     # Train with frozen layers first, to get a stable loss.
     # Adjust num epochs to your dataset. This step is enough to obtain a not bad model.
     if True:
-        model.compile(optimizer=adam_v2.Adam(learning_rate=1e-3), loss={'yolo_loss': lambda y_true, y_pred: y_pred})
-
-        batch_size = 1
+        model.compile(optimizer=Adam(learning_rate=1e-3), loss={'yolo_loss': lambda y_true, y_pred: y_pred})
+        batch_size = 4
         print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
         model.fit(data_generator_wrapper(lines_train, batch_size, anchors_stride_base, num_classes, max_bbox_per_scale, 'train'),
                 steps_per_epoch=max(1, num_train//batch_size),
-                epochs=1,
+                epochs=25,
                 initial_epoch=0,
                 callbacks=[logging, checkpoint])
 
@@ -124,7 +124,7 @@ def _main():
     if True:
         for i in range(len(model.layers)):
             model.layers[i].trainable = True
-        model.compile(optimizer=adam_v2.Adam(learning_rate=1e-5), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
+        model.compile(optimizer=Adam(learning_rate=1e-5), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
         print('Unfreeze all of the layers.')
 
         batch_size = 8 # note that more GPU memory is required after unfreezing the body
@@ -158,8 +158,8 @@ def create_model(input_shape, anchors_stride_base, num_classes, load_pretrained=
             weights_path=None):
     '''create the training model'''
     K.clear_session() # get a new session
-    # image_input = Input(shape=(None, None, 3))
-    image_input = Input(shape=input_shape+(3,))
+    image_input = Input(shape=(None, None, 3))
+    # image_input = Input(shape=input_shape+(3,))
     h, w = input_shape  
     num_anchors = len(anchors_stride_base)
 
@@ -171,7 +171,7 @@ def create_model(input_shape, anchors_stride_base, num_classes, load_pretrained=
     print('Create YOLOv4 model with {} anchors and {} classes.'.format(num_anchors*3, num_classes))
 
     if load_pretrained:
-        model_body.load_weights(weights_path, by_name=False, skip_mismatch=False)
+        model_body.load_weights(weights_path, by_name=True, skip_mismatch=False)
         print('Load weights {}.'.format(weights_path))
         if freeze_body in [1, 2]:
             # Freeze darknet53 body or freeze all but 3 output layers.
@@ -323,7 +323,7 @@ def data_generator(annotation_lines, batch_size, anchors, num_classes, max_bbox_
     i = 0
     # train_input_sizes = [320, 352, 384, 416, 448, 480, 512, 544, 576, 608]
     # train_input_sizes = [128, 160, 192, 224, 256, 288, 320, 352, 384, 416]  
-    train_input_sizes = [512]
+    train_input_sizes = [224, 256, 288, 320, 352, 384, 416, 448, 480, 512]
     strides = np.array([8, 16, 32])
 
     while True:
@@ -350,6 +350,11 @@ def data_generator(annotation_lines, batch_size, anchors, num_classes, max_bbox_
 
             image, bboxes, exist_boxes = parse_annotation(annotation_lines[i], train_input_size, annotation_type)
             label_sbbox, label_mbbox, label_lbbox, sbboxes, mbboxes, lbboxes = preprocess_true_boxes(bboxes, train_output_sizes, strides, num_classes, max_bbox_per_scale, anchors)
+            # tf.print("############################")
+            # tf.print("sbboxes ", sbboxes)
+            # tf.print("mbboxes ", mbboxes)
+            # tf.print("lbboxes ", lbboxes)
+            # tf.print("############################")
             batch_image[num, :, :, :] = image
             if exist_boxes:
                 batch_label_sbbox[num, :, :, :, :] = label_sbbox
@@ -364,6 +369,7 @@ def data_generator(annotation_lines, batch_size, anchors, num_classes, max_bbox_
 def data_generator_wrapper(annotation_lines, batch_size, anchors, num_classes, max_bbox_per_scale, annotation_type):
     n = len(annotation_lines)
     if n==0 or batch_size<=0: return None
+
     return data_generator(annotation_lines, batch_size, anchors, num_classes, max_bbox_per_scale, annotation_type)
 
 if __name__ == '__main__':

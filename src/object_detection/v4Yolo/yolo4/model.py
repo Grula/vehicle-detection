@@ -354,7 +354,6 @@ def preprocess_true_boxes(bboxes, train_output_sizes, strides, num_classes, max_
     sbboxes, mbboxes, lbboxes = bboxes_xywh
     return label_sbbox, label_mbbox, label_lbbox, sbboxes, mbboxes, lbboxes
 
-
 def bbox_ciou(boxes1, boxes2):
     '''
     计算ciou = iou - p2/c2 - av
@@ -416,7 +415,6 @@ def bbox_ciou(boxes1, boxes2):
     ciou = iou - 1.0 * p2 / enclose_c2 - 1.0 * a * v
     return ciou
 
-
 def bbox_iou(boxes1, boxes2):
     '''
     预测框          boxes1 (?, grid_h, grid_w, 3,   1, 4)，神经网络的输出(tx, ty, tw, th)经过了后处理求得的(bx, by, bw, bh)
@@ -460,38 +458,40 @@ def loss_layer(conv, pred, label, bboxes, stride, num_class, iou_loss_thresh):
     ciou = tf.expand_dims(bbox_ciou(pred_xywh, label_xywh), axis=-1)  # (8, 13, 13, 3, 1)
     input_size = tf.cast(input_size, tf.float32)
 
-    # 每个预测框xxxiou_loss的权重 = 2 - (ground truth的面积/图片面积)
+    # Weight of each prediction box xxxiou_loss = 2 - (ground truth area/image area)
     bbox_loss_scale = 2.0 - 1.0 * label_xywh[:, :, :, :, 2:3] * label_xywh[:, :, :, :, 3:4] / (input_size ** 2)
-    ciou_loss = respond_bbox * bbox_loss_scale * (1 - ciou)  # 1. respond_bbox作为mask，有物体才计算xxxiou_loss
 
-    # 2. respond_bbox作为mask，有物体才计算类别loss
+    # 1. Respond_bbox is used as a mask, and xxxiou_loss is calculated only if there is an object
+
+    ciou_loss = respond_bbox * bbox_loss_scale * (1 - ciou)  
+    # 2. Respond_bbox is used as a mask, and the category loss is calculated only if there is an object
     prob_loss = respond_bbox * tf.nn.sigmoid_cross_entropy_with_logits(labels=label_prob, logits=conv_raw_prob)
 
-    # 3. xxxiou_loss和类别loss比较简单。重要的是conf_loss，是一个focal_loss
-    # 分两步：第一步是确定 grid_h * grid_w * 3 个预测框 哪些作为反例；第二步是计算focal_loss。
+    # 3. xxxiou_loss and category loss are relatively simple. The important thing is conf_loss, which is a focal_loss
+    # In two steps: the first step is to determine which of the grid_h * grid_w * 3 prediction boxes are used as negative examples; the second step is to calculate focal_loss.
     expand_pred_xywh = pred_xywh[:, :, :, :, np.newaxis, :]  # 扩展为(?, grid_h, grid_w, 3,   1, 4)
     expand_bboxes = bboxes[:, np.newaxis, np.newaxis, np.newaxis, :, :]  # 扩展为(?,      1,      1, 1, 150, 4)
     iou = bbox_iou(expand_pred_xywh, expand_bboxes)  # 所有格子的3个预测框 分别 和  150个ground truth  计算iou。   (?, grid_h, grid_w, 3, 150)
     max_iou = tf.expand_dims(tf.reduce_max(iou, axis=-1), axis=-1)  # 与150个ground truth的iou中，保留最大那个iou。  (?, grid_h, grid_w, 3, 1)
 
-    # respond_bgd代表  这个分支输出的 grid_h * grid_w * 3 个预测框是否是 反例（背景）
-    # label有物体，respond_bgd是0。 没物体的话：如果和某个gt(共150个)的iou超过iou_loss_thresh，respond_bgd是0；如果和所有gt(最多150个)的iou都小于iou_loss_thresh，respond_bgd是1。
-    # respond_bgd是0代表有物体，不是反例；  权重respond_bgd是1代表没有物体，是反例。
-    # 有趣的是，模型训练时由于不断更新，对于同一张图片，两次预测的 grid_h * grid_w * 3 个预测框（对于这个分支输出）  是不同的。用的是这些预测框来与gt计算iou来确定哪些预测框是反例。
-    # 而不是用固定大小（不固定位置）的先验框。
+    # respond_bgd represents whether the grid_h * grid_w * 3 prediction boxes output by this branch are negative examples (background)
+     # label has objects, respond_bgd is 0. If there is no object: if the iou with a certain gt (150 in total) exceeds iou_loss_thresh, respond_bgd is 0; if the iou with all gts (up to 150) is less than iou_loss_thresh, respond_bgd is 1.
+     # respond_bgd is 0 means there is an object, not a counter example; weight respond_bgd is 1 means there is no object, it is a counter example.
+     # Interestingly, due to continuous updating during model training, for the same picture, the grid_h * grid_w * 3 prediction boxes (for this branch output) predicted twice are different. These prediction boxes are used to calculate the iou with gt to determine which prediction boxes are negative examples.
+     # instead of a fixed size (not fixed position) prior box.
     respond_bgd = (1.0 - respond_bbox) * tf.cast(max_iou < iou_loss_thresh, tf.float32)
 
-    # 二值交叉熵损失
+    # Binary cross entropy loss
     pos_loss = respond_bbox * (0 - K.log(pred_conf + K.epsilon()))
     neg_loss = respond_bgd  * (0 - K.log(1 - pred_conf + K.epsilon()))
 
     conf_loss = pos_loss + neg_loss
-    # 回顾respond_bgd，某个预测框和某个gt的iou超过iou_loss_thresh，不被当作是反例。在参与“预测的置信位 和 真实置信位 的 二值交叉熵”时，这个框也可能不是正例(label里没标这个框是1的话)。这个框有可能不参与置信度loss的计算。
-    # 这种框一般是gt框附近的框，或者是gt框所在格子的另外两个框。它既不是正例也不是反例不参与置信度loss的计算。（论文里称之为ignore）
+    # Looking back at respond_bgd, the iou of a prediction box and a gt exceeds iou_loss_thresh and is not regarded as a negative example. When participating in "binary cross-entropy of predicted confidence level and true confidence level", this box may not be a positive example (if the box is not marked as 1 in the label). This box may not participate in the calculation of confidence loss.
+    # This kind of box is generally the box near the gt box, or the other two boxes in the grid where the gt box is located. It is neither a positive example nor a negative example and does not participate in the calculation of the confidence loss. (called ignore in the paper)
 
-    ciou_loss = tf.reduce_mean(tf.reduce_sum(ciou_loss, axis=[1, 2, 3, 4]))  # 每个样本单独计算自己的ciou_loss，再求平均值
-    conf_loss = tf.reduce_mean(tf.reduce_sum(conf_loss, axis=[1, 2, 3, 4]))  # 每个样本单独计算自己的conf_loss，再求平均值
-    prob_loss = tf.reduce_mean(tf.reduce_sum(prob_loss, axis=[1, 2, 3, 4]))  # 每个样本单独计算自己的prob_loss，再求平均值
+    ciou_loss = tf.reduce_mean(tf.reduce_sum(ciou_loss, axis=[1, 2, 3, 4]))  # Each sample calculates its own ciou_loss separately, and then averages
+    conf_loss = tf.reduce_mean(tf.reduce_sum(conf_loss, axis=[1, 2, 3, 4]))  # Each sample calculates its own conf_loss separately, and then averages
+    prob_loss = tf.reduce_mean(tf.reduce_sum(prob_loss, axis=[1, 2, 3, 4]))  # Each sample calculates its own prob_loss separately, and then averages
     return ciou_loss, conf_loss, prob_loss
 
 def decode(conv_output, anchors, stride, num_class):
@@ -504,11 +504,14 @@ def decode(conv_output, anchors, stride, num_class):
     conv_raw_dwdh = conv_output[:, :, :, :, 2:4]
     conv_raw_conf = conv_output[:, :, :, :, 4:5]
     conv_raw_prob = conv_output[:, :, :, :, 5: ]
+
     y = tf.tile(tf.range(output_size, dtype=tf.int32)[:, tf.newaxis], [1, output_size])
     x = tf.tile(tf.range(output_size, dtype=tf.int32)[tf.newaxis, :], [output_size, 1])
+
     xy_grid = tf.concat([x[:, :, tf.newaxis], y[:, :, tf.newaxis]], axis=-1)
     xy_grid = tf.tile(xy_grid[tf.newaxis, :, :, tf.newaxis, :], [batch_size, 1, 1, anchor_per_scale, 1])
     xy_grid = tf.cast(xy_grid, tf.float32)
+
     pred_xy = (tf.sigmoid(conv_raw_dxdy) + xy_grid) * stride
     pred_wh = (tf.exp(conv_raw_dwdh) * anchors) * stride
     pred_xywh = tf.concat([pred_xy, pred_wh], axis=-1)
@@ -517,26 +520,54 @@ def decode(conv_output, anchors, stride, num_class):
     return tf.concat([pred_xywh, pred_conf, pred_prob], axis=-1)
 
 def yolo_loss(args, num_classes, iou_loss_thresh, anchors):
-    conv_lbbox = args[0]   # (?, ?, ?, 3*(num_classes+5))
+    #! NOT OK
+    # conv_lbbox = args[0]   # (?, ?, ?, 3*(num_classes+5))
+    # conv_mbbox = args[1]   # (?, ?, ?, 3*(num_classes+5))
+    # conv_sbbox = args[2]   # (?, ?, ?, 3*(num_classes+5))
+
+    # Note: was flipped large and small
+    # NOTE OK
+    conv_sbbox = args[0]   # (?, ?, ?, 3*(num_classes+5))
+    #! NAN
     conv_mbbox = args[1]   # (?, ?, ?, 3*(num_classes+5))
-    conv_sbbox = args[2]   # (?, ?, ?, 3*(num_classes+5))
+    #! NAN
+    conv_lbbox = args[2]   # (?, ?, ?, 3*(num_classes+5))
+    
+    #Note OK
     label_sbbox = args[3]   # (?, ?, ?, 3, num_classes+5)
     label_mbbox = args[4]   # (?, ?, ?, 3, num_classes+5)
     label_lbbox = args[5]   # (?, ?, ?, 3, num_classes+5)
+
+    #Note OK
     true_sbboxes = args[6]   # (?, 150, 4)
     true_mbboxes = args[7]   # (?, 150, 4)
     true_lbboxes = args[8]   # (?, 150, 4)
+
+    #HACK: all NaN values in arrays are replaced with 0.0
+    conv_sbbox = tf.where(tf.math.is_nan(conv_sbbox), 0., conv_sbbox)
+    conv_mbbox = tf.where(tf.math.is_nan(conv_mbbox), tf.zeros_like(conv_mbbox), conv_mbbox)
+    conv_lbbox = tf.where(tf.math.is_nan(conv_lbbox), tf.zeros_like(conv_lbbox), conv_lbbox)
+
+
     pred_sbbox = decode(conv_sbbox, anchors[0], 8, num_classes)
     pred_mbbox = decode(conv_mbbox, anchors[1], 16, num_classes)
     pred_lbbox = decode(conv_lbbox, anchors[2], 32, num_classes)
-    sbbox_ciou_loss, sbbox_conf_loss, sbbox_prob_loss = loss_layer(conv_sbbox, pred_sbbox, label_sbbox, true_sbboxes, 8, num_classes, iou_loss_thresh)
-    mbbox_ciou_loss, mbbox_conf_loss, mbbox_prob_loss = loss_layer(conv_mbbox, pred_mbbox, label_mbbox, true_mbboxes, 16, num_classes, iou_loss_thresh)
-    lbbox_ciou_loss, lbbox_conf_loss, lbbox_prob_loss = loss_layer(conv_lbbox, pred_lbbox, label_lbbox, true_lbboxes, 32, num_classes, iou_loss_thresh)
+
+    
+    sbbox_ciou_loss, sbbox_conf_loss, sbbox_prob_loss = \
+        loss_layer(conv_sbbox, pred_sbbox, label_sbbox, true_sbboxes, 8, num_classes, iou_loss_thresh)
+    mbbox_ciou_loss, mbbox_conf_loss, mbbox_prob_loss = \
+        loss_layer(conv_mbbox, pred_mbbox, label_mbbox, true_mbboxes, 16, num_classes, iou_loss_thresh)
+    lbbox_ciou_loss, lbbox_conf_loss, lbbox_prob_loss = \
+        loss_layer(conv_lbbox, pred_lbbox, label_lbbox, true_lbboxes, 32, num_classes, iou_loss_thresh)
+  
+
 
     ciou_loss = sbbox_ciou_loss + mbbox_ciou_loss + lbbox_ciou_loss
     conf_loss = sbbox_conf_loss + mbbox_conf_loss + lbbox_conf_loss
     prob_loss = sbbox_prob_loss + mbbox_prob_loss + lbbox_prob_loss
 
     loss = ciou_loss + conf_loss + prob_loss
+
 
     return loss

@@ -40,8 +40,8 @@ def main():
 
     parser = argparse.ArgumentParser(description='')
 
-    parser.add_argument('--image_size', type=int , default=608, help='size of images')
-    parser.add_argument('--cfg_path', type=str , default="yolov4.cfg", )
+    parser.add_argument('--image_size', type=int , default=416, help='size of images')
+    parser.add_argument('--cfg_path', type=str , default="yolov4_custom.cfg", )
     parser.add_argument('--type', type=str , default='weights', help='type of model')
 
 
@@ -220,10 +220,6 @@ def main():
 
     model = Model(inputs=input_layer, outputs=[all_layers[i] for i in out_index])
     
-    # write model summary to file
-    with open("summary.txt", 'w') as f:
-        model.summary()
-        
     if weights_only:
         model.save_weights(output_path)
         print('Saved Keras weights to {}'.format(output_path))

@@ -548,6 +548,7 @@ def yolo_loss(args, num_classes, iou_loss_thresh, anchors):
         K.eval(tf.math.is_nan(conv_sbbox)),\
         K.eval(tf.math.is_nan(conv_mbbox)),\
         K.eval(tf.math.is_nan(conv_lbbox))))
+        
     conv_sbbox = tf.where(tf.math.is_nan(conv_sbbox), K.epsilon(), conv_sbbox)
     conv_mbbox = tf.where(tf.math.is_nan(conv_mbbox), K.epsilon(), conv_mbbox)
     conv_lbbox = tf.where(tf.math.is_nan(conv_lbbox), K.epsilon(), conv_lbbox)

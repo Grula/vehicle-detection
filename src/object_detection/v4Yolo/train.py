@@ -71,8 +71,9 @@ def _main():
     anchors_stride_base[1] /= 16
     anchors_stride_base[2] /= 32
 
-    # input_shape = (416, 416) # multiple of 32, hw
+    # input_shape = (416, 416) #/ multiple of 32, hw
     input_shape = (608, 608) # multiple of 32, hw
+    input_shape = (512, 512) # multiple of 32, hw
 
     model, model_body = create_model(input_shape, anchors_stride_base, num_classes,
                                     load_pretrained=True, freeze_body=2,
@@ -110,11 +111,11 @@ def _main():
     if True:
         model.compile(optimizer=adam_v2.Adam(learning_rate=1e-3), loss={'yolo_loss': lambda y_true, y_pred: y_pred})
 
-        batch_size = 4
+        batch_size = 1
         print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
         model.fit(data_generator_wrapper(lines_train, batch_size, anchors_stride_base, num_classes, max_bbox_per_scale, 'train'),
                 steps_per_epoch=max(1, num_train//batch_size),
-                epochs=10,
+                epochs=1,
                 initial_epoch=0,
                 callbacks=[logging, checkpoint])
 
@@ -159,17 +160,18 @@ def create_model(input_shape, anchors_stride_base, num_classes, load_pretrained=
     K.clear_session() # get a new session
     # image_input = Input(shape=(None, None, 3))
     image_input = Input(shape=input_shape+(3,))
-    h, w = input_shape
+    h, w = input_shape  
     num_anchors = len(anchors_stride_base)
 
     max_bbox_per_scale = 2
     iou_loss_thresh = 0.7
 
     model_body = yolo4_body(image_input, num_anchors, num_classes)
+
     print('Create YOLOv4 model with {} anchors and {} classes.'.format(num_anchors*3, num_classes))
 
     if load_pretrained:
-        model_body.load_weights(weights_path, by_name=True, skip_mismatch=True)
+        model_body.load_weights(weights_path, by_name=False, skip_mismatch=False)
         print('Load weights {}.'.format(weights_path))
         if freeze_body in [1, 2]:
             # Freeze darknet53 body or freeze all but 3 output layers.
@@ -190,22 +192,28 @@ def create_model(input_shape, anchors_stride_base, num_classes, load_pretrained=
                            arguments={'num_classes': num_classes, 'iou_loss_thresh': iou_loss_thresh,
                                       'anchors': anchors_stride_base})([*model_body.output, *y_true])
 
+    # sys.stdout = open('train_summ.txt', 'w')
+    # model_body.summary()
+    # sys.stdout.close()
+    # sys.stdout = sys.__stdout__
+    # import os
+    # os._exit(0)
+
     model = Model([model_body.input, *y_true], loss_list)
-    # model.summary()
 
     return model, model_body
 
 def random_fill(image, bboxes):
     if random.random() < 0.5:
         h, w, _ = image.shape
-        # 水平方向填充黑边，以训练小目标检测
+        # Fill with black borders in the horizontal direction to train small object detection
         if random.random() < 0.5:
             dx = random.randint(int(0.5*w), int(1.5*w))
             black_1 = np.zeros((h, dx, 3), dtype='uint8')
             black_2 = np.zeros((h, dx, 3), dtype='uint8')
             image = np.concatenate([black_1, image, black_2], axis=1)
             bboxes[:, [0, 2]] += dx
-        # 垂直方向填充黑边，以训练小目标检测
+        # Fill with black borders vertically to train small object detection
         else:
             dy = random.randint(int(0.5*h), int(1.5*h))
             black_1 = np.zeros((dy, w, 3), dtype='uint8')
@@ -263,7 +271,7 @@ def random_translate(image, bboxes):
     return image, bboxes
 
 def image_preprocess(image, target_size, gt_boxes):
-    # 传入训练的图片是rgb格式
+    # The incoming training image is in rgb format
     ih, iw = target_size
     h, w = image.shape[:2]
     interps = [   # 随机选一种插值方式
@@ -294,7 +302,7 @@ def parse_annotation(annotation, train_input_size, annotation_type):
     image = np.array(cv2.imread(image_path))
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-    # 没有标注物品，即每个格子都当作背景处理
+    # No items are marked, that is, each grid is treated as a background
     exist_boxes = True
     if len(line) == 1:
         bboxes = np.array([[10, 10, 101, 103, 0]])
@@ -302,7 +310,7 @@ def parse_annotation(annotation, train_input_size, annotation_type):
     else:
         bboxes = np.array([list(map(lambda x: int(float(x)), box.split(','))) for box in line[1:]])
     if annotation_type == 'train':
-        # image, bboxes = random_fill(np.copy(image), np.copy(bboxes))    # 数据集缺乏小物体时打开
+        image, bboxes = random_fill(np.copy(image), np.copy(bboxes))    # Open when dataset lacks small objects
         image, bboxes = random_horizontal_flip(np.copy(image), np.copy(bboxes))
         image, bboxes = random_crop(np.copy(image), np.copy(bboxes))
         image, bboxes = random_translate(np.copy(image), np.copy(bboxes))
@@ -313,8 +321,9 @@ def data_generator(annotation_lines, batch_size, anchors, num_classes, max_bbox_
     '''data generator for fit_generator'''
     n = len(annotation_lines)
     i = 0
-    train_input_sizes = [320, 352, 384, 416, 448, 480, 512, 544, 576, 608]
+    # train_input_sizes = [320, 352, 384, 416, 448, 480, 512, 544, 576, 608]
     # train_input_sizes = [128, 160, 192, 224, 256, 288, 320, 352, 384, 416]  
+    train_input_sizes = [512]
     strides = np.array([8, 16, 32])
 
     while True:
@@ -341,7 +350,6 @@ def data_generator(annotation_lines, batch_size, anchors, num_classes, max_bbox_
 
             image, bboxes, exist_boxes = parse_annotation(annotation_lines[i], train_input_size, annotation_type)
             label_sbbox, label_mbbox, label_lbbox, sbboxes, mbboxes, lbboxes = preprocess_true_boxes(bboxes, train_output_sizes, strides, num_classes, max_bbox_per_scale, anchors)
-
             batch_image[num, :, :, :] = image
             if exist_boxes:
                 batch_label_sbbox[num, :, :, :, :] = label_sbbox

@@ -31,81 +31,47 @@ def get_anchors(anchors_path):
     anchors = [float(x) for x in anchors.split(',')]
     return np.array(anchors).reshape(-1, 2)
 
-def get_relative_path(path):
-    return os.path.join(sys.path[0], path)
+# def get_relative_path(path):
+#     return os.path.join(sys.path[0], path)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='')
-    
-    parser.add_argument('--model_dir', default='model_data/', type=str)
-    parser.add_argument('--weights_path', default='', type=str)
-    parser.add_argument('--classes_path', default='', type=str)
-    parser.add_argument('--image_dim', default=416, type=int)
+
+    parser.add_argument('--model_data', type=str , default='model_data/', help='path to model data')
+    parser.add_argument('--weights_name', type=str , default='512_yolo4_weights.h5', help='name of model weights')
+    parser.add_argument('--image_dim', default=512, type=int)
     parser.add_argument('--images', default='', type=str, required=True)
+    
+    # parser.add_argument('--model_dir', default='model_data/', type=str)
+    # parser.add_argument('--weights_path', default='', type=str)
+    # parser.add_argument('--classes_path', default='', type=str)
     parser.add_argument('--save', default=0, type=bool)
 
     args = vars(parser.parse_args())
 
-    model_dir = get_relative_path(args['model_dir'])
+    model_dir = args['model_data']
     print(model_dir)
     images_path = args['images']
 
-    # Give an option to choose the model if args is empty
-    # model_path = 'model_data/yolo4_weight.h5'
-    weights = args['weights_path']
-    if not weights:
-        # list all weights files that end with .h5
-        weights_files = [f for f in os.listdir(model_dir) if f.endswith('.h5')]
-        for i, weights in enumerate(weights_files):
-            print(f'\t{i}: {weights}')
-        while True:
-            try:
-                idx = int(input('Select model: '))
-                weights = weights_files[idx]
-                break
-            except Exception as e:
-                print('Invalid model index')
-                continue
-    weights_path = os.path.join(get_relative_path(model_dir), weights)
-    # model_path = 'model_data/custom_trained_weights.h5'
+    weights_path = os.path.join(args['model_data'],args['weights_name'])
+    classes_path = os.path.join(args['model_data'], 'custom_classes.txt')
+    anchors_path = os.path.join(args['model_data'], 'yolo4_anchors.txt')
 
-    # Give an option to choose the model if args is empty
-    # classes_path = 'model_data/custom_classes.txt'
-    # classes_path = 'model_data/coco_classes.txt'
-    classes = args['classes_path']
-    if not classes:
-        # list all classes files that have class in name
-        classes_files = [f for f in os.listdir(model_dir) if 'class' in f]
-        for i, cls in enumerate(classes_files):
-            print(f'\t{i}: {cls}')
-        while True:
-            try:
-                idx = int(input('Select class file: '))
-                classes = classes_files[idx]
-                break
-            except Exception as e:
-                print('Invalid model index')
-                continue
-
-    classes_path = os.path.join(model_dir, classes)
 
     # model_image_size = (416, 416)
     # model_image_size = (608, 608)
     model_image_size = (args['image_dim'], args['image_dim'])
     
-    anchors_path = get_relative_path('model_data/yolo4_anchors.txt')
-
     class_names = get_class(classes_path)
     anchors = get_anchors(anchors_path)
 
     num_anchors = len(anchors)
     num_classes = len(class_names)
 
-
     # conf_thresh = 0.8
     # nms_thresh = 0.7
-    conf_thresh = 0.2
-    nms_thresh = 0.45
+    conf_thresh = 0.8
+    nms_thresh = 0.7
 
     yolo4_model = yolo4_body(Input(shape=model_image_size+(3,)), num_anchors//3, num_classes)
 
@@ -116,7 +82,6 @@ if __name__ == '__main__':
     yolo4_model.load_weights(model_path)
     _decode = Decode(conf_thresh, nms_thresh, model_image_size, yolo4_model, class_names)
 
-
     # create csv file
     f = open('data_augmented.csv', 'w')
     # im_path, label, x, y, w, h
@@ -126,18 +91,20 @@ if __name__ == '__main__':
 
     # detect images in test floder
     subfolders = [ f.path for f in os.scandir(images_path) if f.is_dir() ]
-    print(subfolders)
     for subfolder in subfolders:
         images = [f for f in os.listdir(subfolder) if f.endswith('.png') or f.endswith('.jpg')]
         current_label = subfolder.split('/')[-1]
-        destination_folder = get_relative_path(f'{subfolder}-PREDICTED')
+
+        destination_folder = os.path.join(images_path,(f'{current_label}-PREDICTED'))
+        print("Destination folder ----> ", destination_folder)
         if not os.path.exists(destination_folder):
             os.makedirs(destination_folder)
+        
         for image_file in images[:10]:
-            images_path = os.path.join(subfolder, image_file)
-            image = cv2.imread(images_path)
+            image_path = os.path.join(subfolder, image_file)
 
-            print("Detecing image: {}".format(images_path))
+            print("Detecing image: {}".format(image_path))
+            image = cv2.imread(image_path)
             image, boxes, scores, classes = _decode.detect_image(image, True)
             
             # find image with highest score if exists
@@ -159,10 +126,10 @@ if __name__ == '__main__':
                     w = right - x
                     h = bottom - y
                     # saving info to csv file 
-                    f.write(f'{images_path},{current_label},{x},{y},{w},{h}\n')
+                    f.write(f'{image_path},{current_label},{x},{y},{w},{h}\n')
 
-                cv2.imwrite(f'{destination_folder}/{image_file}', image)
-                print(f'Saved {image_file}')
+            cv2.imwrite(f'{destination_folder}/{image_file}', image)
+            print(f'Saved {image_file}')
     
     
     f.close()

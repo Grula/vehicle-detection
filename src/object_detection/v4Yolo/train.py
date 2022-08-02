@@ -85,7 +85,7 @@ def _main():
     checkpoint = ModelCheckpoint(os.path.join(args['log_dir'], 'ep{epoch:03d}.h5'),
         monitor='loss', save_weights_only=True, save_best_only=True, save_freq='epoch')
     reduce_lr = ReduceLROnPlateau(monitor='loss', factor=0.1, patience=3, verbose=1)
-    early_stopping = EarlyStopping(monitor='loss', min_delta=0, patience=10, verbose=1)
+    early_stopping = EarlyStopping(monitor='loss', min_delta=0, patience=3, verbose=1)
 
     evaluation = Evaluate(model_body=model_body, anchors=anchors, class_names=class_index,
          score_threshold=0.05, tensorboard=logging, weighted_average=True, eval_file=annotation_val_path, log_dir=log_dir,
@@ -129,7 +129,7 @@ def _main():
                 steps_per_epoch=max(1, num_train//batch_size),
                 epochs=10,
                 initial_epoch=0,
-                callbacks=[logging, checkpoint])
+                callbacks=[logging, checkpoint, early_stopping])
 
     # Unfreeze and continue training, to fine-tune.
     # Train longer if the result is not good.

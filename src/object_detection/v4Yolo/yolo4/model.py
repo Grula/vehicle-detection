@@ -525,21 +525,20 @@ def yolo_loss(args, num_classes, iou_loss_thresh, anchors):
     # conv_mbbox = args[1]   # (?, ?, ?, 3*(num_classes+5))
     # conv_sbbox = args[2]   # (?, ?, ?, 3*(num_classes+5))
 
-    # Note outputs of network were flipped so we mirror in loss too
-    #Note OK
-    true_sbboxes = args[0]   # (?, 150, 4)
-    true_mbboxes = args[1]   # (?, 150, 4)
-    true_lbboxes = args[2]   # (?, 150, 4)
+    # Note: was flipped large and small
+    conv_sbbox = args[0]   # (?, ?, ?, 3*(num_classes+5))
+    conv_mbbox = args[1]   # (?, ?, ?, 3*(num_classes+5))
+    conv_lbbox = args[2]   # (?, ?, ?, 3*(num_classes+5))
     
     #Note OK
     label_sbbox = args[3]   # (?, ?, ?, 3, num_classes+5)
     label_mbbox = args[4]   # (?, ?, ?, 3, num_classes+5)
     label_lbbox = args[5]   # (?, ?, ?, 3, num_classes+5)
 
-    # Note: was flipped large and small
-    conv_lbbox = args[6]   # (?, ?, ?, 3*(num_classes+5))
-    conv_mbbox = args[7]   # (?, ?, ?, 3*(num_classes+5))
-    conv_sbbox = args[8]   # (?, ?, ?, 3*(num_classes+5))
+    #Note OK
+    true_sbboxes = args[6]   # (?, 150, 4)
+    true_mbboxes = args[7]   # (?, 150, 4)
+    true_lbboxes = args[8]   # (?, 150, 4)
 
     tf.print("############################")
     tf.print("true_sbboxes ", true_sbboxes)

@@ -122,7 +122,7 @@ def _main():
         batch_size = 8
         # DEBUG START
         # using just for testing
-        batch_size = 4
+        batch_size = 8
         # DEBUG END
         print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
         model.fit(data_generator_wrapper(lines_train, batch_size, anchors_stride_base, num_classes, max_bbox_per_scale, 'train'),

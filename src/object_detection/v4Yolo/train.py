@@ -91,6 +91,10 @@ def _main():
 
     with open(annotation_train_path) as f:
         lines_train = f.readlines()
+        # DEBUG START
+        # using just for testing
+        lines_train = lines_train[:5]
+        # DEBUG END
 
     np.random.seed(42)
     np.random.shuffle(lines_train)
@@ -100,6 +104,10 @@ def _main():
 
     with open(annotation_val_path) as f:
         lines_val = f.readlines()
+        # DEBUG START
+        # using just for testing
+        lines_val = lines_val[:1]
+        # DEBUG END
 
     np.random.seed(42)
     np.random.shuffle(lines_val)
@@ -112,10 +120,14 @@ def _main():
     if True:
         model.compile(optimizer=adam_v2.Adam(learning_rate=1e-3), loss={'yolo_loss': lambda y_true, y_pred: y_pred})
         batch_size = 8
+        # DEBUG START
+        # using just for testing
+        batch_size = 1
+        # DEBUG END
         print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
         model.fit(data_generator_wrapper(lines_train, batch_size, anchors_stride_base, num_classes, max_bbox_per_scale, 'train'),
                 steps_per_epoch=max(1, num_train//batch_size),
-                epochs=5,
+                epochs=1,
                 initial_epoch=0,
                 callbacks=[logging, checkpoint])
 
@@ -374,3 +386,30 @@ def data_generator_wrapper(annotation_lines, batch_size, anchors, num_classes, m
 
 if __name__ == '__main__':
     _main()
+
+# ERR
+# Traceback (most recent call last):
+#   File "/content/vehicle-detection/src/object_detection/v4Yolo/train.py", line 376, in <module>
+#     _main()
+#   File "/content/vehicle-detection/src/object_detection/v4Yolo/train.py", line 136, in _main
+#     callbacks=[logging, checkpoint, reduce_lr, early_stopping, evaluation])
+#   File "/usr/local/lib/python3.7/dist-packages/keras/utils/traceback_utils.py", line 67, in error_handler
+#     raise e.with_traceback(filtered_tb) from None
+#   File "/content/vehicle-detection/src/object_detection/v4Yolo/callback_eval.py", line 277, in on_epoch_end
+#     self.calc_result(epoch)
+#   File "/content/vehicle-detection/src/object_detection/v4Yolo/callback_eval.py", line 90, in calc_result
+#     out_boxes, out_scores, out_classes = self.calc_image(image)
+#   File "/content/vehicle-detection/src/object_detection/v4Yolo/callback_eval.py", line 71, in calc_image
+#     image, boxes, scores, classes = self._decode.detect_image(image, False)
+#   File "/content/vehicle-detection/src/object_detection/v4Yolo/decode_np.py", line 22, in detect_image
+#     boxes, scores, classes = self.predict(pimage, image.shape)
+#   File "/content/vehicle-detection/src/object_detection/v4Yolo/decode_np.py", line 130, in predict
+#     a1 = np.reshape(outs[0], (1, self.input_shape[0]//32, self.input_shape[1]//32, 3, 5+self.num_classes))
+#   File "<__array_function__ internals>", line 6, in reshape
+#   File "/usr/local/lib/python3.7/dist-packages/numpy/core/fromnumeric.py", line 298, in reshape
+#     return _wrapfunc(a, 'reshape', newshape, order=order)
+#   File "/usr/local/lib/python3.7/dist-packages/numpy/core/fromnumeric.py", line 57, in _wrapfunc
+#     return bound(*args, **kwds)
+# ValueError: cannot reshape array of size 155952 into shape (1,19,19,3,9)
+# 2022-08-01 22:29:33.406441: W tensorflow/core/kernels/data/generator_dataset_op.cc:107] Error occurred when finalizing GeneratorDataset iterator: FAILED_PRECONDITION: Python interpreter state is not initialized. The process may be terminated.
+# 	 [[{{node PyFunc}}]]

@@ -30,7 +30,8 @@ class Evaluate(keras.callbacks.Callback):
         weighted_average=False,
         eval_file='2007_val.txt',
         log_dir='logs/000/',
-        verbose=1
+        verbose=1,
+        image_shape = (608, 608),
     ):
         """ Evaluate a given dataset using a given model at the end of every epoch during training.
 
@@ -54,6 +55,7 @@ class Evaluate(keras.callbacks.Callback):
         self.eval_file       = eval_file
         self.log_dir         = log_dir
         self.verbose         = verbose
+        self.image_shape     = image_shape
 
         self.sess = K.get_session()
 
@@ -61,7 +63,7 @@ class Evaluate(keras.callbacks.Callback):
         conf_thresh = score_threshold
         nms_thresh = 0.45
 
-        self._decode = Decode(conf_thresh, nms_thresh, (608,608), self.model_body, self.class_names)
+        self._decode = Decode(conf_thresh, nms_thresh, image_shape, self.model_body, self.class_names)
 
         super(Evaluate, self).__init__()
 

@@ -93,7 +93,7 @@ def _main():
         lines_train = f.readlines()
         # DEBUG START
         # using just for testing
-        # lines_train = lines_train[:(2**4)]
+        lines_train = lines_train[:(2**4)]
         # DEBUG END
 
     np.random.seed(42)
@@ -106,7 +106,7 @@ def _main():
         lines_val = f.readlines()
         # DEBUG START
         # using just for testing
-        # lines_val = lines_val[:2]
+        lines_val = lines_val[:2]
         # DEBUG END
 
     np.random.seed(42)
@@ -122,10 +122,6 @@ def _main():
     if True:
         model.compile(optimizer=adam_v2.Adam(learning_rate=1e-3), loss={'yolo_loss': lambda y_true, y_pred: y_pred})
         batch_size = 4
-        # DEBUG START
-        # using just for testing
-        # batch_size = 8
-        # DEBUG END
         print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
         model.fit(data_generator_wrapper(lines_train, batch_size, anchors_stride_base, num_classes, max_bbox_per_scale, 'train'),
                 steps_per_epoch=max(1, num_train//batch_size),
@@ -141,7 +137,7 @@ def _main():
         model.compile(optimizer=adam_v2.Adam(learning_rate=1e-5), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
         print('Unfreeze all of the layers.')
 
-        batch_size = 4 # note that more GPU memory is required after unfreezing the body
+        batch_size = 2 # note that more GPU memory is required after unfreezing the body
         print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
         model.fit(data_generator_wrapper(lines_train, batch_size, anchors_stride_base, num_classes, max_bbox_per_scale, 'train'),
             steps_per_epoch=max(1, num_train//batch_size),
@@ -365,11 +361,11 @@ def data_generator(annotation_lines, batch_size, anchors, num_classes, max_bbox_
 
             image, bboxes, exist_boxes = parse_annotation(annotation_lines[i], train_input_size, annotation_type)
             label_sbbox, label_mbbox, label_lbbox, sbboxes, mbboxes, lbboxes = preprocess_true_boxes(bboxes, train_output_sizes, strides, num_classes, max_bbox_per_scale, anchors)
-            # tf.print("############################")
-            # tf.print("sbboxes ", sbboxes)
-            # tf.print("mbboxes ", mbboxes)
-            # tf.print("lbboxes ", lbboxes)
-            # tf.print("############################")
+            tf.print("############################")
+            tf.print("sbboxes ", sbboxes)
+            tf.print("mbboxes ", mbboxes)
+            tf.print("lbboxes ", lbboxes)
+            tf.print("############################")
             batch_image[num, :, :, :] = image
             if exist_boxes:
                 batch_label_sbbox[num, :, :, :, :] = label_sbbox

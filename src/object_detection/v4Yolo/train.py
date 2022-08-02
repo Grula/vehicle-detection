@@ -121,7 +121,7 @@ def _main():
 
     # Train with frozen layers first, to get a stable loss.
     # Adjust num epochs to your dataset. This step is enough to obtain a not bad model.
-    if False:
+    if True:
         model.compile(optimizer=adam_v2.Adam(learning_rate=1e-3), loss={'yolo_loss': lambda y_true, y_pred: y_pred})
         batch_size = 4
         print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))

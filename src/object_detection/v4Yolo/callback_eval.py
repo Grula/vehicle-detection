@@ -32,6 +32,7 @@ class Evaluate(keras.callbacks.Callback):
         log_dir='logs/000/',
         verbose=1,
         image_shape = (608, 608),
+        eval_path  = '.'
     ):
         """ Evaluate a given dataset using a given model at the end of every epoch during training.
 
@@ -56,6 +57,7 @@ class Evaluate(keras.callbacks.Callback):
         self.log_dir         = log_dir
         self.verbose         = verbose
         self.image_shape     = image_shape
+        self.eval_path       = eval_path 
 
         self.sess = K.get_session()
 
@@ -83,7 +85,7 @@ class Evaluate(keras.callbacks.Callback):
 
         #np.random.shuffle(lines)
 
-        result_file = open('eval_result_{}.txt'.format(epoch+1), 'w')
+        result_file = open(os.path.join( self.eval_path,'eval_result_{}.txt'.format(epoch+1)), 'w')
         count = 0
         for annotation_line in lines[:500]:
             #print(count)

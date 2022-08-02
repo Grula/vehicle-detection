@@ -89,7 +89,7 @@ def _main():
 
     evaluation = Evaluate(model_body=model_body, anchors=anchors, class_names=class_index,
          score_threshold=0.05, tensorboard=logging, weighted_average=True, eval_file=annotation_val_path, log_dir=log_dir,
-         image_shape = input_shape)
+         image_shape = input_shape, eval_path = args['log_dir'])
 
     with open(annotation_train_path) as f:
         lines_train = f.readlines()

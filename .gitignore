@@ -140,4 +140,5 @@ dmypy.json
 models*/ 
 *.h5
 *.weights
+logs/
 

@@ -143,7 +143,8 @@ def _main():
             steps_per_epoch=max(1, num_train//batch_size),
             epochs=100,
             initial_epoch=0,
-            callbacks=[logging, checkpoint, reduce_lr, early_stopping, evaluation])
+            callbacks=[logging, checkpoint, reduce_lr, early_stopping])
+            # callbacks=[logging, checkpoint, reduce_lr, early_stopping, evaluation])
 
     # Further training if needed.
 

@@ -94,7 +94,7 @@ def _main():
         lines_train = f.readlines()
         # DEBUG START
         # using just for testing
-        lines_train = lines_train[:(2**4)]
+        # lines_train = lines_train[:(2**4)]
         # DEBUG END
 
     np.random.seed(42)
@@ -107,7 +107,7 @@ def _main():
         lines_val = f.readlines()
         # DEBUG START
         # using just for testing
-        lines_val = lines_val[:2]
+        # lines_val = lines_val[:2]
         # DEBUG END
 
     np.random.seed(42)
@@ -126,7 +126,7 @@ def _main():
         print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
         model.fit(data_generator_wrapper(lines_train, batch_size, anchors_stride_base, num_classes, max_bbox_per_scale, 'train'),
                 steps_per_epoch=max(1, num_train//batch_size),
-                epochs=1,
+                epochs=10,
                 initial_epoch=0,
                 callbacks=[logging, checkpoint])
 

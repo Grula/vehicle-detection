@@ -115,6 +115,8 @@ def _main():
     
     num_val = len(lines_val)
 
+    np.random.seed(42)
+
     # Train with frozen layers first, to get a stable loss.
     # Adjust num epochs to your dataset. This step is enough to obtain a not bad model.
     if True:
@@ -309,6 +311,7 @@ def image_preprocess(image, target_size, gt_boxes):
 def parse_annotation(annotation, train_input_size, annotation_type):
     line = annotation.split()
     image_path = line[0]
+    tf.print(image_path)
     if not os.path.exists(image_path):
         raise KeyError("%s does not exist ... " %image_path)
     image = np.array(cv2.imread(image_path))

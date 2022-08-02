@@ -57,7 +57,7 @@ class Evaluate(keras.callbacks.Callback):
         self.log_dir         = log_dir
         self.verbose         = verbose
         self.image_shape     = image_shape
-        self.eval_path       = os.path.join(eval_path,'eval_result_{}.txt'.format())
+        self.eval_path       = '{:s}'.format(os.path.join(eval_path, 'eval_result_{}.txt'))
 
 
 

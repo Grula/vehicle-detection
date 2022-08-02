@@ -93,7 +93,7 @@ def _main():
         lines_train = f.readlines()
         # DEBUG START
         # using just for testing
-        lines_train = lines_train[:(2**3)]
+        lines_train = lines_train[:(2**4)]
         # DEBUG END
 
     np.random.seed(42)

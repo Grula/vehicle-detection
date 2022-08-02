@@ -542,9 +542,9 @@ def yolo_loss(args, num_classes, iou_loss_thresh, anchors):
 
     # DEBUG START
     tf.print("############################")
-    tf.print("conv_sbbox ", conv_sbbox[0][0])
-    tf.print("conv_mbbox ", conv_mbbox[0][0])
-    tf.print("conv_lbbox ", conv_lbbox[0][0])
+    tf.print("conv_sbbox ", conv_sbbox[0][0][0])
+    tf.print("conv_mbbox ", conv_mbbox[0][0][0])
+    tf.print("conv_lbbox ", conv_lbbox[0][0][0])
     tf.print("############################")
     # DEBUG END
     #HACK: all NaN values in arrays are replaced with K.epsilon()

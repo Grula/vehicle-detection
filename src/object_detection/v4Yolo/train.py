@@ -12,7 +12,7 @@ import argparse
 
 import tensorflow as tf
 import numpy as np
-import keras
+
 import keras.backend as K
 from keras.layers import Input, Lambda
 from keras.models import Model
@@ -35,6 +35,7 @@ def _main():
     parser.add_argument('--model_data', type=str , default='model_data/', help='path to model data')
     parser.add_argument('--weights_name', type=str , default='yolo4_weights.h5', help='name of model weights')
     parser.add_argument('--model_name', type=str , default='yolo4_model.h5', help='name of model')
+    parser.add_argument('--log_dir', type=str , default='logs/')
 
 
     args = vars(parser.parse_args())
@@ -43,7 +44,7 @@ def _main():
     annotation_val_path = 'data/valid_data.txt'
     # annotation_train_path = '2012_train.txt'
     # annotation_val_path = '2012_val.txt'
-    log_dir = 'logs/'
+    log_dir = args['log_dir']
 
 
     classes_path = os.path.join(args['model_data'], 'custom_classes.txt')
@@ -81,7 +82,7 @@ def _main():
                                     weights_path=weights_path)
 
     logging = TensorBoard(log_dir=log_dir)
-    checkpoint = ModelCheckpoint(log_dir + 'ep{epoch:03d}.h5',
+    checkpoint = ModelCheckpoint(os.path.join(args['log_dir'], 'ep{epoch:03d}.h5'),
         monitor='loss', save_weights_only=True, save_best_only=True, save_freq='epoch')
     reduce_lr = ReduceLROnPlateau(monitor='loss', factor=0.1, patience=3, verbose=1)
     early_stopping = EarlyStopping(monitor='loss', min_delta=0, patience=10, verbose=1)
@@ -148,6 +149,8 @@ def _main():
             callbacks=[logging, checkpoint, reduce_lr, early_stopping, evaluation])
 
     # Further training if needed.
+
+    model.save(os.path.join(args['model_data'], 'final_model.h5'))
 
 
 def get_classes(classes_path):
@@ -386,30 +389,3 @@ def data_generator_wrapper(annotation_lines, batch_size, anchors, num_classes, m
 
 if __name__ == '__main__':
     _main()
-
-# ERR
-# Traceback (most recent call last):
-#   File "/content/vehicle-detection/src/object_detection/v4Yolo/train.py", line 376, in <module>
-#     _main()
-#   File "/content/vehicle-detection/src/object_detection/v4Yolo/train.py", line 136, in _main
-#     callbacks=[logging, checkpoint, reduce_lr, early_stopping, evaluation])
-#   File "/usr/local/lib/python3.7/dist-packages/keras/utils/traceback_utils.py", line 67, in error_handler
-#     raise e.with_traceback(filtered_tb) from None
-#   File "/content/vehicle-detection/src/object_detection/v4Yolo/callback_eval.py", line 277, in on_epoch_end
-#     self.calc_result(epoch)
-#   File "/content/vehicle-detection/src/object_detection/v4Yolo/callback_eval.py", line 90, in calc_result
-#     out_boxes, out_scores, out_classes = self.calc_image(image)
-#   File "/content/vehicle-detection/src/object_detection/v4Yolo/callback_eval.py", line 71, in calc_image
-#     image, boxes, scores, classes = self._decode.detect_image(image, False)
-#   File "/content/vehicle-detection/src/object_detection/v4Yolo/decode_np.py", line 22, in detect_image
-#     boxes, scores, classes = self.predict(pimage, image.shape)
-#   File "/content/vehicle-detection/src/object_detection/v4Yolo/decode_np.py", line 130, in predict
-#     a1 = np.reshape(outs[0], (1, self.input_shape[0]//32, self.input_shape[1]//32, 3, 5+self.num_classes))
-#   File "<__array_function__ internals>", line 6, in reshape
-#   File "/usr/local/lib/python3.7/dist-packages/numpy/core/fromnumeric.py", line 298, in reshape
-#     return _wrapfunc(a, 'reshape', newshape, order=order)
-#   File "/usr/local/lib/python3.7/dist-packages/numpy/core/fromnumeric.py", line 57, in _wrapfunc
-#     return bound(*args, **kwds)
-# ValueError: cannot reshape array of size 155952 into shape (1,19,19,3,9)
-# 2022-08-01 22:29:33.406441: W tensorflow/core/kernels/data/generator_dataset_op.cc:107] Error occurred when finalizing GeneratorDataset iterator: FAILED_PRECONDITION: Python interpreter state is not initialized. The process may be terminated.
-# 	 [[{{node PyFunc}}]]

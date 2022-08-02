@@ -121,7 +121,7 @@ def _main():
     # Adjust num epochs to your dataset. This step is enough to obtain a not bad model.
     if True:
         model.compile(optimizer=adam_v2.Adam(learning_rate=1e-3), loss={'yolo_loss': lambda y_true, y_pred: y_pred})
-        batch_size = 8
+        batch_size = 4
         # DEBUG START
         # using just for testing
         # batch_size = 8

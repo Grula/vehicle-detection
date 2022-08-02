@@ -57,7 +57,9 @@ class Evaluate(keras.callbacks.Callback):
         self.log_dir         = log_dir
         self.verbose         = verbose
         self.image_shape     = image_shape
-        self.eval_path       = eval_path 
+        self.eval_path       = os.path.join(eval_path,'eval_result_{}.txt'.format())
+
+
 
         self.sess = K.get_session()
 
@@ -85,7 +87,7 @@ class Evaluate(keras.callbacks.Callback):
 
         #np.random.shuffle(lines)
 
-        result_file = open(os.path.join( self.eval_path,'eval_result_{}.txt'.format(epoch+1)), 'w')
+        result_file = open(self.eval_path.format(epoch+1), 'w')
         count = 0
         for annotation_line in lines[:500]:
             #print(count)
@@ -284,7 +286,8 @@ class Evaluate(keras.callbacks.Callback):
         aps = []
         counts = []
         for classname in self.class_names:
-            rec, prec, ap, count = self.map_eval('eval_result_{}.txt'.format(epoch+1), self.eval_file, classname)
+            # rec, prec, ap, count = self.map_eval('eval_result_{}.txt'.format(epoch+1), self.eval_file, classname)
+            rec, prec, ap, count = self.map_eval(self.eval_path.format(epoch+1), self.eval_file, classname)
             aps.append(ap)
             counts.append(count)
 

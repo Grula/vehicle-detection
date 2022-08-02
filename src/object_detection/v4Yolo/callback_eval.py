@@ -59,7 +59,7 @@ class Evaluate(keras.callbacks.Callback):
 
         self.sess = K.get_session()
 
-        # 验证时的分数阈值和nms_iou阈值
+        # Score threshold and nms_iou threshold when validating
         conf_thresh = score_threshold
         nms_thresh = 0.45
 

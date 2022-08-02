@@ -122,7 +122,7 @@ def _main():
         batch_size = 8
         # DEBUG START
         # using just for testing
-        batch_size = 1
+        batch_size = 2
         # DEBUG END
         print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
         model.fit(data_generator_wrapper(lines_train, batch_size, anchors_stride_base, num_classes, max_bbox_per_scale, 'train'),
@@ -362,11 +362,11 @@ def data_generator(annotation_lines, batch_size, anchors, num_classes, max_bbox_
 
             image, bboxes, exist_boxes = parse_annotation(annotation_lines[i], train_input_size, annotation_type)
             label_sbbox, label_mbbox, label_lbbox, sbboxes, mbboxes, lbboxes = preprocess_true_boxes(bboxes, train_output_sizes, strides, num_classes, max_bbox_per_scale, anchors)
-            tf.print("############################")
-            tf.print("sbboxes ", sbboxes)
-            tf.print("mbboxes ", mbboxes)
-            tf.print("lbboxes ", lbboxes)
-            tf.print("############################")
+            # tf.print("############################")
+            # tf.print("sbboxes ", sbboxes)
+            # tf.print("mbboxes ", mbboxes)
+            # tf.print("lbboxes ", lbboxes)
+            # tf.print("############################")
             batch_image[num, :, :, :] = image
             if exist_boxes:
                 batch_label_sbbox[num, :, :, :, :] = label_sbbox

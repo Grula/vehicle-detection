@@ -525,28 +525,32 @@ def yolo_loss(args, num_classes, iou_loss_thresh, anchors):
     # conv_mbbox = args[1]   # (?, ?, ?, 3*(num_classes+5))
     # conv_sbbox = args[2]   # (?, ?, ?, 3*(num_classes+5))
 
-    # Note: was flipped large and small
-    # NOTE OK
-    conv_sbbox = args[0]   # (?, ?, ?, 3*(num_classes+5))
-    #! NAN
-    conv_mbbox = args[1]   # (?, ?, ?, 3*(num_classes+5))
-    #! NAN
-    conv_lbbox = args[2]   # (?, ?, ?, 3*(num_classes+5))
+    # Note outputs of network were flipped so we mirror in loss too
+    #Note OK
+    true_sbboxes = args[0]   # (?, 150, 4)
+    true_mbboxes = args[1]   # (?, 150, 4)
+    true_lbboxes = args[2]   # (?, 150, 4)
     
     #Note OK
     label_sbbox = args[3]   # (?, ?, ?, 3, num_classes+5)
     label_mbbox = args[4]   # (?, ?, ?, 3, num_classes+5)
     label_lbbox = args[5]   # (?, ?, ?, 3, num_classes+5)
 
-    #Note OK
-    true_sbboxes = args[6]   # (?, 150, 4)
-    true_mbboxes = args[7]   # (?, 150, 4)
-    true_lbboxes = args[8]   # (?, 150, 4)
+    # Note: was flipped large and small
+    conv_sbbox = args[6]   # (?, ?, ?, 3*(num_classes+5))
+    conv_mbbox = args[7]   # (?, ?, ?, 3*(num_classes+5))
+    conv_lbbox = args[8]   # (?, ?, ?, 3*(num_classes+5))
+
+    tf.print("############################")
+    tf.print("true_sbboxes ", true_sbboxes)
+    tf.print("true_mbboxes ", true_mbboxes)
+    tf.print("true_lbboxes ", true_lbboxes)
+    tf.print("############################")
 
     #HACK: all NaN values in arrays are replaced with K.epsilon()
-    conv_sbbox = tf.where(tf.math.is_nan(conv_sbbox), K.epsilon(), conv_sbbox)
-    conv_mbbox = tf.where(tf.math.is_nan(conv_mbbox), K.epsilon(), conv_mbbox)
-    conv_lbbox = tf.where(tf.math.is_nan(conv_lbbox), K.epsilon(), conv_lbbox)
+    # conv_sbbox = tf.where(tf.math.is_nan(conv_sbbox), K.epsilon(), conv_sbbox)
+    # conv_mbbox = tf.where(tf.math.is_nan(conv_mbbox), K.epsilon(), conv_mbbox)
+    # conv_lbbox = tf.where(tf.math.is_nan(conv_lbbox), K.epsilon(), conv_lbbox)
 
 
     pred_sbbox = decode(conv_sbbox, anchors[0], 8, num_classes)

@@ -307,7 +307,6 @@ def image_preprocess(image, target_size, gt_boxes):
 def parse_annotation(annotation, train_input_size, annotation_type):
     line = annotation.split()
     image_path = line[0]
-    tf.print(image_path)
     if not os.path.exists(image_path):
         raise KeyError("%s does not exist ... " %image_path)
     image = np.array(cv2.imread(image_path))

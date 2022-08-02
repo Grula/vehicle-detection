@@ -127,9 +127,9 @@ class Decode(object):
     def predict(self, image, shape):
         outs = self._yolo.predict(image)
 
-        a1 = np.reshape(outs[0], (1, self.input_shape[0]//32, self.input_shape[1]//32, 3, 5+self.num_classes))
+        a1 = np.reshape(outs[2], (1, self.input_shape[0]//32, self.input_shape[1]//32, 3, 5+self.num_classes))
         a2 = np.reshape(outs[1], (1, self.input_shape[0]//16, self.input_shape[1]//16, 3, 5+self.num_classes))
-        a3 = np.reshape(outs[2], (1, self.input_shape[0]//8, self.input_shape[1]//8, 3, 5+self.num_classes))
+        a3 = np.reshape(outs[0], (1, self.input_shape[0]//8, self.input_shape[1]//8, 3, 5+self.num_classes))
         boxes, scores, classes = self._yolo_out([a1, a2, a3], shape)
 
         return boxes, scores, classes

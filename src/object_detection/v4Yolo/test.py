@@ -55,7 +55,6 @@ if __name__ == '__main__':
 
     weights_path = os.path.join(args['model_data'],args['weights_name'])
     classes_path = os.path.join(args['model_data'], 'custom_classes.txt')
-    classes_path = os.path.join(args['model_data'], 'coco_classes.txt')
     anchors_path = os.path.join(args['model_data'], 'yolo4_anchors.txt')
 
 
@@ -106,25 +105,28 @@ if __name__ == '__main__':
         if not os.path.exists(destination_folder):
             os.makedirs(destination_folder)
         
-        for image_file in images[:5]:
+        for image_file in images:
             image_path = os.path.join(subfolder, image_file)
 
             print("Detecing image: {}".format(image_path))
             image = cv2.imread(image_path)
             image, boxes, scores, classes = _decode.detect_image(image, True)
-            
+            if boxes is  None:
+                f.write(f'{current_label}:{False},{0}\n')
+                continue
             predicted_data = list(zip(boxes, scores, classes))
             predicted_data.sort(key=lambda x: x[1], reverse=True)
+            
             # find image with highest score if exists
-            if boxes is  None:
-                continue
             detected = False
+            max_score = 0
             for box, score, cl in predicted_data:
                 # Check if class is in the list of classes to detect
                 if class_names[cl] != current_label:
                     continue
                 detected = True
-                # max_score = 0
+                if max_score < score:
+                    max_score = score
                 # max_idx = 0
                 # for i, box in enumerate(boxes):
                 #     if scores[i] > max_score:
@@ -143,10 +145,11 @@ if __name__ == '__main__':
 
                 # f.write(f'{image_path},{current_label},{class_names[classes[i]]},{max_score},{x},{y},{w},{h}\n')
             
-            f.write(f'{current_label}:{detected},{score if detected else 0}\n')
+            f.write(f'{current_label}:{detected},{max_score}\n')
 
-            cv2.imwrite(f'{destination_folder}/{image_file}', image)
-            print(f'Saved {image_file}')
+            if args['save']:
+                cv2.imwrite(f'{destination_folder}/{image_file}', image)
+                print(f'Saved {image_file}')
     
     
     f.close()

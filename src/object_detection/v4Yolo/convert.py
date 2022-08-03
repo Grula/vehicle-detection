@@ -42,7 +42,7 @@ def main():
 
     parser = argparse.ArgumentParser(description='')
 
-    parser.add_argument('--img_size', type=int , default=416, help='size of images')
+    parser.add_argument('--img_size', type=int , default=512, help='size of images')
     parser.add_argument('--cfg', type=str , default="yolov4_custom.cfg", )
     parser.add_argument('--type', type=str , default='weights', help='type of model')
 

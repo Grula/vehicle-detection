@@ -55,6 +55,7 @@ if __name__ == '__main__':
 
     weights_path = os.path.join(args['model_data'],args['weights_name'])
     classes_path = os.path.join(args['model_data'], 'custom_classes.txt')
+    classes_path = os.path.join(args['model_data'], 'coco_classes.txt')
     anchors_path = os.path.join(args['model_data'], 'yolo4_anchors.txt')
 
 
@@ -83,9 +84,10 @@ if __name__ == '__main__':
     _decode = Decode(conf_thresh, nms_thresh, model_image_size, yolo4_model, class_names)
 
     # create csv file
-    f = open('data_augmented.csv', 'w')
+    f = open('data_prediction.csv', 'w')
     # im_path, label, x, y, w, h
-    f.write('im_path,label,x,y,w,h\n')
+    # f.write('im_path,label,x,y,w,h\n')
+    f.write('detected_label, score\n')
 
 
 
@@ -95,38 +97,53 @@ if __name__ == '__main__':
         images = [f for f in os.listdir(subfolder) if f.endswith('.png') or f.endswith('.jpg')]
         current_label = subfolder.split('/')[-1]
 
+        print(subfolder)
+        if 'PREDICTED' in subfolder:
+            continue
+
         destination_folder = os.path.join(images_path,(f'{current_label}-PREDICTED'))
         print("Destination folder ----> ", destination_folder)
         if not os.path.exists(destination_folder):
             os.makedirs(destination_folder)
         
-        for image_file in images[:10]:
+        for image_file in images[:5]:
             image_path = os.path.join(subfolder, image_file)
 
             print("Detecing image: {}".format(image_path))
             image = cv2.imread(image_path)
             image, boxes, scores, classes = _decode.detect_image(image, True)
             
+            predicted_data = list(zip(boxes, scores, classes))
+            predicted_data.sort(key=lambda x: x[1], reverse=True)
             # find image with highest score if exists
-           
-            if args['save']:
-                if scores is not None and len(scores) > 0:
-                    max_score = 0
-                    max_idx = 0
-                    for i, box in enumerate(boxes):
-                        if scores[i] > max_score:
-                            max_score = scores[i]
-                            max_idx = i
+            if boxes is  None:
+                continue
+            detected = False
+            for box, score, cl in predicted_data:
+                # Check if class is in the list of classes to detect
+                if class_names[cl] != current_label:
+                    continue
+                detected = True
+                # max_score = 0
+                # max_idx = 0
+                # for i, box in enumerate(boxes):
+                #     if scores[i] > max_score:
+                #         max_score = scores[i]
+                #         max_idx = i
 
-                    x0, y0, x1, y1 = boxes[max_idx]
-                    x = max(0, np.floor(x0 + 0.5).astype(int))
-                    y = max(0, np.floor(y0 + 0.5).astype(int))
-                    right = min(image.shape[1], np.floor(x1 + 0.5).astype(int))
-                    bottom = min(image.shape[0], np.floor(y1 + 0.5).astype(int))
-                    w = right - x
-                    h = bottom - y
-                    # saving info to csv file 
-                    f.write(f'{image_path},{current_label},{x},{y},{w},{h}\n')
+                # x0, y0, x1, y1 = boxes[max_idx]
+                x0, y0, x1, y1 = box
+                x = max(0, np.floor(x0 + 0.5).astype(int))
+                y = max(0, np.floor(y0 + 0.5).astype(int))
+                right = min(image.shape[1], np.floor(x1 + 0.5).astype(int))
+                bottom = min(image.shape[0], np.floor(y1 + 0.5).astype(int))
+                w = right - x
+                h = bottom - y
+                # saving info to csv file 
+
+                # f.write(f'{image_path},{current_label},{class_names[classes[i]]},{max_score},{x},{y},{w},{h}\n')
+            
+            f.write(f'{current_label}:{detected},{score if detected else 0}\n')
 
             cv2.imwrite(f'{destination_folder}/{image_file}', image)
             print(f'Saved {image_file}')

@@ -2,7 +2,7 @@ import csv
 
 
 # open csv and save as txt file
-csv_paths = ['data/data.csv', 'data/augmented.csv']
+csv_paths = ['data/data.csv', 'data/augmented_stylegan_bt.csv', 'data/augmented_stylegan_cm.csv' ,]
 
 train_annotation_path = 'data/train_data.txt'
 valid_annotation_path = 'data/valid_data.txt'

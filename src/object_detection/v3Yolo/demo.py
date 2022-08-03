@@ -92,57 +92,76 @@ def detect_image(image, yolo, all_classes):
 
     print('time: {0:.2f}s'.format(end - start))
 
-    if boxes is not None:
-        draw(image, boxes, scores, classes, all_classes)
+    # if boxes is not None:
+    #     draw(image, boxes, scores, classes, all_classes)
 
     return image , boxes, classes, scores
 
 
 if __name__ == '__main__':
-    yolo = YOLO(0.8, 0.7)
+    yolo = YOLO(0.1, 0.45)
     file = 'coco_classes.txt'
     all_classes = get_classes(file)
 
-    images_path = 'valid/'
+    images_path = 'augmented_stylegan/'
     # detect images in test floder
     # create csv file
-    f = open('data_augmented.csv', 'w')
+    f = open('augmented_stylegan.csv', 'w')
     # im_path, label, x, y, w, h
     f.write('im_path,label,x,y,w,h\n')
     subfolders = [ f.path for f in os.scandir(images_path) if f.is_dir() ]
     for subfolder in subfolders:
         images = [f for f in os.listdir(subfolder) if f.endswith('.png') or f.endswith('.jpg')]
         current_label = subfolder.split('/')[-1]
+        
         destination_folder = f'{subfolder}-PREDICTED'
+        
         if not os.path.exists(destination_folder):
             os.makedirs(destination_folder)
-        for image_file in images[:10]:
+        
+        for image_file in images:
             image_path = os.path.join(subfolder, image_file)
             image = cv2.imread(image_path)
 
             print("Detecing image: {}".format(image_path))
-            image, boxes, scores, classes = detect_image(image, yolo, all_classes)
+            _, boxes, classes, scores = detect_image(image, yolo, all_classes)
 
             #find image with highest score if exists
-            if scores is not None and len(scores) > 0:
-                max_score = 0
+            if boxes is not None:
+
+                max_score = -1
                 max_idx = 0
                 for i, box in enumerate(boxes):
-                    if scores[i] > max_score:
+                    current_class = all_classes[classes[i]]
+                    if scores[i] > max_score and current_class in ('car', 'truck', 'bus', 'motorbike'):
                         max_score = scores[i]
                         max_idx = i
+                
+                if max_score == -1:
+                    continue # with loop
 
-                x0, y0, x1, y1 = boxes[max_idx]
-                x = max(0, np.floor(x0 + 0.5).astype(int))
-                y = max(0, np.floor(y0 + 0.5).astype(int))
-                right = min(image.shape[1], np.floor(x1 + 0.5).astype(int))
-                bottom = min(image.shape[0], np.floor(y1 + 0.5).astype(int))
-                w = right - x
-                h = bottom - y
+                # end for
 
+                x, y, w, h = boxes[max_idx]
+
+                # draw on image
+                top = max(0, np.floor(x + 0.5).astype(int))
+                left = max(0, np.floor(y + 0.5).astype(int))
+                w = max(0, np.floor(w + 0.5).astype(int))
+                h = max(0, np.floor(h + 0.5).astype(int))
+                
+                right = min(image.shape[1], np.floor(x + w + 0.5).astype(int))
+                bottom = min(image.shape[0], np.floor(y + h + 0.5).astype(int))
+
+                cv2.rectangle(image, (top, left), (right, bottom), (255, 0, 0), 2)
+                cv2.putText(image, '{0} {1:.2f}'.format(current_class, max_score),
+                            (top, left + 18),
+                            cv2.FONT_HERSHEY_SIMPLEX,
+                            0.6, (0, 255, 0), 1,
+                            cv2.LINE_AA)
 
                 # saving info to csv file 
-                f.write(f'{image_path},{current_label},{x},{y},{w},{h}\n')
+                f.write(f'{image_path},{current_label},{top},{left},{w},{h}\n')
 
             cv2.imwrite(f'{destination_folder}/{image_file}', image)
             print(f'Saved {image_file}')    

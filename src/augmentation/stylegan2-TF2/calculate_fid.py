@@ -26,6 +26,7 @@ def filter_resolutions_featuremaps(resolutions, featuremaps, res):
     return filtered_resolutions, filtered_featuremaps
 
 def generate_images(n_images, generator, ):
+    fake_images = []
     for _ in range(n_images):
         test_z = tf.random.normal(shape=(1, g_params['z_dim']), dtype=tf.dtypes.float32)
         test_labels = tf.ones((1, g_params['labels_dim']), dtype=tf.dtypes.float32)

@@ -199,16 +199,16 @@ if __name__ == '__main__':
     vehicles = {'car': [], 'truck': [], 'bus': [], 'motorcycle': [], }
     # Pick one image from each set 
     for i in range(len(classes)):
-        if classes[i] == 'car':
-            vehicles['car'] = [data[i], targets[i]]
-        elif classes[i] == 'bus':
-            vehicles['bus'] = [data[i], targets[i]]
-        elif classes[i] == 'truck':
-            vehicles['truck'] = [data[i], targets[i]]
-        elif classes[i] == 'motorbike':
-            vehicles['motorcycle'] = [data[i], targets[i]]
-        if all(vehicles.values()):
-            break
+    #     if classes[i] == 'car':
+    #         vehicles['car'] = [data[i], targets[i]]
+    #     elif classes[i] == 'bus':
+    #         vehicles['bus'] = [data[i], targets[i]]
+    #     elif classes[i] == 'truck':
+    #         vehicles['truck'] = [data[i], targets[i]]
+    #     elif classes[i] == 'motorbike':
+    #         vehicles['motorcycle'] = [data[i], targets[i]]
+    #     if all(vehicles.values()):
+    #         break
 
         vehicles[classes[i]].append([data[i], targets[i]])
 

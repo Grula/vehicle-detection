@@ -196,7 +196,7 @@ if __name__ == '__main__':
     # Evalute model
     data, classes, targets = load_data(['data/data.csv'], train=False)
 
-    vehicles = {'car': [], 'truck': [], 'bus': [], 'motorcycle': [], }
+    vehicles = {'car': [], 'truck': [], 'bus': [], 'motorbike': [], }
     # Pick one image from each set 
     for i in range(len(classes)):
     #     if classes[i] == 'car':
@@ -216,7 +216,7 @@ if __name__ == '__main__':
     if not os.path.exists('res'):
         os.mkdir('res')
 
-    guesses =  {'car': 0, 'truck': 0, 'bus': 0, 'motorcycle': 0, }
+    guesses =  {'car': 0, 'truck': 0, 'bus': 0, 'motorbike': 0, }
 
     # Evalute images
     for vehicle, data in vehicles.items():

@@ -25,6 +25,19 @@ def filter_resolutions_featuremaps(resolutions, featuremaps, res):
     filtered_featuremaps = featuremaps[:index + 1]
     return filtered_resolutions, filtered_featuremaps
 
+def generate_images(n_images, generator, ):
+    for _ in range(n_images):
+        test_z = tf.random.normal(shape=(1, g_params['z_dim']), dtype=tf.dtypes.float32)
+        test_labels = tf.ones((1, g_params['labels_dim']), dtype=tf.dtypes.float32)
+
+        psi = tf.random.uniform(shape=(1, 1), minval=0, maxval=1, dtype=tf.dtypes.float32)
+        fake = generator([test_z, test_labels], truncation_psi=psi, training=False, truncation_cutoff = None)
+        as_tensor = tf.transpose(fake, [0, 2, 3, 1])[0]
+        as_tensor = (tf.clip_by_value(as_tensor, -1.0, 1.0) + 1.0) * 127.5
+        as_tensor = tf.cast(as_tensor, tf.uint8)
+
+        fake_images.append(as_tensor)
+    return numpy.array(fake_images)
 
 # scale an array of images to a new size
 def scale_images(images, new_shape):
@@ -111,46 +124,46 @@ real_images = numpy.array(real_images)
 real_images = real_images
 
 
-n_img = real_images.shape[0]
+total_images = real_images.shape[0]
 print(real_images.shape)
+
+real_images = real_images.astype('float32')
+print('Prepared reals', real_images.shape)
+real_images = scale_images(real_images, (299,299,3))
+print('Scaled reals', real_images.shape)
+real_images = preprocess_input(real_images)
+
+
 
 # images1 = randint(0, 255, 10*32*32*3)
 # images1 = images1.reshape((10,32,32,3))
 
-# Generate n_images fake images
-fake_images = []
-for _ in range(n_img):
-    test_z = tf.random.normal(shape=(1, g_params['z_dim']), dtype=tf.dtypes.float32)
-    test_labels = tf.ones((1, g_params['labels_dim']), dtype=tf.dtypes.float32)
-
-    psi = tf.random.uniform(shape=(1, 1), minval=0, maxval=1, dtype=tf.dtypes.float32)
-    fake = generator([test_z, test_labels], truncation_psi=0.7, training=False, truncation_cutoff = None)
-    as_tensor = tf.transpose(fake, [0, 2, 3, 1])[0]
-    as_tensor = (tf.clip_by_value(as_tensor, -1.0, 1.0) + 1.0) * 127.5
-    as_tensor = tf.cast(as_tensor, tf.uint8)
-
-    fake_images.append(as_tensor)
-fake_images = numpy.array(fake_images)
-
-
 # images2 = randint(0, 255, n_img*32*32*3)
 # images2 = images2.reshape((n_img,32,32,3))
 
+loop_time = 100000 // total_images
+total_fid = 0
+for i in range(loop_time):
+    fake_images = generate_images(total_images)
 
-print('Prepared', real_images.shape, fake_images.shape)
-# convert integer to floating point values
-real_images = real_images.astype('float32')
-fake_images = fake_images.astype('float32')
-# resize images
-real_images = scale_images(real_images, (299,299,3))
-fake_images = scale_images(fake_images, (299,299,3))
-print('Scaled', real_images.shape, fake_images.shape)
-# pre-process images
-real_images = preprocess_input(real_images)
-fake_images = preprocess_input(fake_images)
-# fid between images1 and images1
-# fid = calculate_fid(model, images1, images1)
-# print('FID (same): %.3f' % fid)
-# fid between images1 and images2
-fid = calculate_fid(model, real_images, fake_images)
-print('FID : %.3f' % fid)
+    print('Prepared fakes',fake_images.shape)
+    # convert integer to floating point values
+    # real_images = real_images.astype('float32')
+    fake_images = fake_images.astype('float32')
+    # resize images
+    # real_images = scale_images(real_images, (299,299,3))
+    fake_images = scale_images(fake_images, (299,299,3))
+    print('Scaled fakes', real_images.shape, fake_images.shape)
+    # pre-process images
+    fake_images = preprocess_input(fake_images)
+
+
+    # fid between images1 and images1
+    # fid = calculate_fid(model, images1, images1)
+
+    # fid between images1 and images2
+    fid = calculate_fid(model, real_images, fake_images)
+    print('FID %1000d: %.3f' % i, fid)
+    total_fid += fid
+
+print("Average FID: %.3f" % (total_fid / loop_time))

@@ -216,6 +216,8 @@ if __name__ == '__main__':
     if not os.path.exists('res'):
         os.mkdir('res')
 
+    guesses =  {'car': 0, 'truck': 0, 'bus': 0, 'motorcycle': 0, }
+
     # Evalute images
     for vehicle, data in vehicles.items():
         image, bbox = data
@@ -227,6 +229,11 @@ if __name__ == '__main__':
         # Inverse transform to get real label
         real_label = lb.inverse_transform(np.array([pred_label]))[0]
         print(f'{vehicle}: ', real_label)
+
+        guesses[vehicle] += 1 if vehicle == real_label else 0
+        print(f'{vehicle}: {guesses[vehicle]}')
+        print()
+
 
 
 

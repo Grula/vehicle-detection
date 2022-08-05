@@ -144,7 +144,7 @@ real_images = preprocess_input(real_images)
 loop_time = 100000 // total_images
 total_fid = 0
 for i in range(loop_time):
-    fake_images = generate_images(total_images)
+    fake_images = generate_images(total_images, generator)
 
     print('Prepared fakes',fake_images.shape)
     # convert integer to floating point values

@@ -210,6 +210,8 @@ if __name__ == '__main__':
         if all(vehicles.values()):
             break
 
+        vehicles[classes[i]].append([data[i], targets[i]])
+
     # Check if res folder exists
     if not os.path.exists('res'):
         os.mkdir('res')

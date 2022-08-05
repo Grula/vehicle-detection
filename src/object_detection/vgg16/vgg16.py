@@ -217,6 +217,8 @@ if __name__ == '__main__':
     # Evalute images
     for vehicle, data in vehicles.items():
         image, bbox = data
+        # convert from rgb to bgr
+        image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
         cv2.imwrite(f'res/{vehicle}_real.jpg', draw_bbox(image*255, bbox))
         pred_label, pred_bbox = eval_model(model, image)
         cv2.imwrite(f'res/{vehicle}_pred.jpg', draw_bbox(image*255, pred_bbox))

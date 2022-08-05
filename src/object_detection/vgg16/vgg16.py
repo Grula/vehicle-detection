@@ -233,6 +233,7 @@ if __name__ == '__main__':
         guesses[vehicle] += 1 if vehicle == real_label else 0
         print(f'{vehicle}: {guesses[vehicle]}')
         print()
+    print("Guesses: ", guesses)
 
 
 

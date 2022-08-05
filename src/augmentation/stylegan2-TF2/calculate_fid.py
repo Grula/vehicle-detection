@@ -145,6 +145,7 @@ real_images = preprocess_input(real_images)
 loop_time = 100000 // total_images
 total_fid = 0
 for i in range(loop_time):
+    print("Step ", i)
     fake_images = generate_images(total_images, generator)
 
     print('Prepared fakes',fake_images.shape)
@@ -164,7 +165,8 @@ for i in range(loop_time):
 
     # fid between images1 and images2
     fid = calculate_fid(model, real_images, fake_images)
-    print('FID %1000d: %.3f' % i, fid)
+
+    print('FID : %.3f' % fid)
     total_fid += fid
 
 print("Average FID: %.3f" % (total_fid / loop_time))

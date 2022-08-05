@@ -1,0 +1,36 @@
+we show that for small-data problems, low complexity CNNs are comparable to or better than high complexity ones depending on the training set dimension andthe use of data augmentation;
+ https://arxiv.org/pdf/2003.12843.pdf
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -44,7 +44,7 @@ Ublažena verzija ovoga je šum soli i bibera, koji se predstavlja kao nasumičn
 
 3.2.2 Neurnske Mreze
 
-Generativne adversarijske mreže (GAN) su donekle nova teorija u mašinskom učenju, predložena po prvi put 2014. Njihova svrha je da sintetizuju veštačke primere, kao što su slike koje su nejasne sa autentičnih fotografija. Tipičan primer GAN aplikacije je pravljenje veštačkih slika lica učenjem iz skupa podataka značajnih lica.
+Generativne suparnicke mreže (GAN) su donekle nova teorija u mašinskom učenju, predložena po prvi put 2014. Njihova svrha je da sintetizuju veštačke primere, kao što su slike koje su nejasne sa autentičnih fotografija. Tipičan primer GAN aplikacije je pravljenje veštačkih slika lica učenjem iz skupa podataka značajnih lica.
 
 Style Generative Adversarial Network, ili skraćeno StyleGAN, je dodatak GAN arhitekturi koji uvodi značajne modifikacije u model generatora. StyleGAN proizvodi simuliranu sliku sekvencijalno, polazeći od jednostavne rezolucije i povećavajući do ogromne rezolucije (1024×1024).
 Transformisanjem unosa svakog nivoa pojedinačno, ispituje vizuelne karakteristike koje se manifestuju na tom nivou, od standardnih osobina do sitnih detalja, bez menjanja drugih nivoa.

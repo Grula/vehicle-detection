@@ -11,7 +11,7 @@ import csv
 
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelBinarizer
-
+import pickle
 
 import cv2
 
@@ -150,7 +150,12 @@ if __name__ == '__main__':
 
     # Labelize classes
     lb = LabelBinarizer()
-    classes = lb.fit_transform(classes)
+    lb.fit(classes)
+    classes = lb.transform(classes)
+    # classes = lb.fit_transform(classes)
+    # save lb for future use with pickle
+    with open('lb.pickle', 'wb') as f:
+        pickle.dump(lb, f)
     classes = np.array(classes, dtype = 'float32')
 
     print("Splitting data...")

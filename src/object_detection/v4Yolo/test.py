@@ -70,7 +70,7 @@ if __name__ == '__main__':
 
     # conf_thresh = 0.8
     # nms_thresh = 0.7
-    conf_thresh = 0.1
+    conf_thresh = 0.01
     nms_thresh = 0.45
 
     yolo4_model = yolo4_body(Input(shape=model_image_size+(3,)), num_anchors//3, num_classes)

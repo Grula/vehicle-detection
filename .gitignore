@@ -141,4 +141,4 @@ models*/
 *.h5
 *.weights
 logs/
-
+*pickle*

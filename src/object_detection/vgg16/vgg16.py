@@ -146,7 +146,7 @@ if __name__ == '__main__':
 
 
     print("Loading data...")
-    data, classes, targets = load_data(data_paths, train=True)
+    data, classes, bboxes = load_data(data_paths, train=True)
 
     # Labelize classes
     lb = LabelBinarizer()
@@ -155,7 +155,7 @@ if __name__ == '__main__':
 
     print("Splitting data...")
     # Split into Train and Test
-    X_train, X_test, y1_train, y1_test, y2_train, y2_test = train_test_split(data, classes, targets, test_size=0.3, random_state=42)
+    X_train, X_test, y1_train, y1_test, y2_train, y2_test = train_test_split(data, classes, bboxes, test_size=0.3, random_state=42)
     X_test, X_valid, y1_test, y1_valid, y2_test, y2_valid  = train_test_split(X_test, y1_test, y2_test, test_size=0.35, random_state=42)
 
     if not model_loaded:
@@ -194,46 +194,80 @@ if __name__ == '__main__':
         model.save(f'model_weigh:{args.weights}_appen:{args.augment}.h5')
 
     # Evalute model
-    data, classes, targets = load_data(['data/data.csv'], train=False)
+    images, classes, bboxes = load_data(['data/data.csv'], train=False)
 
     vehicles = {'car': [], 'truck': [], 'bus': [], 'motorbike': [], }
     # Pick one image from each set 
-    for i in range(len(classes)):
-    #     if classes[i] == 'car':
-    #         vehicles['car'] = [data[i], targets[i]]
-    #     elif classes[i] == 'bus':
-    #         vehicles['bus'] = [data[i], targets[i]]
-    #     elif classes[i] == 'truck':
-    #         vehicles['truck'] = [data[i], targets[i]]
-    #     elif classes[i] == 'motorbike':
-    #         vehicles['motorcycle'] = [data[i], targets[i]]
+    # for i in range(len(classes)):
     #     if all(vehicles.values()):
     #         break
-
-        vehicles[classes[i]].append([data[i], targets[i]])
+    vehicles = {}
+    for i, cl in enumerate(classes):
+        if cl not in vehicles.keys():
+            vehicles[cl] = []
+        vehicles[cl].append((images[i], bboxes[i]))
 
     # Check if res folder exists
     if not os.path.exists('res'):
         os.mkdir('res')
 
-    guesses =  {'car': 0, 'truck': 0, 'bus': 0, 'motorbike': 0, }
+
+
+    matrix =  {'car': {'car':0, 'truck':0, 'bus': 0, 'motorbike': 0},
+               'truck': {'car':0, 'truck':0, 'bus': 0, 'motorbike': 0},
+               'bus': {'car':0, 'truck':0, 'bus': 0, 'motorbike': 0},
+               'motorbike': {'car':0, 'truck':0, 'bus': 0, 'motorbike': 0},
+    }
+
+    for cl in vehicles.keys():
+        for i, (image, bbox) in enumerate(vehicles[cl]):
+
+            image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+            pred_label, pred_bbox = eval_model(model, image)
+            cv2.imwrite(f'res/{cl}_real.jpg', draw_bbox(image*255, bbox))
+            cv2.imwrite(f'res/{cl}_pred.jpg', draw_bbox(image*255, pred_bbox))
+            pred_label = lb.inverse_transform(np.array([pred_label]))[0]
+            
+            matrix[cl][pred_label] += 1
+            
+
+
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+    import pandas as pd
+    import numpy as np
+
+    # Plot confusion matrix
+    plt.figure(figsize=(10,10))
+    sns.heatmap(pd.DataFrame(matrix), annot=True, cmap="Blues", fmt='.0f', linewidths=.5)
+    plt.title('Confusion Matrix')
+    plt.ylabel('True label')
+    plt.xlabel('Predicted label')
+    #  save plot to file
+    plt.savefig('res/confusion_matrix.png')
+
+
+
+
+    # Create confusion matrix
 
     # Evalute images
-    for vehicle, data in vehicles.items():
-        image, bbox = data
-        # convert from rgb to bgr
-        image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
-        cv2.imwrite(f'res/{vehicle}_real.jpg', draw_bbox(image*255, bbox))
-        pred_label, pred_bbox = eval_model(model, image)
-        cv2.imwrite(f'res/{vehicle}_pred.jpg', draw_bbox(image*255, pred_bbox))
-        # Inverse transform to get real label
-        real_label = lb.inverse_transform(np.array([pred_label]))[0]
-        print(f'{vehicle}: ', real_label)
+    # for vehicle, data in vehicles.items():
 
-        guesses[vehicle] += 1 if vehicle == real_label else 0
-        print(f'{vehicle}: {guesses[vehicle]}')
-        print()
-    print("Guesses: ", guesses)
+    #     image, bbox = data
+    #     # convert from rgb to bgr
+    #     image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+    #     cv2.imwrite(f'res/{vehicle}_real.jpg', draw_bbox(image*255, bbox))
+    #     pred_label, pred_bbox = eval_model(model, image)
+    #     cv2.imwrite(f'res/{vehicle}_pred.jpg', draw_bbox(image*255, pred_bbox))
+    #     # Inverse transform to get real label
+    #     real_label = lb.inverse_transform(np.array([pred_label]))[0]
+    #     print(f'{vehicle}: ', real_label)
+
+    #     guesses[vehicle] += 1 if vehicle == real_label else 0
+    #     print(f'{vehicle}: {guesses[vehicle]}')
+    #     print()
+    # print("Guesses: ", guesses)
 
 
 

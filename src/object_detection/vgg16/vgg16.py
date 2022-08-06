@@ -229,7 +229,9 @@ if __name__ == '__main__':
             pred_label = lb.inverse_transform(np.array([pred_label]))[0]
             
             matrix[cl][pred_label] += 1
-            
+
+    import pprint
+    pprint.pprint(matrix)        
 
 
     import matplotlib.pyplot as plt

@@ -20,8 +20,10 @@ from keras.layers import Input, Flatten, Dense
 from keras.models import Model
 from keras.callbacks import EarlyStopping, TensorBoard
 
-from keras.utils import load_img
-from keras.utils import img_to_array
+# from keras.utils import load_img
+from keras.preprocessing.image import img_to_array
+from keras.preprocessing.image import load_img
+# from keras.utils import img_to_array
 
 import argparse
 

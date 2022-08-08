@@ -165,7 +165,7 @@ class CustomDataGenerator(keras.utils.Sequence):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='')
-    parser.add_argument('--weights', type=str, default=None, help='Use weights, default to None, use imagenet if not specified')
+    parser.add_argument('--weights', type=str, default='imagenet', help='Use weights, default to None, use imagenet if not specified')
     parser.add_argument('--load', type=str, default=None, help='Specify to load model, provide path to model .h5 file')
     parser.add_argument('--train', type=bool, default=1, help='Specify to train model, default to True')
 
@@ -178,7 +178,7 @@ if __name__ == '__main__':
         assert args.load.endswith('.h5'), 'Model must be .h5 file'
         model = keras.models.load_model(args.load)
     else: # create model
-        model = create_model(args.weights)
+        model = create_model(None if args.weights != 'imagenet' else args.weights)
 
     print("loaded/created model")
 

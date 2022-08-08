@@ -55,24 +55,30 @@ for folder in folders:
         lines = list(map(lambda x: x.strip().split(','), lines))
         data.close()
 
-        confusion_matrix = {'car': {'car': 0, 'motorbike': 0, 'bus': 0, 'truck': 0, 'none': 0},
-                            'motorbike': {'car': 0, 'motorbike': 0, 'bus': 0, 'truck': 0, 'none': 0},
-                            'bus': {'car': 0, 'motorbike': 0, 'bus': 0, 'truck': 0, 'none': 0},
-                            'truck': {'car': 0, 'motorbike': 0, 'bus': 0, 'truck': 0, 'none': 0},
-                            'none': {'car': 0, 'motorbike': 0, 'bus': 0, 'truck': 0, 'none': 0}
+
+        confusion_matrix = {'car': {'car': 0, 'motorbike': 0, 'bus': 0, 'truck': 0,},
+                            'motorbike': {'car': 0, 'motorbike': 0, 'bus': 0, 'truck': 0,},
+                            'bus': {'car': 0, 'motorbike': 0, 'bus': 0, 'truck': 0,},
+                            'truck': {'car': 0, 'motorbike': 0, 'bus': 0, 'truck': 0,},
                             }
 
+        confusion_matrix_TF = { 'car': {'TP': 0, 'FN': 0, 'FP': 0, 'FN': 0},
+                                'motorbike': {'TP': 0, 'FN': 0, 'FP': 0, 'FN': 0},
+                                'bus': {'TP': 0, 'FN': 0, 'FP': 0, 'FN': 0},
+                                'truck': {'TP': 0, 'FN': 0, 'FP': 0, 'FN': 0},
+                                }
         # We will store IoU results in this array for each preidction
-        IoU_results = []
+        IoU_class_res = {'car': [], 'motorbike': [], 'bus': [], 'truck': []}
 
         # Calculate confusion matrix for each class
         for line in lines:
             line = list(map(lambda x: x.strip(), line)) # get rid of whitespaces
             image_path, true_class, predicted_class, score, true_bbox, predicted_bbox = line
-            true_class = true_class.lower()
-            predicted_class = predicted_class.lower()
 
-            confusion_matrix[true_class][predicted_class] += 1
+            if predicted_class == 'None':
+                confusion_matrix_TF[true_class]['FN'] += 1
+            else:
+                confusion_matrix[true_class][predicted_class] += 1
 
             # Calculate IoU for each prediction
             # convert boxes fro x,y,w,h to x1,y1,x2,y2
@@ -81,18 +87,25 @@ for folder in folders:
                 predicted_bbox = list(map(int, predicted_bbox.split(' ')))
                 true_bbox = [true_bbox[0], true_bbox[1], true_bbox[0] + true_bbox[2], true_bbox[1] + true_bbox[3]]
                 predicted_bbox = [predicted_bbox[0], predicted_bbox[1], predicted_bbox[0] + predicted_bbox[2], predicted_bbox[1] + predicted_bbox[3]]
-                IoU_results.append(bb_intersection_over_union(true_bbox, predicted_bbox))
+                IoU_class_res[true_class].append(bb_intersection_over_union(true_bbox, predicted_bbox))
             else:
-                IoU_results.append(0)
+                IoU_class_res[true_class].append(0)
 
+
+        # pirnt Confusion matrix
+        print("Confusion matrix:")
+        print("\t", end='')
+        for class_name in classes:
+            print(class_name, end='\t')
+        print("")
+        for class_name in classes:
+            print(class_name, end='\t')
+            for class_name2 in classes:
+                print(confusion_matrix[class_name][class_name2], end='\t')
+            print("")
+        print("")
         
 
-        confusion_matrix_TF = { 'car': {'TP': 0, 'FN': 0, 'FP': 0, 'FN': 0},
-                                'motorbike': {'TP': 0, 'FN': 0, 'FP': 0, 'FN': 0},
-                                'bus': {'TP': 0, 'FN': 0, 'FP': 0, 'FN': 0},
-                                'truck': {'TP': 0, 'FN': 0, 'FP': 0, 'FN': 0},
-                                'none': {'TP': 0, 'FN': 0, 'FP': 0, 'FN': 0}
-                                }
 
         # For each class calculate TP, FP, TN, FN
         for i, (true_class, predictions) in enumerate(confusion_matrix.items()):
@@ -111,47 +124,43 @@ for folder in folders:
                                                     confusion_matrix_TF[true_class]['FN']
 
         # pirnt Confusion matrix
-        print("Confusion matrix for ", file)
-        print("\t", end='')
-        for class_name in classes:
-            print(class_name, end='\t')
-        print()
-        for class_name, row in confusion_matrix_TF.items():
-            print(class_name, end='\t')
-            for value in row.values():
-                print(value, end='\t')
-            print()
-        print()
-        
-       
+        # print("Postivies matrix for ", file)
+        # print("\t", end='')
+        # for class_name in classes:
+        #     print(class_name, end='\t')
+        # print()
+        # for class_name, row in confusion_matrix_TF.items():
+        #     print(class_name, end='\t')
+        #     for value in row.values():
+        #         print(value, end='\t')
+        #     print()
+        # print()
+              
 
-        # precision is calculated based on the IoU threshold.
-        ap = []
+        # precision is calculated based on the IoU threshold. for BBOXES 
+        iou_ap = []
         for iou_threshold in np.arange(0.5, 1.0, 0.01):
             # Calculate precision for each class
             precision = {'car': 0, 'motorbike': 0, 'bus': 0, 'truck': 0}
-            for true_class in classes:
-                try:
-                    precision[true_class] = sum([1 if IoU > iou_threshold else 0 for IoU in IoU_results]) / confusion_matrix_TF[true_class]['TP']
-                except ZeroDivisionError:
-                    precision[true_class] = 0
+            for true_class, IoU_results in IoU_class_res.items():
+                precision[true_class] = sum([1 for IoU in IoU_results if IoU >= iou_threshold]) / len(IoU_results)
             precision_all = sum(precision.values()) / len(classes)
-            ap.append(precision_all)
+            iou_ap.append(precision_all)
             # print("Precision for IoU threshold: ", iou_threshold, " is: ", precision_all)
 
         # Calculate mAP
-        mAP = sum(ap) / len(ap)
+        mAP = sum(iou_ap) / len(iou_ap)
         print("mAP: ", mAP)
 
         # plit iou_curve
-        ap = np.array(ap)
-        plt.plot(np.arange(0.5, 1.0, 0.01), ap)
+        iou_ap = np.array(iou_ap)
+        plt.plot(np.arange(0.5, 1.0, 0.01), iou_ap)
         plt.xlabel('IoU Threshold')
         plt.ylabel('Precision')
         plt.title(f'Precision vs IoU Threshold for {file.split("-")[0]}')
-        plt.show()
+        # plt.show()
         plt.savefig(os.path.join(folder, f'precision_vs_iou_threshold_{file.split("-")[0]}.png'))
-
+        plt.close()
         # Precision score = sum(TP) / (sum(TP) + sum(FP))
         precision = {'car': 0, 'motorbike': 0, 'bus': 0, 'truck': 0}
         for true_class in classes:
@@ -183,9 +192,7 @@ for folder in folders:
         print("Recall for classes: ", recall_all)
         print("F1 for classes:: ", F1_all)
 
-
-
-
+        # plot precision recall curve
 
 
 

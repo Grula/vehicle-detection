@@ -1,0 +1,67 @@
+Current Object Detection folder:  vgg16
+###################################################
+Current file:  VGG16-notrasfer-data_prediction.csv
+Confusion matrix:
+	car	motorbike	bus	truck	
+car	89	0	0	0	
+motorbike	97	0	0	0	
+bus	1	0	0	0	
+truck	1	0	0	0	
+
+mAP:  0.09597185219506545
+Precision for classes:  0.11835106382978723
+Recall for classes:  0.25
+F1 for classes::  0.16064981949458484
+Current Object Detection folder:  yolo
+###################################################
+Current file:  BASaugment-512-data_prediction.csv
+Confusion matrix:
+	car	motorbike	bus	truck	
+car	82	0	0	0	
+motorbike	0	95	0	0	
+bus	0	0	0	0	
+truck	1	0	0	0	
+
+mAP:  0.5016095216031511
+Precision for classes:  0.4969879518072289
+Recall for classes:  0.5
+F1 for classes::  0.49848942598187307
+###################################################
+Current file:  STYLaugment-512-data_prediction.csv
+Confusion matrix:
+	car	motorbike	bus	truck	
+car	89	0	0	0	
+motorbike	0	78	0	0	
+bus	0	0	0	0	
+truck	1	0	0	0	
+
+mAP:  0.5012840264102862
+Precision for classes:  0.49722222222222223
+Recall for classes:  0.5
+F1 for classes::  0.4986072423398329
+###################################################
+Current file:  yolo4-608-data_prediction.csv
+Confusion matrix:
+	car	motorbike	bus	truck	
+car	87	0	0	5	
+motorbike	4	48	0	0	
+bus	0	0	0	0	
+truck	0	0	0	1	
+
+mAP:  0.4895388223032831
+Precision for classes:  0.5306776556776557
+Recall for classes:  0.7171822742474916
+F1 for classes::  0.6099925141663266
+###################################################
+Current file:  NOaugment-512-data_prediction.csv
+Confusion matrix:
+	car	motorbike	bus	truck	
+car	4721	0	0	0	
+motorbike	554	0	0	0	
+bus	0	0	0	0	
+truck	0	0	0	0	
+
+mAP:  0.007237723690811666
+Precision for classes:  0.22374407582938388
+Recall for classes:  0.25
+F1 for classes::  0.23614445778311324

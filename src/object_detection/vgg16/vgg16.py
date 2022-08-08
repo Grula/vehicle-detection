@@ -162,7 +162,6 @@ class CustomDataGenerator(keras.utils.Sequence):
             np.random.shuffle(self.files)
 
 
-    
 
 if __name__ == '__main__':
 
@@ -227,69 +226,8 @@ if __name__ == '__main__':
                 callbacks = [early_stopping, tensorboard]
                 )
 
-        model.save(f'model_weigh:{args.weights}_appen:{args.augment}.h5')
+        model.save(f'vgg16_{args.weights}.h5')
 
 
     custom_id = {'car' : 0, 'motorbike' : 1, 'bus' : 2, 'truck' : 3}
-
-
-
-    exit()
-    # Data pathts
-    data_paths = ['data/data.csv']
-    if args.augment:
-        data_paths.append('data/data_augmented.csv')
-
-
-    print("Loading data...")
-    data, classes, bboxes = load_data(data_paths, train=True)
-
-    # Labelize classes
-    lb = LabelBinarizer()
-    lb.fit(classes)
-    classes = lb.transform(classes)
-    # classes = lb.fit_transform(classes)
-    # save lb for future use with pickle
-    with open('lb.pickle', 'wb') as f:
-        pickle.dump(lb, f)
-    classes = np.array(classes, dtype = 'float32')
-
-    print("Splitting data...")
-    # Split into Train and Test
-    X_train, X_test, y1_train, y1_test, y2_train, y2_test = train_test_split(data, classes, bboxes, test_size=0.3, random_state=42)
-    X_test, X_valid, y1_test, y1_valid, y2_test, y2_valid  = train_test_split(X_test, y1_test, y2_test, test_size=0.35, random_state=42)
-
-    print("Creating model...")
-    model = create_model(weights=args.weights)
-
-    trainTargets = {
-        "class_label": y1_train,
-        "bounding_box": y2_train
-    }
-
-    testTargets = {
-        "class_label": y1_test,
-        "bounding_box": y2_test
-    }
-
-    early_stopping_patience = 10
-    early_stopping = EarlyStopping(
-        monitor="loss", 
-        patience=early_stopping_patience, 
-        restore_best_weights=True
-    )
-
-    tensorboard = TensorBoard(
-        histogram_freq=100, 
-        write_images=True,
-    )
-
-    model.fit(X_train, trainTargets,
-            epochs=100, 
-            batch_size=32, 
-            validation_data=(X_test, testTargets),
-            callbacks = [early_stopping, tensorboard]
-            )
-
-    model.save(f'model_weigh:{args.weights}_appen:{args.augment}.h5')
 

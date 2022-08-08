@@ -101,7 +101,6 @@ class CustomDataGenerator(keras.utils.Sequence):
 
     def __getitem__(self, index):
         'Generate one batch of data'
-        print(index)
         batches = self.files[index * self.batch_size:(index + 1) * self.batch_size]
         X, y = self.__get_data(batches)        
         return X, y

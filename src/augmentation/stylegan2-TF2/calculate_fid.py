@@ -7,7 +7,6 @@ from numpy import asarray
 from scipy.linalg import sqrtm
 from keras.applications.inception_v3 import InceptionV3
 from keras.applications.inception_v3 import preprocess_input
-from keras.datasets.mnist import load_data
 from skimage.transform import resize
 from load_models import load_generator
 
@@ -16,6 +15,8 @@ import os
 import cv2
 import tensorflow as tf
 import numpy as np
+
+import time
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
 
@@ -70,7 +71,7 @@ def calculate_fid(model, images1, images2):
 	return fid
  
 # prepare the inception v3 model
-model = InceptionV3(include_top=False, pooling='avg', input_shape=(299,299,3))
+interception = InceptionV3(include_top=False, pooling='avg', input_shape=(299,299,3))
 
 # global program arguments parser
 parser = argparse.ArgumentParser(description='')
@@ -80,6 +81,7 @@ args = vars(parser.parse_args())
 
 # For folders in model_dir print them and ask user to select one
 model_dir_list = os.listdir(args['model_dir'])
+model_dir_list.sort()
 print('Available models:')
 for i, model_dir in enumerate(model_dir_list):
     print(f'\t{i}: {model_dir}')
@@ -114,59 +116,54 @@ g_params = {
 model_base_dir =  os.path.join(args['model_dir'], model_dir)
 generator = load_generator(g_params=g_params, is_g_clone=False, ckpt_dir=model_base_dir, custom_cuda=False)
 
-# define two fake collections of images
-# Load real images to batch of 100 from folder
+n_images = 32*100
+
+# expand real images paths 
 real_images_dir = os.path.join('data', name)
 real_images = os.listdir(real_images_dir)
-real_images = real_images[:100]
+real_images = real_images * (n_images // len(real_images)) + real_images[:n_images % len(real_images)]
 real_images = [os.path.join(real_images_dir, image) for image in real_images]
-real_images = [cv2.resize(cv2.imread(image), (512,512)) for image in real_images]
-real_images = numpy.array(real_images)
-real_images = real_images
+
+# shuffle
+numpy.random.shuffle(real_images) 
 
 
-total_images = real_images.shape[0]
-print(real_images.shape)
+# define params
+batch_size = 32
+n_batches = int(n_images / batch_size)
+fids = []
 
-real_images = real_images.astype('float32')
-print('Prepared reals', real_images.shape)
-real_images = scale_images(real_images, (299,299,3))
-print('Scaled reals', real_images.shape)
-real_images = preprocess_input(real_images)
+for idx in range(n_batches):
+    # start time    
+    start_time = time.time()
+
+    real_batch = real_images[idx*batch_size:(idx+1)*batch_size]
+
+    real_batch = [cv2.resize(cv2.imread(image), (512,512)) for image in real_batch]
+    real_batch = numpy.array(real_batch)
+    real_batch = real_batch.astype('float32')
+
+    real_batch = scale_images(real_batch, (299,299,3))
+    real_batch = preprocess_input(real_batch)
+ 
+    fake_batch = generate_images(batch_size, generator)
+    fake_batch = fake_batch.astype('float32')
+
+    fake_batch = scale_images(fake_batch, (299,299,3))
+    fake_batch = preprocess_input(fake_batch)
+
+    fid = calculate_fid(interception, real_batch, fake_batch)
+    print('FID', fid)
+    print('----------------------------------------------------')
+    # end time
+    end_time = time.time()
+    
+    print(f'Batch {idx} took : {end_time - start_time}s')
+    fids.append(fid)
+
+print("Average FID: %.3f" % (sum(fids) / n_batches))
+print('----------------------------------------------------')
 
 
 
-# images1 = randint(0, 255, 10*32*32*3)
-# images1 = images1.reshape((10,32,32,3))
-
-# images2 = randint(0, 255, n_img*32*32*3)
-# images2 = images2.reshape((n_img,32,32,3))
-
-loop_time = 100000 // total_images
-total_fid = 0
-for i in range(loop_time):
-    print("Step ", i)
-    fake_images = generate_images(total_images, generator)
-
-    print('Prepared fakes',fake_images.shape)
-    # convert integer to floating point values
-    # real_images = real_images.astype('float32')
-    fake_images = fake_images.astype('float32')
-    # resize images
-    # real_images = scale_images(real_images, (299,299,3))
-    fake_images = scale_images(fake_images, (299,299,3))
-    print('Scaled fakes', real_images.shape, fake_images.shape)
-    # pre-process images
-    fake_images = preprocess_input(fake_images)
-
-
-    # fid between images1 and images1
-    # fid = calculate_fid(model, images1, images1)
-
-    # fid between images1 and images2
-    fid = calculate_fid(model, real_images, fake_images)
-
-    print('FID : %.3f' % fid)
-    total_fid += fid
-
-print("Average FID: %.3f" % (total_fid / loop_time))
+# Create plot 

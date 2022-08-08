@@ -138,7 +138,6 @@ class CustomDataGenerator(keras.utils.Sequence):
             bbox = [x, y, x+w, y+h]
             # transform bbox to normalized coordinates
             bbox = [bbox[0]/image_shape[1], bbox[1]/image_shape[0], bbox[2]/image_shape[1], bbox[3]/image_shape[0]]
-
             bbox = np.array(bbox)
 
             paths.append(path)
@@ -214,7 +213,7 @@ if __name__ == '__main__':
         # Train model
         early_stopping = EarlyStopping(
             monitor="loss", 
-            patience=10, 
+            patience=2, 
             restore_best_weights=True
         )
 
@@ -223,7 +222,7 @@ if __name__ == '__main__':
             write_images=True,
         )
         model.fit(traingen,
-                epochs=100, 
+                epochs=10, 
                 batch_size=batch_size, 
                 validation_data= validgen,
                 callbacks = [early_stopping, tensorboard]

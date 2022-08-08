@@ -134,8 +134,11 @@ class CustomDataGenerator(keras.utils.Sequence):
             image = img_to_array(load_img(path))
             image_shape = image.shape
             bbox = bb_l.split(',')[:-1]
-            bbox = [float(x) for x in bbox]
-            bbox = [bbox[0]/image_shape[1], bbox[1]/image_shape[0], bbox[2]/image_shape[1], bbox[3]/image_shape[0]] # normilize bbox
+            x, y, w, h = [float(bbox[i]) for i in range(4)]
+            bbox = [x, y, x+w, y+h]
+            # transform bbox to normalized coordinates
+            bbox = [bbox[0]/image_shape[1], bbox[1]/image_shape[0], bbox[2]/image_shape[1], bbox[3]/image_shape[0]]
+
             bbox = np.array(bbox)
 
             paths.append(path)

@@ -14,7 +14,8 @@ import cv2
 from tensorflow import keras
 import PIL
 
-from keras.applications import VGG16
+from tensorflow.keras.applications.vgg16 import VGG16
+# from keras.applications import VGG16
 from keras.layers import Input, Flatten, Dense
 from keras.models import Model
 from keras.callbacks import EarlyStopping, TensorBoard

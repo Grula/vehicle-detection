@@ -12,6 +12,7 @@ import pickle
 import cv2
 
 from tensorflow import keras
+import PIL
 
 from keras.applications import VGG16
 from keras.layers import Input, Flatten, Dense
@@ -70,74 +71,96 @@ def eval_model(model, image):
     return car_pred[0][0], car_pred[1][0]
 
 
+class CustomDataGenerator(keras.utils.Sequence):
+    'Generates data for Keras'
+    def __init__(self, files, batch_size=32, input_size=(224,224,3), n_classes=4, shuffle=True, train = True):
+        'Initialization'
+        self.files = files
+        self.batch_size = batch_size
+        self.input_size = input_size
 
-def data_generator(files, train = True, batch_size = 32):
+        # self.n_channels = n_channels
+        # Number of label classes
+        self.n_classes = n_classes
+        self.shuffle = shuffle
 
-    def get_classes(files):
-        classes = []
+        self.train = train
+        
+        self.classes_id = {0 : 'car', 1 : 'motorbike', 2 : 'bus', 3 : 'truck'}
+        self.n = len(self.files)
+
+
+        self.on_epoch_end()
+
+    def __len__(self):
+        'Denotes the number of batches per epoch'
+        return self.n // self.batch_size
+
+    def __getitem__(self, index):
+        'Generate one batch of data'
+        print(index)
+        batches = self.files[index * self.batch_size:(index + 1) * self.batch_size]
+        X, y = self.__get_data(batches)        
+        return X, y
+
+    def __get_input(self, path,  target_size):
+        
+        image = load_img(path, target_size=target_size)
+        image_arr = img_to_array(image)
+        
+        if self.train:
+            # Implment data augmentation
+            pass
+
+        return image_arr/255.
+    
+    def __get_output_class(self, label, num_classes):
+        return keras.utils.to_categorical(label, num_classes=num_classes)
+
+    def __get_output_bbox(self, bbox, ):
+        return bbox
+    
+    def __parse_data(self, files):
+        paths = []
+        labels = []
+        bboxes = []
         for file in files:
-            path, _ = file.split(' ')
-            label = path.split('/')[-2]
-            classes.append(label)
-        return classes
+            path, bb_l = file.split(' ')
+            label_id = bb_l.split(',')[-1]
 
-    def parse_file(file):
-        path, bbox = file.split(' ')
+            # We have to load image and get its shape
+            image = img_to_array(load_img(path))
+            image_shape = image.shape
+            bbox = bb_l.split(',')[:-1]
+            bbox = [float(x) for x in bbox]
+            bbox = [bbox[0]/image_shape[1], bbox[1]/image_shape[0], bbox[2]/image_shape[1], bbox[3]/image_shape[0]] # normilize bbox
+            bbox = np.array(bbox)
 
-        # Get label from path
-        label = path.split('/')[-2]
-        
-        # Load image
-        image = load_img(path, target_size=(224,224))
-        image = img_to_array(image)
-        image = image / 255.0 # Normalize image
-        image = np.expand_dims(image,axis=0)
-        
-        # get bbox
-        bb_lab = [float(x) for x in bbox.split(',')] # ignore ID on last spot
-        bbox, label_id = bb_lab[:-1], int(bb_lab[-1])
-        bbox = [bbox[0]/image.shape[1], bbox[1]/image.shape[0], bbox[2]/image.shape[1], bbox[3]/image.shape[0]] # normilize bbox
-        bbox = np.array(bbox)
+            paths.append(path)
+            labels.append(label_id)
+            bboxes.append(bbox)
+        return paths, labels, bboxes
 
-        return image, label_id, bbox
+    def __get_data(self, batches):
+        # Generates data containing batch_size samples
+        path_batch, label_batch, bbox_batch = self.__parse_data(batches)
 
-    n = len(files)
-    i = 0
 
-    classes = get_classes(files)
-    n_classes = 4 # Hack
+        X_batch = np.asarray([self.__get_input(x, self.input_size) for x in path_batch])
 
-    # Check if lb.pickle exists
-    # if os.path.isfile('lb.pickle'):
-    #     with open('lb.pickle', 'rb') as f:
-    #         lb = pickle.load(f)
-    # else:
-    #     lb.fit(classes)
-    #     classes = lb.transform(classes)
-    #     with open('lb.pickle', 'wb') as f:
-    #         pickle.dump(lb, f)
+        y0_batch = np.asarray([self.__get_output_class(y, self.n_classes) for y in label_batch])
+        y1_batch = np.asarray([self.__get_output_bbox(y,) for y in bbox_batch])
 
-    while True:
+        # input image, output [classhead and output bbox]
+        return X_batch, tuple([y0_batch, y1_batch])
 
-        batch_image = np.zeros((batch_size, 224, 224, 3))
-        classes_batch = np.zeros((batch_size, 1))
-        bboxes_batch = np.zeros((batch_size, 4))
+    def on_epoch_end(self):
+        if self.shuffle:
+            'shuffle list of files'
+            np.random.shuffle(self.files)
 
-        for num in range(batch_size):
-            if i == 0:
-                np.random.shuffle(files)
 
-            image, label, bbox = parse_file(files[num])
-            
-            # label = lb.transform([label])
-
-            batch_image[num, :, :, :] = image
-            classes_batch[num, :] = keras.utils.to_categorical(label, n_classes)
-            bboxes_batch[num, :] = bbox
-
-            i = (i + 1) % n
-        yield [batch_image, classes_batch, bboxes_batch]
-
+    
 
 if __name__ == '__main__':
 
@@ -148,6 +171,8 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     lb = LabelBinarizer()
+    
+
 
     if args.load is not None:
         assert args.load.endswith('.h5'), 'Model must be .h5 file'
@@ -171,8 +196,13 @@ if __name__ == '__main__':
     with open(valid_list) as f:
         lines_val = f.readlines()
     np.random.seed(42)
-    np.random.shuffle(lines_train)
+    np.random.shuffle(lines_val)
     np.random.seed(None)
+
+    batch_size = 16
+    traingen = CustomDataGenerator(lines_train, batch_size=batch_size, input_size=(224,224,3), n_classes=4, shuffle=True)
+    validgen = CustomDataGenerator(lines_val, batch_size=batch_size, input_size=(224,224,3), n_classes=4, shuffle=True, train=False)
+
 
 
 
@@ -188,11 +218,10 @@ if __name__ == '__main__':
             histogram_freq=1, 
             write_images=True,
         )
-        batch_size = 16
-        model.fit(data_generator(lines_val, train = True, batch_size = batch_size),
+        model.fit(traingen,
                 epochs=100, 
                 batch_size=batch_size, 
-                validation_data= data_generator(valid_list, batch_size = batch_size),
+                validation_data= validgen,
                 callbacks = [early_stopping, tensorboard]
                 )
 
@@ -262,55 +291,3 @@ if __name__ == '__main__':
 
     model.save(f'model_weigh:{args.weights}_appen:{args.augment}.h5')
 
-
-
-
-# def data_generator(annotation_lines, batch_size, anchors, num_classes, max_bbox_per_scale, annotation_type):
-#     '''data generator for fit_generator'''
-#     n = len(annotation_lines)
-#     i = 0
-#     # train_input_sizes = [320, 352, 384, 416, 448, 480, 512, 544, 576, 608]
-#     # train_input_sizes = [128, 160, 192, 224, 256, 288, 320, 352, 384, 416]  
-#     train_input_sizes = [224, 256, 288, 320, 352, 384, 416, 448, 480, 512]
-#     strides = np.array([8, 16, 32])
-
-#     while True:
-#         train_input_size = random.choice(train_input_sizes)
-
-#         train_output_sizes = train_input_size // strides
-
-#         batch_image = np.zeros((batch_size, train_input_size, train_input_size, 3))
-
-#         batch_label_sbbox = np.zeros((batch_size, train_output_sizes[0], train_output_sizes[0],
-#                                       3, 5 + num_classes))
-#         batch_label_mbbox = np.zeros((batch_size, train_output_sizes[1], train_output_sizes[1],
-#                                       3, 5 + num_classes))
-#         batch_label_lbbox = np.zeros((batch_size, train_output_sizes[2], train_output_sizes[2],
-#                                       3, 5 + num_classes))
-
-#         batch_sbboxes = np.zeros((batch_size, max_bbox_per_scale, 4))
-#         batch_mbboxes = np.zeros((batch_size, max_bbox_per_scale, 4))
-#         batch_lbboxes = np.zeros((batch_size, max_bbox_per_scale, 4))
-
-#         for num in range(batch_size):
-#             if i == 0:
-#                 np.random.shuffle(annotation_lines)
-
-#             image, bboxes, exist_boxes = parse_annotation(annotation_lines[i], train_input_size, annotation_type)
-#             label_sbbox, label_mbbox, label_lbbox, sbboxes, mbboxes, lbboxes = preprocess_true_boxes(bboxes, train_output_sizes, strides, num_classes, max_bbox_per_scale, anchors)
-#             # tf.print("############################")
-#             # tf.print("sbboxes ", sbboxes)
-#             # tf.print("mbboxes ", mbboxes)
-#             # tf.print("lbboxes ", lbboxes)
-#             # tf.print("############################")
-#             batch_image[num, :, :, :] = image
-#             if exist_boxes:
-#                 batch_label_sbbox[num, :, :, :, :] = label_sbbox
-#                 batch_label_mbbox[num, :, :, :, :] = label_mbbox
-#                 batch_label_lbbox[num, :, :, :, :] = label_lbbox
-#                 batch_sbboxes[num, :, :] = sbboxes
-#                 batch_mbboxes[num, :, :] = mbboxes
-#                 batch_lbboxes[num, :, :] = lbboxes
-#             i = (i + 1) % n
-#         yield [batch_image, batch_label_sbbox, batch_label_mbbox, batch_label_lbbox, batch_sbboxes, batch_mbboxes, batch_lbboxes], np.zeros(batch_size)
-    

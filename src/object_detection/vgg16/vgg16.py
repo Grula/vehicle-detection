@@ -1,10 +1,6 @@
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
 
-import sys
-# Add src directory to path
-sys.path.append('src')
-
 import numpy as np
 
 import csv
@@ -15,68 +11,22 @@ import pickle
 
 import cv2
 
-from tensorflow.keras.applications import VGG16
-from tensorflow.keras.layers import Input, Flatten, Dense
-from tensorflow.keras.models import Model
-from tensorflow.keras.callbacks import EarlyStopping, TensorBoard
+from tensorflow import keras
 
-from tensorflow.keras.preprocessing.image import load_img
-from tensorflow.keras.preprocessing.image import img_to_array
+from keras.applications import VGG16
+from keras.layers import Input, Flatten, Dense
+from keras.models import Model
+from keras.callbacks import EarlyStopping, TensorBoard
+
+from keras.utils import load_img
+from keras.utils import img_to_array
 
 import argparse
 
-# Open and read CSV with images and labels
-
-def load_data(paths,  train = True):
-    data = []
-    classes = []
-    targets =  []
-    for csv_path in paths:
-        with open(csv_path) as csv_file:
-            csv_reader = csv.reader(csv_file, delimiter=',')
-            next(csv_reader, None)
-            for row in csv_reader:
-                filename, label, startX, startY, w, h = row
-                
-                # Skip validation set if training
-                if 'valid' in filename and train:
-                    continue
-
-                # Skip training set if validation
-                if 'valid' not in filename and not train:
-                    continue                    
-
-                endX = float(startX) + float(w)
-                endY = float(startY) + float(h)
-
-                image = cv2.imread(filename)
-                (h,w)=image.shape[:2]
-                
-                startX = float(startX) / w
-                startY = float(startY) / h
-                endX = float(endX) / w
-                endY = float(endY) / h
-
-                image = load_img(filename, target_size=(224, 224))
-                image = img_to_array(image)
-                
-                data.append(image)
-                classes.append(label)
-                targets.append((startX, startY, endX, endY))
-
-    data = np.array(data, dtype="float32") / 255.
-    classes = np.array(classes)
-    targets = np.array(targets, dtype="float32")
 
 
-    return data, classes, targets
-
-def create_model(weights = False):
+def create_model(weights = None):
     # Load VGG16 model
-    if weights:
-        weights = 'imagenet'
-    else:
-        weights = None
     vgg=VGG16(weights=weights, include_top=False,input_tensor=Input(shape=(224,224,3)))
     flatten = vgg.output
     flatten = Flatten()(flatten)
@@ -103,7 +53,7 @@ def create_model(weights = False):
     return model
 
 def draw_bbox(image, bbox):
-    (startX, startY, endX, endY) = bbox
+    startX, startY, endX, endY = bbox
     # Normilized coordinates, multyply by image width and height
     startX = int(startX * image.shape[1])
     startY = int(startY * image.shape[0])
@@ -119,26 +69,141 @@ def eval_model(model, image):
     # label and bbox predicitons
     return car_pred[0][0], car_pred[1][0]
 
+
+
+def data_generator(files, train = True, batch_size = 32):
+
+    def get_classes(files):
+        classes = []
+        for file in files:
+            path, _ = file.split(' ')
+            label = path.split('/')[-2]
+            classes.append(label)
+        return classes
+
+    def parse_file(file):
+        path, bbox = file.split(' ')
+
+        # Get label from path
+        label = path.split('/')[-2]
+        
+        # Load image
+        image = load_img(path, target_size=(224,224))
+        image = img_to_array(image)
+        image = image / 255.0 # Normalize image
+        image = np.expand_dims(image,axis=0)
+        
+        # get bbox
+        bb_lab = [float(x) for x in bbox.split(',')] # ignore ID on last spot
+        bbox, label_id = bb_lab[:-1], int(bb_lab[-1])
+        bbox = [bbox[0]/image.shape[1], bbox[1]/image.shape[0], bbox[2]/image.shape[1], bbox[3]/image.shape[0]] # normilize bbox
+        bbox = np.array(bbox)
+
+        return image, label_id, bbox
+
+    n = len(files)
+    i = 0
+
+    classes = get_classes(files)
+    n_classes = 4 # Hack
+
+    # Check if lb.pickle exists
+    # if os.path.isfile('lb.pickle'):
+    #     with open('lb.pickle', 'rb') as f:
+    #         lb = pickle.load(f)
+    # else:
+    #     lb.fit(classes)
+    #     classes = lb.transform(classes)
+    #     with open('lb.pickle', 'wb') as f:
+    #         pickle.dump(lb, f)
+
+    while True:
+
+        batch_image = np.zeros((batch_size, 224, 224, 3))
+        classes_batch = np.zeros((batch_size, 1))
+        bboxes_batch = np.zeros((batch_size, 4))
+
+        for num in range(batch_size):
+            if i == 0:
+                np.random.shuffle(files)
+
+            image, label, bbox = parse_file(files[num])
+            
+            # label = lb.transform([label])
+
+            batch_image[num, :, :, :] = image
+            classes_batch[num, :] = keras.utils.to_categorical(label, n_classes)
+            bboxes_batch[num, :] = bbox
+
+            i = (i + 1) % n
+        yield [batch_image, classes_batch, bboxes_batch]
+
+
 if __name__ == '__main__':
 
-
     parser = argparse.ArgumentParser(description='')
-    parser.add_argument('--weights', type=int, default=0, help='Use weights, default 0 (False)')
-    parser.add_argument('--augment', type=int, default=0, help='Use augmenttation, default 0 (False)')
+    parser.add_argument('--weights', type=str, default=None, help='Use weights, default to None, use imagenet if not specified')
+    parser.add_argument('--load', type=str, default=None, help='Specify to load model, provide path to model .h5 file')
+    parser.add_argument('--train', type=bool, default=1, help='Specify to train model, default to True')
 
     args = parser.parse_args()
+    lb = LabelBinarizer()
 
-    args.weights = bool(args.weights)
-    args.augment = bool(args.augment)
-    model_loaded = False
-
-    # Check if model exists and load instead
-    if os.path.isfile(f'model_weigh:{args.weights}_appen:{args.augment}.h5'):
-        print("Loading model...")
+    if args.load is not None:
+        assert args.load.endswith('.h5'), 'Model must be .h5 file'
+        model = keras.models.load_model(args.load)
+    else: # create model
         model = create_model(args.weights)
-        model.load_weights(f'model_weigh:{args.weights}_appen:{args.augment}.h5')
-        model_loaded = True
 
+    print("loaded/created model")
+
+    train_list = 'data/train_data.txt'
+    valid_list = 'data/valid_data.txt'
+
+    with open(train_list) as f:
+        lines_train = f.readlines()
+    np.random.seed(42)
+    np.random.shuffle(lines_train)
+    np.random.seed(None)
+
+    
+
+    with open(valid_list) as f:
+        lines_val = f.readlines()
+    np.random.seed(42)
+    np.random.shuffle(lines_train)
+    np.random.seed(None)
+
+
+
+    if args.train:
+        # Train model
+        early_stopping = EarlyStopping(
+            monitor="loss", 
+            patience=10, 
+            restore_best_weights=True
+        )
+
+        tensorboard = TensorBoard(
+            histogram_freq=1, 
+            write_images=True,
+        )
+        batch_size = 16
+        model.fit(data_generator(lines_val, train = True, batch_size = batch_size),
+                epochs=100, 
+                batch_size=batch_size, 
+                validation_data= data_generator(valid_list, batch_size = batch_size),
+                callbacks = [early_stopping, tensorboard]
+                )
+
+        model.save(f'model_weigh:{args.weights}_appen:{args.augment}.h5')
+
+
+    custom_id = {'car' : 0, 'motorbike' : 1, 'bus' : 2, 'truck' : 3}
+
+
+
+    exit()
     # Data pathts
     data_paths = ['data/data.csv']
     if args.augment:
@@ -163,121 +228,89 @@ if __name__ == '__main__':
     X_train, X_test, y1_train, y1_test, y2_train, y2_test = train_test_split(data, classes, bboxes, test_size=0.3, random_state=42)
     X_test, X_valid, y1_test, y1_valid, y2_test, y2_valid  = train_test_split(X_test, y1_test, y2_test, test_size=0.35, random_state=42)
 
-    if not model_loaded:
-        print("Creating model...")
-        model = create_model(weights=args.weights)
+    print("Creating model...")
+    model = create_model(weights=args.weights)
 
-        trainTargets = {
-            "class_label": y1_train,
-            "bounding_box": y2_train
-        }
-
-        testTargets = {
-            "class_label": y1_test,
-            "bounding_box": y2_test
-        }
-
-        early_stopping_patience = 10
-        early_stopping = EarlyStopping(
-            monitor="loss", 
-            patience=early_stopping_patience, 
-            restore_best_weights=True
-        )
-
-        tensorboard = TensorBoard(
-            histogram_freq=100, 
-            write_images=True,
-        )
-
-        model.fit(X_train, trainTargets,
-                epochs=100, 
-                batch_size=32, 
-                validation_data=(X_test, testTargets),
-                callbacks = [early_stopping, tensorboard]
-                )
-
-        model.save(f'model_weigh:{args.weights}_appen:{args.augment}.h5')
-
-    # Evalute model
-    images, classes, bboxes = load_data(['data/data.csv'], train=False)
-
-    vehicles = {'car': [], 'truck': [], 'bus': [], 'motorbike': [], }
-    # Pick one image from each set 
-    # for i in range(len(classes)):
-    #     if all(vehicles.values()):
-    #         break
-    vehicles = {}
-    for i, cl in enumerate(classes):
-        if cl not in vehicles.keys():
-            vehicles[cl] = []
-        vehicles[cl].append((images[i], bboxes[i]))
-
-    # Check if res folder exists
-    if not os.path.exists('res'):
-        os.mkdir('res')
-
-
-
-    matrix =  {'car': {'car':0, 'truck':0, 'bus': 0, 'motorbike': 0},
-               'truck': {'car':0, 'truck':0, 'bus': 0, 'motorbike': 0},
-               'bus': {'car':0, 'truck':0, 'bus': 0, 'motorbike': 0},
-               'motorbike': {'car':0, 'truck':0, 'bus': 0, 'motorbike': 0},
+    trainTargets = {
+        "class_label": y1_train,
+        "bounding_box": y2_train
     }
 
-    for cl in vehicles.keys():
-        for i, (image, bbox) in enumerate(vehicles[cl]):
+    testTargets = {
+        "class_label": y1_test,
+        "bounding_box": y2_test
+    }
 
-            image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
-            pred_label, pred_bbox = eval_model(model, image)
-            cv2.imwrite(f'res/{cl}_real.jpg', draw_bbox(image*255, bbox))
-            cv2.imwrite(f'res/{cl}_pred.jpg', draw_bbox(image*255, pred_bbox))
-            pred_label = lb.inverse_transform(np.array([pred_label]))[0]
-            
-            matrix[cl][pred_label] += 1
+    early_stopping_patience = 10
+    early_stopping = EarlyStopping(
+        monitor="loss", 
+        patience=early_stopping_patience, 
+        restore_best_weights=True
+    )
 
-    import pprint
-    pprint.pprint(matrix)        
+    tensorboard = TensorBoard(
+        histogram_freq=100, 
+        write_images=True,
+    )
 
+    model.fit(X_train, trainTargets,
+            epochs=100, 
+            batch_size=32, 
+            validation_data=(X_test, testTargets),
+            callbacks = [early_stopping, tensorboard]
+            )
 
-    import matplotlib.pyplot as plt
-    import seaborn as sns
-    import pandas as pd
-    import numpy as np
-
-    # Plot confusion matrix
-    plt.figure(figsize=(10,10))
-    sns.heatmap(pd.DataFrame(matrix), annot=True, cmap="Blues", fmt='.0f', linewidths=.5)
-    plt.title('Confusion Matrix')
-    plt.ylabel('True label')
-    plt.xlabel('Predicted label')
-    #  save plot to file
-    plt.savefig('res/confusion_matrix.png')
+    model.save(f'model_weigh:{args.weights}_appen:{args.augment}.h5')
 
 
 
 
-    # Create confusion matrix
+# def data_generator(annotation_lines, batch_size, anchors, num_classes, max_bbox_per_scale, annotation_type):
+#     '''data generator for fit_generator'''
+#     n = len(annotation_lines)
+#     i = 0
+#     # train_input_sizes = [320, 352, 384, 416, 448, 480, 512, 544, 576, 608]
+#     # train_input_sizes = [128, 160, 192, 224, 256, 288, 320, 352, 384, 416]  
+#     train_input_sizes = [224, 256, 288, 320, 352, 384, 416, 448, 480, 512]
+#     strides = np.array([8, 16, 32])
 
-    # Evalute images
-    # for vehicle, data in vehicles.items():
+#     while True:
+#         train_input_size = random.choice(train_input_sizes)
 
-    #     image, bbox = data
-    #     # convert from rgb to bgr
-    #     image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
-    #     cv2.imwrite(f'res/{vehicle}_real.jpg', draw_bbox(image*255, bbox))
-    #     pred_label, pred_bbox = eval_model(model, image)
-    #     cv2.imwrite(f'res/{vehicle}_pred.jpg', draw_bbox(image*255, pred_bbox))
-    #     # Inverse transform to get real label
-    #     real_label = lb.inverse_transform(np.array([pred_label]))[0]
-    #     print(f'{vehicle}: ', real_label)
+#         train_output_sizes = train_input_size // strides
 
-    #     guesses[vehicle] += 1 if vehicle == real_label else 0
-    #     print(f'{vehicle}: {guesses[vehicle]}')
-    #     print()
-    # print("Guesses: ", guesses)
+#         batch_image = np.zeros((batch_size, train_input_size, train_input_size, 3))
 
+#         batch_label_sbbox = np.zeros((batch_size, train_output_sizes[0], train_output_sizes[0],
+#                                       3, 5 + num_classes))
+#         batch_label_mbbox = np.zeros((batch_size, train_output_sizes[1], train_output_sizes[1],
+#                                       3, 5 + num_classes))
+#         batch_label_lbbox = np.zeros((batch_size, train_output_sizes[2], train_output_sizes[2],
+#                                       3, 5 + num_classes))
 
+#         batch_sbboxes = np.zeros((batch_size, max_bbox_per_scale, 4))
+#         batch_mbboxes = np.zeros((batch_size, max_bbox_per_scale, 4))
+#         batch_lbboxes = np.zeros((batch_size, max_bbox_per_scale, 4))
 
+#         for num in range(batch_size):
+#             if i == 0:
+#                 np.random.shuffle(annotation_lines)
 
-
+#             image, bboxes, exist_boxes = parse_annotation(annotation_lines[i], train_input_size, annotation_type)
+#             label_sbbox, label_mbbox, label_lbbox, sbboxes, mbboxes, lbboxes = preprocess_true_boxes(bboxes, train_output_sizes, strides, num_classes, max_bbox_per_scale, anchors)
+#             # tf.print("############################")
+#             # tf.print("sbboxes ", sbboxes)
+#             # tf.print("mbboxes ", mbboxes)
+#             # tf.print("lbboxes ", lbboxes)
+#             # tf.print("############################")
+#             batch_image[num, :, :, :] = image
+#             if exist_boxes:
+#                 batch_label_sbbox[num, :, :, :, :] = label_sbbox
+#                 batch_label_mbbox[num, :, :, :, :] = label_mbbox
+#                 batch_label_lbbox[num, :, :, :, :] = label_lbbox
+#                 batch_sbboxes[num, :, :] = sbboxes
+#                 batch_mbboxes[num, :, :] = mbboxes
+#                 batch_lbboxes[num, :, :] = lbboxes
+#             i = (i + 1) % n
+#         yield [batch_image, batch_label_sbbox, batch_label_mbbox, batch_label_lbbox, batch_sbboxes, batch_mbboxes, batch_lbboxes], np.zeros(batch_size)
     

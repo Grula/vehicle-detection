@@ -42,8 +42,8 @@ if __name__ == '__main__':
 
 
     # Open LabelBinarizer from pickle file
-    with open('lb.pickle', 'rb') as f:
-        lb = pickle.load(f)
+    # with open('lb.pickle', 'rb') as f:
+    #     lb = pickle.load(f)
 
     validation_images = args['valid']
     label_ids = {0 : 'car', 1 : 'motorbike', 2 : 'bus', 3 : 'truck'}
@@ -81,9 +81,13 @@ if __name__ == '__main__':
 
         # Predict image
         predicted_label, pred_bbox = eval_model(model, image)
-        confidence = max(predicted_label)
-        predicted_label = lb.inverse_transform(np.array([predicted_label]))[0]
         
+        confidence = max(predicted_label)
+        
+        # find index of max value
+        predicted_label = np.argmax(predicted_label)
+        predicted_label = label_ids[predicted_label]
+
         # max value in predcted_label is confidence
         # predicted bbox
         x0, y0, x1, y1 = pred_bbox

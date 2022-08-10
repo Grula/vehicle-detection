@@ -548,9 +548,11 @@ def yolo_loss(args, num_classes, iou_loss_thresh, anchors):
     # tf.print("############################")
     # DEBUG END
     #HACK: all NaN values in arrays are replaced with K.epsilon()
+    tf.print(conv_sbbox.shape)
     conv_sbbox = tf.where(tf.math.is_nan(conv_sbbox), K.epsilon(), conv_sbbox)
     conv_mbbox = tf.where(tf.math.is_nan(conv_mbbox), K.epsilon(), conv_mbbox)
     conv_lbbox = tf.where(tf.math.is_nan(conv_lbbox), K.epsilon(), conv_lbbox)
+    tf.print(conv_sbbox.shape)
 
 
     pred_sbbox = decode(conv_sbbox, anchors[0], 8, num_classes)

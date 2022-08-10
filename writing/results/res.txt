@@ -12,6 +12,21 @@ mAP:  0.09597185219506545
 Precision for classes:  0.11835106382978723
 Recall for classes:  0.25
 F1 for classes::  0.16064981949458484
+###################################################
+Current file:  VGG16-augtrans_prediction.csv
+Confusion matrix:
+	car	motorbike	bus	truck	
+car	0	0	89	0	
+motorbike	0	0	97	0	
+bus	0	0	1	0	
+truck	0	0	1	0	
+
+mAP:  0.37500868759411543
+Precision for classes:  0.0013297872340425532
+Recall for classes:  0.25
+F1 for classes::  0.002645502645502646
+###################################################
+
 Current Object Detection folder:  yolo
 ###################################################
 Current file:  BASaugment-512-data_prediction.csv

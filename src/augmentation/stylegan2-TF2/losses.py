@@ -137,7 +137,6 @@ def g_fid(real_images, interception, generator, discriminator, z_dim, policy, la
     # forward pass
     fake_images = generator([z, labels], training=True)
 
-    tf.print( tf.reduce_min(fake_images), tf.reduce_max(fake_images))   
 
     # traftorm to channel last in batch
     real_images = tf.transpose(real_images, perm=[0, 3, 2, 1])
@@ -148,8 +147,6 @@ def g_fid(real_images, interception, generator, discriminator, z_dim, policy, la
         real_images = tf.image.resize(real_images, [75, 75])
         fake_images = tf.image.resize(fake_images, [75, 75])
 
-    fake_images = preprocess_input(fake_images)
-
     # convert from tensor to numpy array
     real_images = real_images.numpy()
     fake_images = fake_images.numpy()
@@ -159,7 +156,8 @@ def g_fid(real_images, interception, generator, discriminator, z_dim, policy, la
     act1 = interception.predict(real_images.numpy())
     act2 = interception.predict(fake_images.numpy())
 
-
+    act1 = np.array(act1)
+    act2 = np.array(act2)
 
 
     mu1, sigma1 = act1.mean(axis=0), np.cov(act1, rowvar=False)

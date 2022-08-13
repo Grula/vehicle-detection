@@ -74,7 +74,11 @@ class Trainer(object):
 
         # load interception
         #?fid score
-        self.interception = InceptionV3(include_top=False, pooling='avg',)
+        if self.train_res < 75:
+            input_shape = (75, 75, 3)
+        else:
+            input_shape = (self.train_res, self.train_res, 3)
+        self.interception = InceptionV3(include_top=False, pooling='avg',input_shape=input_shape)
         
 
         # set optimizers

@@ -116,7 +116,7 @@ g_params = {
 model_base_dir =  os.path.join(args['model_dir'], model_dir)
 generator = load_generator(g_params=g_params, is_g_clone=False, ckpt_dir=model_base_dir, custom_cuda=False)
 
-n_images = 32*100
+n_images = 32*20
 
 # expand real images paths 
 real_images_dir = os.path.join('data', name)

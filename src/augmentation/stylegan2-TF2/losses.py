@@ -2,6 +2,7 @@ import numpy as np
 from scipy.linalg import sqrtm
 
 import tensorflow as tf
+from keras.applications.inception_v3 import preprocess_input
 
 
 
@@ -130,9 +131,12 @@ def g_fid(real_images, interception, generator, discriminator, z_dim, policy, la
     # forward pass
     fake_images = generator([z, labels], training=True)
     
+    real_images_processed = preprocess_input(real_images)
+    fake_images_processed = preprocess_input(fake_images)
+
     # fake_scores = discriminator([fake_images, labels], training=True)
-    act1 = interception.predict(real_images)
-    act2 = interception.predict(fake_images)
+    act1 = interception(real_images_processed)
+    act2 = interception(fake_images_processed)
 
     mu1, sigma1 = act1.mean(axis=0), np.cov(act1, rowvar=False)
     mu2, sigma2 = act2.mean(axis=0), np.cov(act2, rowvar=False)

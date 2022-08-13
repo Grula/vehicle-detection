@@ -147,10 +147,10 @@ def g_fid(real_images, interception, generator, discriminator, z_dim, policy, la
         real_images = tf.image.resize(real_images, [75, 75])
         fake_images = tf.image.resize(fake_images, [75, 75])
 
-
-
-    # real_images_processed = preprocess_input(real_images)
-    # fake_images_processed = preprocess_input(fake_images)
+    # convert from tensor to numpy array
+    real_images = real_images.numpy()
+    fake_images = fake_images.numpy()
+    
 
     # fake_scores = discriminator([fake_images, labels], training=True)
     act1 = interception(real_images)

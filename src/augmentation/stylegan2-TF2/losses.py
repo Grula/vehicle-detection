@@ -137,6 +137,7 @@ def g_fid(real_images, interception, generator, discriminator, z_dim, policy, la
     # forward pass
     fake_images = generator([z, labels], training=True)
 
+    print(tf.reduce_min(fake_images), tf.reduce_max(fake_images))
 
     # traftorm to channel last in batch
     real_images = tf.transpose(real_images, perm=[0, 3, 2, 1])

@@ -73,7 +73,8 @@ class Trainer(object):
                                                                            self.use_custom_cuda)
 
         # load interception
-        self.interception = InceptionV3(include_top=False, pooling='avg')
+        #?fid score
+        self.interception = InceptionV3(include_top=False, pooling='avg', input_shape=(3, self.train_res, self.train_res))
         
 
         # set optimizers
@@ -189,6 +190,7 @@ class Trainer(object):
         self.g_optimizer.apply_gradients(zip(g_gradients, self.generator.trainable_variables))
         return g_loss, g_gan_loss, pl_penalty
 
+    #?fid score
     def fid(self, dist_inputs):
         real_images = dist_inputs[0]
 
@@ -232,6 +234,7 @@ class Trainer(object):
             per_replica_samples = strategy.run(self.gen_samples, args=(dist_inputs,))
             return per_replica_samples
 
+        #?new fid score
         def fid(dist_inputs):
             per_replica_fids = strategy.run(self.fid, args=(dist_inputs,))
             return per_replica_fids
@@ -244,6 +247,7 @@ class Trainer(object):
             dist_g_train_step_reg = tf.function(dist_g_train_step_reg)
             dist_gen_samples = tf.function(dist_gen_samples)
 
+            #?new fid score
             fid = tf.function(fid)
 
         if self.reached_max_steps:
@@ -263,6 +267,7 @@ class Trainer(object):
         metric_r1_penalty = tf.keras.metrics.Mean('r1_penalty', dtype=tf.float32)
         metric_pl_penalty = tf.keras.metrics.Mean('pl_penalty', dtype=tf.float32)
 
+        # new fid score
         metric_fid = tf.keras.metrics.Mean('fid', dtype=tf.float32)
 
         # start training
@@ -287,6 +292,7 @@ class Trainer(object):
                 g_loss = dist_g_train_step((real_images,))
                 g_gan_loss = g_loss
                 pl_penalty = zero
+                # new fid score
                 fid_score = fid((real_images,))
 
             # update g_clone
@@ -300,6 +306,7 @@ class Trainer(object):
             metric_r1_penalty(r1_penalty)
             metric_pl_penalty(pl_penalty)
 
+            # new fid score
             metric_fid(fid_score)
 
             # get current step
@@ -319,6 +326,7 @@ class Trainer(object):
                 tf.summary.scalar('r1_penalty', metric_r1_penalty.result(), step=step)
                 tf.summary.scalar('pl_penalty', metric_pl_penalty.result(), step=step)
 
+                # new fid score
                 tf.summary.scalar('fid', metric_g_loss.result(), step=step)
 
                 # save every self.image_summary_step

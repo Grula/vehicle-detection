@@ -130,7 +130,10 @@ def g_fid(real_images, interception, generator, discriminator, z_dim, policy, la
 
     # forward pass
     fake_images = generator([z, labels], training=True)
-    
+
+    # 
+
+
     real_images_processed = preprocess_input(real_images)
     fake_images_processed = preprocess_input(fake_images)
 

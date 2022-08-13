@@ -12,9 +12,12 @@ from utils import str_to_bool
 from tf_utils import allow_memory_growth, split_gpu_for_testing
 from load_models import load_generator, load_discriminator
 
+from keras.applications.inception_v3 import InceptionV3
+from keras.applications.inception_v3 import preprocess_input
+
 from dataset import create_dataset
 
-from losses import d_logistic, d_logistic_r1_reg, g_logistic_non_saturating, g_logistic_ns_pathreg
+from losses import d_logistic, d_logistic_r1_reg, g_logistic_non_saturating, g_logistic_ns_pathreg, g_fid
 
 
 def initiate_models(g_params, d_params, use_custom_cuda):
@@ -68,6 +71,10 @@ class Trainer(object):
         self.discriminator, self.generator, self.g_clone = initiate_models(self.g_params,
                                                                            self.d_params,
                                                                            self.use_custom_cuda)
+
+        # load interception
+        self.interception = InceptionV3(include_top=False, pooling='avg')
+        
 
         # set optimizers
         self.d_optimizer = tf.keras.optimizers.Adam(self.d_opt['learning_rate'],
@@ -182,6 +189,20 @@ class Trainer(object):
         self.g_optimizer.apply_gradients(zip(g_gradients, self.generator.trainable_variables))
         return g_loss, g_gan_loss, pl_penalty
 
+    def fid(self, dist_inputs):
+        real_images = dist_inputs[0]
+
+        with tf.GradientTape() as g_tape:
+            # compute losses
+            g_fid_loss = g_fid(real_images, self.interception, self.generator, self.discriminator, self.g_params['z_dim'], self.policy)
+
+            # scale loss
+            g_fid_loss = tf.reduce_sum(g_fid_loss) * self.global_batch_scaler
+
+        g_gradients = g_tape.gradient(g_fid_loss, self.generator.trainable_variables)
+        self.g_optimizer.apply_gradients(zip(g_gradients, self.generator.trainable_variables))
+        return g_fid_loss
+
     def train(self, dist_datasets, strategy):
         def dist_d_train_step(inputs):
             per_replica_losses = strategy.run(fn=self.d_train_step, args=(inputs,))
@@ -211,6 +232,10 @@ class Trainer(object):
             per_replica_samples = strategy.run(self.gen_samples, args=(dist_inputs,))
             return per_replica_samples
 
+        def fid(dist_inputs):
+            per_replica_fids = strategy.run(self.fid, args=(dist_inputs,))
+            return per_replica_fids
+
         # wrap with tf.function
         if self.use_tf_function:
             dist_d_train_step = tf.function(dist_d_train_step)
@@ -218,6 +243,8 @@ class Trainer(object):
             dist_d_train_step_reg = tf.function(dist_d_train_step_reg)
             dist_g_train_step_reg = tf.function(dist_g_train_step_reg)
             dist_gen_samples = tf.function(dist_gen_samples)
+
+            fid = tf.function(fid)
 
         if self.reached_max_steps:
             return
@@ -235,6 +262,8 @@ class Trainer(object):
         metric_g_gan_loss = tf.keras.metrics.Mean('g_gan_loss', dtype=tf.float32)
         metric_r1_penalty = tf.keras.metrics.Mean('r1_penalty', dtype=tf.float32)
         metric_pl_penalty = tf.keras.metrics.Mean('pl_penalty', dtype=tf.float32)
+
+        metric_fid = tf.keras.metrics.Mean('fid', dtype=tf.float32)
 
         # start training
         zero = tf.constant(0.0, dtype=tf.float32)
@@ -258,6 +287,7 @@ class Trainer(object):
                 g_loss = dist_g_train_step((real_images,))
                 g_gan_loss = g_loss
                 pl_penalty = zero
+                fid_score = fid((real_images,))
 
             # update g_clone
             self.g_clone.set_as_moving_average_of(self.generator)
@@ -269,6 +299,8 @@ class Trainer(object):
             metric_g_gan_loss(g_gan_loss)
             metric_r1_penalty(r1_penalty)
             metric_pl_penalty(pl_penalty)
+
+            metric_fid(fid_score)
 
             # get current step
             step = self.g_optimizer.iterations.numpy()
@@ -286,6 +318,8 @@ class Trainer(object):
                 tf.summary.scalar('g_gan_loss', metric_g_gan_loss.result(), step=step)
                 tf.summary.scalar('r1_penalty', metric_r1_penalty.result(), step=step)
                 tf.summary.scalar('pl_penalty', metric_pl_penalty.result(), step=step)
+
+                tf.summary.scalar('fid', metric_g_loss.result(), step=step)
 
                 # save every self.image_summary_step
                 if step % self.image_summary_step == 0:

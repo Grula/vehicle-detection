@@ -1,6 +1,12 @@
+import numpy as np
+from scipy.linalg import sqrtm
+
 import tensorflow as tf
 
+
+
 from DiffAugment_tf2 import DiffAugment
+
 
 
 
@@ -112,3 +118,31 @@ def g_logistic_ns_pathreg(real_images, generator, discriminator, z_dim,
     # Calculate (|J*y|-a)^2.
     pl_penalty = tf.square(pl_lengths - pl_mean)
     return g_loss, pl_penalty
+
+
+
+def g_fid(real_images, interception, generator, discriminator, z_dim, policy):
+    batch_size = tf.shape(real_images)[0]
+    z = tf.random.normal(shape=[batch_size, z_dim], dtype=tf.float32)
+    if labels is None:
+        labels = tf.random.normal(shape=[batch_size, 0], dtype=tf.float32)
+
+    # forward pass
+    fake_images = generator([z, labels], training=True)
+    
+    # fake_scores = discriminator([fake_images, labels], training=True)
+    act1 = interception.predict(real_images)
+    act2 = interception.predict(fake_images)
+
+    mu1, sigma1 = act1.mean(axis=0), np.cov(act1, rowvar=False)
+    mu2, sigma2 = act2.mean(axis=0), np.cov(act2, rowvar=False)
+    # calculate sum squared difference between means
+    ssdiff = np.sum((mu1 - mu2)**2.0)
+    # calculate sqrt of product between cov
+    covmean = sqrtm(sigma1.dot(sigma2))
+    # check and correct imaginary numbers from sqrt
+    if np.iscomplexobj(covmean):
+        covmean = covmean.real
+    # calculate score
+    fid = ssdiff + np.trace(sigma1 + sigma2 - 2.0 * covmean)
+    return fid

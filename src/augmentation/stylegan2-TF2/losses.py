@@ -162,10 +162,13 @@ def g_fid(real_images, interception, generator, discriminator, z_dim, policy, la
     act1 = interception(real_images)
     act2 = interception(fake_images)
 
-    print(type(act1))
     # convert to numpy array
-    act1 = act1.numpy()
-    act2 = act2.numpy()
+    if tf.eagerly():
+        act1 = act1.numpy()
+        act2 = act2.numpy()
+    else:
+        act1 = eval(act1)
+        act2 = eval(act2)
     # print the shape of the images
 
 

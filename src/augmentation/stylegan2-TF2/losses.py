@@ -121,7 +121,7 @@ def g_logistic_ns_pathreg(real_images, generator, discriminator, z_dim,
 
 
 
-def g_fid(real_images, interception, generator, discriminator, z_dim, policy):
+def g_fid(real_images, interception, generator, discriminator, z_dim, policy, labels = None):
     batch_size = tf.shape(real_images)[0]
     z = tf.random.normal(shape=[batch_size, z_dim], dtype=tf.float32)
     if labels is None:

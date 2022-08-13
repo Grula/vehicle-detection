@@ -49,7 +49,6 @@ folders = ['vgg16', 'yolo' ]
 # In each folder there is file that ends with .csv
 
 classes = ['car', 'motorbike', 'bus', 'truck']
-fw_mAP = open('mAPs.txt', 'w')
 for folder in folders:
     print("Current Object Detection folder: ", folder)
     files = os.listdir(folder)
@@ -144,7 +143,10 @@ for folder in folders:
                 aps['recall'].append(recall)
                 aps['f1'].append(f1)
             
-
+            # calculate average f1-score for each class
+            avg_f1 = sum(aps['f1']) / len(aps['f1'])
+            print("Average f1-score for class: ", class_name, " is: ", avg_f1)
+        
 
             # plot precision with iou threshold
             plt.plot(np.arange(0.5, 1.0, 0.01), aps['precision'], label=class_name)
@@ -170,5 +172,3 @@ for folder in folders:
         # plt.title('Preciznost za ' + file_name.split('-')[0] + ' sa IoU pragom')
         # plt.savefig(file_name + '_avg.png')
         # plt.close()
-
-fw_mAP.close()

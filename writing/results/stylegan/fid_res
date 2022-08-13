@@ -1,5 +1,6 @@
  BUS:
- 220k - Average FID: 235.6
+ 220k - Average FID: 220.465
+ 220k - Average FID: 235.671
  260k - Average FID: 197.353
  270k - Average FID: 200.626
  280k - Average FID: 233.425

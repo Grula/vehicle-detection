@@ -125,6 +125,7 @@ for folder in folders:
             print(f"AP for {class_name}: {AP}")
             mean_aps[class_name] = AP
             fw_mAP.write(f"AP for {class_name}: {AP}\n")
+            
 
 
         #     # Plot precision-recall curve

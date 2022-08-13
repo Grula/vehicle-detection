@@ -64,7 +64,45 @@ POpularnost ML-a. Gde se koristi.
 
 Učenje na velikoj količini podataka ne može uvek biti ispunjeno iz više razloga. 
 Dobijanje i obeležavanje podataka je potrebno za postizanje kvalitetnih rezultata, ali ovaj proces može biti izuzetno skup ili uopšte nemoguć.
-Postavlja se pitanje, da li je moguće obučiti model na manjoj količini podataka? Zahvaljujući naprednim tehnikama mašinskog učenja, prostim algoritmima i prethodnim istraživanjima \cite{brigato2021close}, takav problem je moguće prevazići.
+Postavlja se pitanje, da li je moguće obučiti model na manjoj količini podataka? Zahvaljujući naprednim tehnikama mašinskog učenja, prostim algoritmima i najnovijim istraživanjima \cite{brigato2021close}, takav problem je moguće prevazići.
 
 Postoji vise razloga zbog kojih velika kolicina podataka potrebna za ucenje nije uvek dostupna.
 Dobijanje i obeležavanje podataka je potrebno za postizanje dobrih rezultata, ali ovaj proces može biti izuzetno skup ili uopšte nemoguć.
+Zahvaljujući naprednim tehnikama mašinskog učenja, prostim algoritmima i najnovijim istraživanjima \cite{brigato2021close}, moguće je obučiti modele na manjoj količini podataka.
+
+******************************************************************************************************************************************************************
+
+
+U okviru ovog rada, opisan je postupak proširivanja skupa podataka. Podaci se prosiruju prostim algoritmima augmentacija i sintetičkim podacima pomocu  "\textit{state of the art}" modela za generisanje fotorealističnih slika.
+
+Nakon korišćenja ovih metoda, model koji će biti obučen sintetičkim podacima biće dovoljno generalizovan da prepozna nepoznate podatke.
+
+******************************************************************************************************************************************************************
+
+- dodajte ovde neki primer
+- probajte da dopunite ovako nekako, tu svakako pomenite mreže da bi se poveyalo dole sa narednom rečenicom
+
+- primer
+- masinsko ucenje i neuronske mreze
+
+Automatska detekcija i prepoznavanje objekta ima veoma važnu ulogu u svakodnevnom životu. 
+Da bi se omogućilo efikasno prepoznavanje objekata, koriste se metode mašinskog učenja posebno, metode računarkse vizije korišćenjem neurnoskih mreža. ... Time se postiže ... Međutim, da bi se dobili adekvatni rezultati, obično je neophodna velika količina podataka i takođe velika procesorska snaga.
+
+
+Ovaj rad se bavi metodama za proširivanje podataka kao i metodama za smanjenje vremena potrebnog za učenje mreža, u slučaju da velika količina podataka ili procesorska snaga nisu na raspolaganju. Podaci se proširuju baznim augmentacijama i novonastalim metodama kreiranja potpuno sintetičkih podataka. 
+Kako bi smanjili vreme potrebno za učenje primenom metoda transfernog učenja, mreže ne moramo da učimo od samog početka.
+Korišćenjem navedenih metoda dobijaju se pozitivni rezultati. Mreže koje su koristile spomenute metode pokazuju bolje rezultate nego mreže koje su izostavile neke od spomenutih metoda.
+
+automatska detekcija i prepoznavanje objekta ima veoma vaznu ulogu u svakodnevnom zivotu. 
+
+Najznačajnija primena detekcije objekta je kod autonomne vožnje, gde vozilo pomoću različitih senzora otkriva objekte i zaključuje sledeće korake.
+Jedna od primena je kod autonomne voznje da bi se saobracaj ucinio bezbednijim i laksim za ljude.
+prepoznavanje objekata igra veliku ulogu u razumevanju scena povezanih sa vojskom, obezbeđenjem, medicinom i transportom.
+
+Da bi se omogućilo efikasno prepoznavanje objekata, koriste se metode mašinskog učenja posebno, metode računarkse vizije korišćenjem neurnoskih mreža i dubokog ucenja. Međutim, da bi se dobili adekvatni rezultati, obično je neophodna velika količina podataka i velika procesorska snaga.
+
+
+Automatska detekcija i prepoznavanje objekta ima veoma važnu ulogu u svakodnevnom životu. Najznačajniji primer detekcije objekta je kod autonomne vožnje. % kako bi se saobraćaj učinio bezbednijim i lagodnijim za ljude.
+
+
+------------------------------------------------------------------------------------------------------------------------

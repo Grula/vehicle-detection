@@ -154,8 +154,8 @@ def g_fid(real_images, interception, generator, discriminator, z_dim, policy, la
     
 
     # fake_scores = discriminator([fake_images, labels], training=True)
-    act1 = interception.predict(real_images)
-    act2 = interception.predict(fake_images)
+    act1 = interception(real_images)
+    act2 = interception(fake_images)
 
     print(type(act1), type(act2))
 

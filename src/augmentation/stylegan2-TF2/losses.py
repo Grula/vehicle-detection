@@ -163,6 +163,7 @@ def g_fid(real_images, interception, generator, discriminator, z_dim, policy, la
     act1 = interception(real_images)
     act2 = interception(fake_images)
 
+    print(act1.shape)
 
     mu1, sigma1 = act1.mean(axis=0), np.cov(act1, rowvar=False)
     mu2, sigma2 = act2.mean(axis=0), np.cov(act2, rowvar=False)

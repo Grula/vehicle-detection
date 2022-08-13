@@ -136,7 +136,7 @@ def g_fid(real_images, interception, generator, discriminator, z_dim, policy, la
 
     # traftorm to channel last in batch
     print(real_images.shape)
-    real_images = tf.transpose(real_images, perm=[0, 3, 1, 2])
+    real_images = tf.transpose(real_images, perm=[0, 3, 2, 1])
     print(real_images.shape)
     exit()
     # print the shape of the images

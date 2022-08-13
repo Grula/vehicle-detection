@@ -134,6 +134,13 @@ def g_fid(real_images, interception, generator, discriminator, z_dim, policy, la
     # min and max values of real images
     tf.print( tf.reduce_min(real_images), tf.reduce_max(real_images))
 
+    # scale images to at least 75x75 if they are lower than 75x75
+    if real_images.shape[1] < 75:
+        real_images = tf.image.resize(real_images, [75, 75])
+        fake_images = tf.image.resize(fake_images, [75, 75])
+
+
+
     # real_images_processed = preprocess_input(real_images)
     # fake_images_processed = preprocess_input(fake_images)
 

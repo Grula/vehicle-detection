@@ -135,8 +135,8 @@ def g_fid(real_images, interception, generator, discriminator, z_dim, policy, la
     tf.print( tf.reduce_min(real_images), tf.reduce_max(real_images))   
 
     # traftorm to channel last
-    # real_images = tf.transpose(real_images, perm=[0, 3, 1, 2])
-    # fake_images = tf.transpose(fake_images, perm=[0, 3, 1, 2])
+    real_images = tf.transpose(real_images, perm=[0, 3, 1, 2])
+    fake_images = tf.transpose(fake_images, perm=[0, 3, 1, 2])
 
     # print the shape of the images
     tf.print(tf.shape(real_images), tf.shape(fake_images))
@@ -145,9 +145,9 @@ def g_fid(real_images, interception, generator, discriminator, z_dim, policy, la
     tf.print( tf.reduce_min(fake_images), tf.reduce_max(fake_images))
 
     # scale images to at least 75x75 if they are lower than 75x75
-    if real_images.shape[1] < 75:
-        real_images = tf.image.resize(real_images, [75, 75])
-        fake_images = tf.image.resize(fake_images, [75, 75])
+    # if real_images.shape[1] < 75:
+    #     real_images = tf.image.resize(real_images, [75, 75])
+    #     fake_images = tf.image.resize(fake_images, [75, 75])
 
 
 

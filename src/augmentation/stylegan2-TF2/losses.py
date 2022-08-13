@@ -134,10 +134,11 @@ def g_fid(real_images, interception, generator, discriminator, z_dim, policy, la
     # min and max values of real images
     tf.print( tf.reduce_min(real_images), tf.reduce_max(real_images))   
 
-    # traftorm to channel last
+    # traftorm to channel last in batch
+    print(real_images.shape)
     real_images = tf.transpose(real_images, perm=[0, 3, 1, 2])
-    fake_images = tf.transpose(fake_images, perm=[0, 3, 1, 2])
-
+    print(real_images.shape)
+    exit()
     # print the shape of the images
     tf.print(tf.shape(real_images), tf.shape(fake_images))
     

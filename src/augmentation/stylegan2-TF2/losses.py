@@ -146,12 +146,13 @@ def g_fid(real_images, interception, generator, discriminator, z_dim, policy, la
     # print the shape of the images
     
     # print min and max values of fake images
-    tf.print( tf.reduce_min(fake_images), tf.reduce_max(fake_images))
 
     # scale images to at least 75x75 if they are lower than 75x75
     if real_images.shape[2] < 75:
         real_images = tf.image.resize(real_images, [75, 75])
         fake_images = tf.image.resize(fake_images, [75, 75])
+
+    fake_images = preprocess_input(fake_images)
 
     # convert from tensor to numpy array
     real_images = real_images.numpy()
@@ -161,15 +162,6 @@ def g_fid(real_images, interception, generator, discriminator, z_dim, policy, la
     # fake_scores = discriminator([fake_images, labels], training=True)
     act1 = interception(real_images)
     act2 = interception(fake_images)
-
-    # convert to numpy array
-    if tf.eagerly():
-        act1 = act1.numpy()
-        act2 = act2.numpy()
-    else:
-        act1 = eval(act1)
-        act2 = eval(act2)
-    # print the shape of the images
 
 
     mu1, sigma1 = act1.mean(axis=0), np.cov(act1, rowvar=False)

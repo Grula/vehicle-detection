@@ -4,23 +4,19 @@ import random
 import cv2
 import numpy as np
 
-class Augmenter():
 
-    def __init__(self) -> None:
-        pass
-
-    
 
 def flip(image: np.array, flipcode = 1) -> np.array:
-    """Flip image horizontally.
+    """Flip image.
     Args:
         image (np.array): Image to flip.
+        flipcode (int): Flip code. default is 1 (horizontally).
     Returns:
         np.array: Flipped image.
     """
-    return cv2.flip(image, flipcode)
+    return cv2.flip(image, 1)
 
-def rotate(image: np.array, angle: int = 90) -> np.array:
+def rotation(image: np.array, angle: int = 90) -> np.array:
     """Rotate image.
     Args:
         image (np.array): Image to rotate.
@@ -36,7 +32,7 @@ def rotate(image: np.array, angle: int = 90) -> np.array:
     result = cv2.warpAffine(image, rot_mat, image.shape[1::-1], flags=flag)
     return result
     
-def scale(image: np.array, scale: float = 0.5) -> np.array:
+def zoom(image: np.array, scale: float = 0.5) -> np.array:
     """Scale image but keep original shape.
     Args:
         image (np.array): Image to scale.
@@ -69,7 +65,7 @@ def crop(image: np.array, crop_size: int = 256) -> np.array:
     image = cv2.resize(image, (col, row))
     return image
 
-def translation(image: np.array, translation_size: int = 100) -> np.array:
+def translation(image: np.array, translation_size: int = 10,) -> np.array:
     """Translate image.
     Args:
         image (np.array): Image to translate.
@@ -88,7 +84,7 @@ def translation(image: np.array, translation_size: int = 100) -> np.array:
     result = cv2.warpAffine(image, translation_mat, (col, row), flags=flag, borderMode=cv2.BORDER_REPLICATE)
     return result
 
-def guassian_noise(image: np.array) -> np.array:
+def guassian_noise(image: np.array,) -> np.array:
     """Add guassian noise to image.
     Args:
         image (np.array): Image to add noise to.
@@ -102,7 +98,7 @@ def guassian_noise(image: np.array) -> np.array:
     gaussian_img = gaussian_img.astype(np.uint8)
     return gaussian_img
 
-def guassian_blur(image: np.array, kernel_size = (7,7)) -> np.array:
+def guassian_blur(image: np.array, kernel_size = (7,7),) -> np.array:
     """Blur image with guassian blur.
     Args:
         image (np.array): Image to blur.
@@ -113,7 +109,7 @@ def guassian_blur(image: np.array, kernel_size = (7,7)) -> np.array:
     gaussian_blur = cv2.GaussianBlur(image, kernel_size, 0)
     return gaussian_blur
 
-def brightness(image: np.array, brightness_factor = 1.0) -> np.array:
+def brightness(image: np.array, brightness_factor = 1.0,) -> np.array:
     """Change brightness of image.
     Args:
         image (np.array): Image to change brightness of.
@@ -123,7 +119,7 @@ def brightness(image: np.array, brightness_factor = 1.0) -> np.array:
     brightness_img = cv2.multiply(image, np.array([brightness_factor]))
     return brightness_img
 
-def contrast(image: np.array) -> np.array:
+def contrast(image: np.array,) -> np.array:
     """Change contrast of image.
     Args:
         image (np.array): Image to change contrast of.
@@ -147,7 +143,7 @@ def contrast(image: np.array) -> np.array:
     # Stacking the original image with the enhanced image
     return enhanced_image
 
-def saturation(image: np.array, satmul = 1.0) -> np.array:
+def saturation(image: np.array, satmul = 1.0,) -> np.array:
     """Change saturation of image.
     Args:
         image (np.array): Image to change saturation of.
@@ -162,7 +158,7 @@ def saturation(image: np.array, satmul = 1.0) -> np.array:
     image = cv2.cvtColor(imghsv.astype("uint8"), cv2.COLOR_HSV2BGR)
     return image
 
-def hue(image: np.array, huemul = 1.0) -> np.array:
+def hue(image: np.array, huemul = 1.0,) -> np.array:
     """Change hue of image.
     Args:
         image (np.array): Image to change hue of.
@@ -178,7 +174,43 @@ def hue(image: np.array, huemul = 1.0) -> np.array:
     return image
 
 
+def augment_image(image: np.array, bbox : np.array) -> np.array:
 
+    color_augmentations = ['brightness', 'contrast', 'saturation', 'hue']
+    affine_augmentations = ['flip', 'translation', 'zoom']
+    noise_augmentations = ['guassian_noise', 'guassian_blur']
+
+
+    augmentation = color_augmentations + affine_augmentations + noise_augmentations
+    augmentation = random.sample(augmentation, 5)
+
+    for aug in augmentation:
+        if aug == 'flip':
+            bbox[:, 0] = image.shape[1] - bbox[:, 0]
+            bbox[:, 2] = image.shape[1] - bbox[:, 2]
+            arg = 1
+        elif aug == 'translation':
+            bbox[:, 0] = bbox[:, 0] + random.randint(-10, 10)
+            bbox[:, 1] = bbox[:, 1] + random.randint(-10, 10)
+            bbox[:, 2] = bbox[:, 2] + random.randint(-10, 10)
+            bbox[:, 3] = bbox[:, 3] + random.randint(-10, 10)
+            arg = 10
+        elif aug == 'zoom':
+            scale = random.uniform(0.8, 1.2)
+            bbox[:, 0] = bbox[:, 0] * scale
+            bbox[:, 1] = bbox[:, 1] * scale
+            bbox[:, 2] = bbox[:, 2] * scale
+            bbox[:, 3] = bbox[:, 3] * scale
+            bbox[:, 0] = np.clip(bbox[:, 0], 0, image.shape[1])
+            bbox[:, 1] = np.clip(bbox[:, 1], 0, image.shape[0])
+            bbox[:, 2] = np.clip(bbox[:, 2], 0, image.shape[1])
+            bbox[:, 3] = np.clip(bbox[:, 3], 0, image.shape[0])
+            arg = scale
+        image = eval(aug)(image, arg)
+        
+
+    
+    return image, bbox
 
 
 if __name__ == '__main__':
@@ -204,15 +236,15 @@ if __name__ == '__main__':
 
     #rotate image
     # augmented = rotate(image, np.random.randint(0, 360))
-    aug_rot45 = rotate(image, 45)
-    aug_rot120 = rotate(image, 120)
+    aug_rot45 = rotation(image, 45)
+    aug_rot120 = rotation(image, 120)
     img = cv2.hconcat([image, aug_rot45, aug_rot120])
     cv2.imwrite('rotate.jpg', img)
 
 
     #scale image
-    aug_scale2 = scale(image, 2)
-    aug_scale0_5 = scale(image, 0.5)
+    aug_scale2 = zoom(image, 2)
+    aug_scale0_5 = zoom(image, 0.5)
     img = cv2.hconcat([image, aug_scale2, aug_scale0_5])
     cv2.imwrite('scale.jpg', img)
 

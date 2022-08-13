@@ -143,11 +143,11 @@ for key in data_dict.keys():
         aug_img  = datagen.random_transform(img)
         
         # Add noise to image 25% chnace
-        if np.random.rand() < 0.25:
+        if np.random.rand() < 0.2:
             aug_img = add_noise(aug_img)
           
         # Flip the image 25% chance
-        if np.random.rand() > 0.25:
+        if np.random.rand() > 0.2:
             aug_img = cv2.flip(aug_img, 1)
             # Flip coordinates of bbox
             bbox[0] = w - bbox[0]            
@@ -160,7 +160,7 @@ for key in data_dict.keys():
             aug_img[[a,b]] = aug_img[[b,a]]
 
         # Add blur 15% chance
-        if np.random.rand() < 0.15:
+        if np.random.rand() < 0.2:
             dst = cv2.GaussianBlur(aug_img, (3,3), cv2.BORDER_DEFAULT)
 
             

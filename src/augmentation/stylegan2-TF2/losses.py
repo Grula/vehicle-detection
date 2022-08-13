@@ -149,13 +149,13 @@ def g_fid(real_images, interception, generator, discriminator, z_dim, policy, la
     fake_images = preprocess_input(fake_images)
 
     # convert from tensor to numpy array
-    # real_images = real_images.numpy()
-    # fake_images = fake_images.numpy()
+    real_images = real_images.numpy()
+    fake_images = fake_images.numpy()
     
 
     # fake_scores = discriminator([fake_images, labels], training=True)
-    act1 = interception.predict(real_images.numpy())
-    act2 = interception.predict(fake_images.numpy())
+    act1 = interception.predict(real_images)
+    act2 = interception.predict(fake_images)
 
     print(type(act1), type(act2))
 

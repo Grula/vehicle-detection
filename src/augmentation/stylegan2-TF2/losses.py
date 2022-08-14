@@ -151,9 +151,9 @@ def g_fid(real_images, interception, generator, discriminator, z_dim, policy, la
     
     act1 = interception(real_images)
     act2 = interception(fake_images)
-
-    act1 = act1.eval() 
-    act2 = act2.eval() 
+    with tf.Session() as sess:
+        act1 = act1.eval() 
+        act2 = act2.eval() 
 
 
 

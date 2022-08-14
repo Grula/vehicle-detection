@@ -177,5 +177,6 @@ def g_fid(real_images, interception, generator, discriminator, z_dim, policy, la
     # if tf.is_complex(covmean):
         # covmean = covmean.real
     # calculate score
-    fid = ssdiff + np.trace(sigma1 + sigma2 - 2.0 * covmean)
+    # fid = ssdiff + np.trace(sigma1 + sigma2 - 2.0 * covmean)
+    fid = ssdiff + tf.linalg.trace(sigma1 + sigma2 - 2.0 * covmean)
     return fid

@@ -2,6 +2,8 @@ import numpy as np
 from scipy.linalg import sqrtm
 
 import tensorflow as tf
+# import tensorflow probability as tfp
+
 from keras.applications.inception_v3 import preprocess_input
 
 
@@ -121,12 +123,13 @@ def g_logistic_ns_pathreg(real_images, generator, discriminator, z_dim,
     return g_loss, pl_penalty
 
 
-def tf_cov(x):
+def _tf_cov(x):
     mean_x = tf.reduce_mean(x, axis=0, keep_dims=True)
     mx = tf.matmul(tf.transpose(mean_x), mean_x)
     vx = tf.matmul(tf.transpose(x), x)/tf.cast(tf.shape(x)[0], tf.float32)
     cov_xx = vx - mx
     return cov_xx
+
 
 def g_fid(real_images, interception, generator, discriminator, z_dim, policy, labels = None):
     batch_size = tf.shape(real_images)[0]
@@ -148,19 +151,18 @@ def g_fid(real_images, interception, generator, discriminator, z_dim, policy, la
 
     fake_images = preprocess_input(fake_images)
 
-    # convert from tensor to numpy array
-    real_images = real_images.numpy()
-    fake_images = fake_images.numpy()
-    
 
     # fake_scores = discriminator([fake_images, labels], training=True)
     act1 = interception(real_images)
     act2 = interception(fake_images)
 
     print(type(act1), type(act2))
+    mu1, sigma1 = tf.reduce_mean(act1, axis=0), _tf_cov(act1)
+    mu2, sigma2 = tf.reduce_mean(act2, axis=0), _tf_cov(act2)
 
-    mu1, sigma1 = act1.mean(axis=0), np.cov(act1, rowvar=False)
-    mu2, sigma2 = act2.mean(axis=0), np.cov(act2, rowvar=False)
+    # mu1, sigma1 = act1.mean(axis=0), np.cov(act1, rowvar=False)
+    # mu2, sigma2 = act2.mean(axis=0), np.cov(act2, rowvar=False)
+
     # calculate sum squared difference between means
     ssdiff = np.sum((mu1 - mu2)**2.0)
     # calculate sqrt of product between cov

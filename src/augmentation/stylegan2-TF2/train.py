@@ -408,7 +408,7 @@ def main():
     parser.add_argument('--allow_memory_growth', type=str_to_bool, nargs='?', const=True, default=True)
 
     parser.add_argument('--debug_split_gpu', type=str_to_bool, nargs='?', const=True, default=False)
-    parser.add_argument('--use_tf_function', type=str_to_bool, nargs='?', const=True, default=False)
+    parser.add_argument('--use_tf_function', type=str_to_bool, nargs='?', const=True, default=True)
     parser.add_argument('--use_custom_cuda', type=str_to_bool, nargs='?', const=True, default=True)
 
     parser.add_argument('--model_base_dir', default='./models', type=str)

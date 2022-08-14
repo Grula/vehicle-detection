@@ -167,7 +167,7 @@ def g_fid(real_images, interception, generator, discriminator, z_dim, policy, la
     ssdiff = tf.reduce_sum(tf.math.square(mu1 - mu2))
     # calculate sqrt of product between cov, matrix square root
     # covmean = sqrtm(sigma1.dot(sigma2))
-    covmean = tf.linalg.sqrtm(sigma1 @ sigma2)
+    covmean = tf.linalg.sqrtm(tf.tensordot(sigma1, sigma2))
 
     # check and correct imaginary numbers from sqrt
     # if np.iscomplexobj(covmean):

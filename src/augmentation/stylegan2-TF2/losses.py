@@ -158,10 +158,10 @@ def g_fid(real_images, interception, generator, discriminator, z_dim, policy, la
 
     
 
-    act1 = interception.predict(real_images)
-    replica_context.merge_call(lambda: act1 = interception.predict(real_images))
-    act2 = interception.predict(fake_images)
-    replica_context.merge_call(lambda: act2 = interception.predict(fake_images))
+    # act1 = interception.predict(real_images)
+    act1 = replica_context.merge_call(interception.predict(real_images))
+    # act2 = interception.predict(fake_images)
+    act2 = replica_context.merge_call(interception.predict(fake_images))
 
 
     # act1 = tf.make_tensor_proto(act1)  

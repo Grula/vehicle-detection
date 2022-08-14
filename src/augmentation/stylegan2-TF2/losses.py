@@ -165,13 +165,17 @@ def g_fid(real_images, interception, generator, discriminator, z_dim, policy, la
 
     # calculate sum squared difference between means
     # ssdiff = np.sum((mu1 - mu2)**2.0)
-    ssdif = tf.reduce_sum(tf.math.square(mu1 - mu2))
+    ssdiff = tf.reduce_sum(tf.math.square(mu1 - mu2))
     # calculate sqrt of product between cov, matrix square root
     # covmean = sqrtm(sigma1.dot(sigma2))
     covmean = tf.linalg.sqrtm(sigma1 @ sigma2)
+
     # check and correct imaginary numbers from sqrt
-    if np.iscomplexobj(covmean):
-        covmean = covmean.real
+    # if np.iscomplexobj(covmean):
+    #     covmean = covmean.real
+    # check and correct imaginary numbers from sqrt
+    # if tf.is_complex(covmean):
+        # covmean = covmean.real
     # calculate score
     fid = ssdiff + np.trace(sigma1 + sigma2 - 2.0 * covmean)
     return fid

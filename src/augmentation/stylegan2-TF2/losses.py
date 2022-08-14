@@ -170,6 +170,7 @@ def g_fid(real_images, interception, generator, discriminator, z_dim, policy, la
 
     # calculate sqrt of product between cov,
     # covmean = sqrtm(sigma1.dot(sigma2))
+
     covmean = tf.linalg.sqrtm(tf.experimental.numpy.dot(sigma1, sigma2))
 
     # check and correct imaginary numbers from sqrt
@@ -183,6 +184,7 @@ def g_fid(real_images, interception, generator, discriminator, z_dim, policy, la
     tf.print("######################")
     tf.print('sigma1', sigma1)
     tf.print('sigma2', sigma2)
+    tf.print('dot', tf.experimental.numpy.dot(sigma1, sigma2))
     tf.print('covmean', covmean)
     tf.print(tf.linalg.trace(sigma1 + sigma2 - 2.0 * covmean))
     tf.print("######################")

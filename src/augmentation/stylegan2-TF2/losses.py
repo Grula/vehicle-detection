@@ -124,14 +124,6 @@ def g_logistic_ns_pathreg(real_images, generator, discriminator, z_dim,
     return g_loss, pl_penalty
 
 
-def _tf_cov(x):
-    mean_x = tf.reduce_mean(x, axis=0, keepdims=True)
-    mx = tf.matmul(tf.transpose(mean_x), mean_x)
-    vx = tf.matmul(tf.transpose(x), x)/tf.cast(tf.shape(x)[0], tf.float32)
-    cov_xx = vx - mx
-    return cov_xx
-
-
 def g_fid(real_images, interception, generator, discriminator, z_dim, policy, labels = None):
     batch_size = tf.shape(real_images)[0]
     z = tf.random.normal(shape=[batch_size, z_dim], dtype=tf.float32)
@@ -157,11 +149,9 @@ def g_fid(real_images, interception, generator, discriminator, z_dim, policy, la
     replica_context = tf.distribute.get_replica_context()  # for strategy
 
     
-
-    # act1 = interception.predict(real_images)
-    act1 = replica_context.merge_call(interception.predict(real_images))
-    # act2 = interception.predict(fake_images)
-    act2 = replica_context.merge_call(interception.predict(fake_images))
+    with replica_context as ctx:
+        act1 = interception.predict(real_images)
+        act2 = interception.predict(fake_images)
 
 
     # act1 = tf.make_tensor_proto(act1)  

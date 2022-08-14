@@ -142,3 +142,6 @@ models*/
 *.weights
 logs/
 *pickle*
+
+#tmp 
+*tmp*

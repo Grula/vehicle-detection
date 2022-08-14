@@ -2,7 +2,8 @@ import numpy as np
 from scipy.linalg import sqrtm
 
 import tensorflow as tf
-# import tensorflow probability as tfp
+import tensorflow_probability as tfp
+# import tensorflow probability as tf
 
 from keras.applications.inception_v3 import preprocess_input
 
@@ -159,14 +160,17 @@ def g_fid(real_images, interception, generator, discriminator, z_dim, policy, la
     mu1, sigma1 = tf.reduce_mean(act1, axis=0), _tf_cov(act1)
     mu2, sigma2 = tf.reduce_mean(act2, axis=0), _tf_cov(act2)
 
+    sigma1 = tfp.stats.covariance(act1)
+    sigma2 = tfp.stats.covariance(act2)
     # mu1, sigma1 = act1.mean(axis=0), np.cov(act1, rowvar=False)
     # mu2, sigma2 = act2.mean(axis=0), np.cov(act2, rowvar=False)
 
     # calculate sum squared difference between means
     # ssdiff = np.sum((mu1 - mu2)**2.0)
     ssdiff = tf.reduce_sum(tf.math.square(mu1 - mu2))
-    # calculate sqrt of product between cov, matrix square root
+    # calculate sqrt of product between cov,
     # covmean = sqrtm(sigma1.dot(sigma2))
+    tf.print(tf.experimental.numpy.dot(sigma1, sigma2))
     covmean = tf.linalg.sqrtm(tf.experimental.numpy.dot(sigma1, sigma2))
 
     # check and correct imaginary numbers from sqrt

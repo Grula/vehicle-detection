@@ -454,6 +454,7 @@ def main():
     elif tf.config.experimental.list_physical_devices('GPU'):
         # prepare distribute strategy
         strategy = tf.distribute.MirroredStrategy()
+        strategy = tf.distribute.Strategy()
     else:
         raise ValueError('No GPU/TPU devices found.')
 

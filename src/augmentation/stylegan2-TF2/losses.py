@@ -152,14 +152,8 @@ def g_fid(real_images, interception, generator, discriminator, z_dim, policy, la
     act1 = interception(real_images)
     act2 = interception(fake_images)
 
-    # how to convert to fucking numpy 
-    act1 = tf.convert_to_tensor(act1)
-    act2 = tf.convert_to_tensor(act2)
-    # i need numpy array
-    # act1 = act1.numpy() # doesnt work with tensorflow
-    # act2 = act2.numpy() # doesnt work with tensorflow
-    act1 = act1.eval() # doesnt work with tensorflow
-    act2 = act2.eval() # doesnt work with tensorflow
+    act1 = act1.eval() 
+    act2 = act2.eval() 
 
 
 

@@ -157,20 +157,19 @@ def g_fid(real_images, interception, generator, discriminator, z_dim, policy, la
     act1 = interception(real_images)
     act2 = interception(fake_images)
 
-    mu1, sigma1 = tf.reduce_mean(act1, axis=0), tfp.stats.covariance(act1)
-    mu2, sigma2 = tf.reduce_mean(act2, axis=0), tfp.stats.covariance(act2)
+    mu1, sigma1 = tf.reduce_mean(act1, axis=0), tfp.stats.covariance(act1, sample_axis=1 )
+    mu2, sigma2 = tf.reduce_mean(act2, axis=0), tfp.stats.covariance(act2, sample_axis=1)
 
-    sigma1 = tfp.stats.covariance(act1)
-    sigma2 = tfp.stats.covariance(act2)
+
     # mu1, sigma1 = act1.mean(axis=0), np.cov(act1, rowvar=False)
     # mu2, sigma2 = act2.mean(axis=0), np.cov(act2, rowvar=False)
 
     # calculate sum squared difference between means
     # ssdiff = np.sum((mu1 - mu2)**2.0)
     ssdiff = tf.reduce_sum(tf.math.square(mu1 - mu2))
+
     # calculate sqrt of product between cov,
     # covmean = sqrtm(sigma1.dot(sigma2))
-    tf.print(tf.experimental.numpy.dot(sigma1, sigma2))
     covmean = tf.linalg.sqrtm(tf.experimental.numpy.dot(sigma1, sigma2))
 
     # check and correct imaginary numbers from sqrt

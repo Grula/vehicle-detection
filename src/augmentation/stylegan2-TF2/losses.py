@@ -154,13 +154,11 @@ def g_fid(real_images, interception, generator, discriminator, z_dim, policy, la
 
 
     # fake_scores = discriminator([fake_images, labels], training=True)
-    act1 = interception(real_images)
-    act2 = interception(fake_images)
+    act1 = interception.predict(real_images)
+    act2 = interception.predict(fake_images)
 
     # act1 = tf.make_tensor_proto(act1)  
-    act1 = act1.op.get_attr('value')
     # act2 = tf.make_tensor_proto(act2)
-    act2 = act2.op.get_attr('value')
 
     # mu1, sigma1 = tf.reduce_mean(act1, axis=0), tfp.stats.covariance(act1)
     # mu2, sigma2 = tf.reduce_mean(act2, axis=0), tfp.stats.covariance(act2)

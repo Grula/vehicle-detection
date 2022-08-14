@@ -178,7 +178,9 @@ def g_fid(real_images, interception, generator, discriminator, z_dim, policy, la
     # calculate score
     # fid = ssdiff + np.trace(sigma1 + sigma2 - 2.0 * covmean)
     tf.print("######################")
-    tf.print(ssdiff)
+    tf.print('sigma1', sigma1)
+    tf.print('sigma2', sigma2)
+    tf.print('covmean', covmean)
     tf.print(tf.linalg.trace(sigma1 + sigma2 - 2.0 * covmean))
     tf.print("######################")
     fid = ssdiff + tf.linalg.trace(sigma1 + sigma2 - 2.0 * covmean)

@@ -157,37 +157,31 @@ def g_fid(real_images, interception, generator, discriminator, z_dim, policy, la
     act1 = interception(real_images)
     act2 = interception(fake_images)
 
-    mu1, sigma1 = tf.reduce_mean(act1, axis=0), tfp.stats.covariance(act1)
-    mu2, sigma2 = tf.reduce_mean(act2, axis=0), tfp.stats.covariance(act2)
+    act1 = tf.make_tensor_proto(act1)  
+    act1 = tf.make_ndarray(act1) 
 
+    act2 = tf.make_tensor_proto(act2)
+    act2 = tf.make_ndarray(act2)
 
-    # mu1, sigma1 = act1.mean(axis=0), np.cov(act1, rowvar=False)
-    # mu2, sigma2 = act2.mean(axis=0), np.cov(act2, rowvar=False)
+    # mu1, sigma1 = tf.reduce_mean(act1, axis=0), tfp.stats.covariance(act1)
+    # mu2, sigma2 = tf.reduce_mean(act2, axis=0), tfp.stats.covariance(act2)
+
+    mu1, sigma1 = act1.mean(axis=0), np.cov(act1, rowvar=False)
+    mu2, sigma2 = act2.mean(axis=0), np.cov(act2, rowvar=False)
 
     # calculate sum squared difference between means
-    # ssdiff = np.sum((mu1 - mu2)**2.0)
-    ssdiff = tf.reduce_sum(tf.math.square(mu1 - mu2))
+    ssdiff = np.sum((mu1 - mu2)**2.0)
+    # ssdiff = tf.reduce_sum(tf.math.square(mu1 - mu2))
 
     # calculate sqrt of product between cov,
-    # covmean = sqrtm(sigma1.dot(sigma2))
+    covmean = sqrtm(sigma1.dot(sigma2))
 
-    covmean = tf.linalg.sqrtm(tf.experimental.numpy.dot(sigma1, sigma2))
+    # covmean = tf.linalg.sqrtm(tf.experimental.numpy.dot(sigma1, sigma2))
 
     # check and correct imaginary numbers from sqrt
-    # if np.iscomplexobj(covmean):
-    #     covmean = covmean.real
-    # check and correct imaginary numbers from sqrt
-    # if tf.is_complex(covmean):
-        # covmean = covmean.real
+    if np.iscomplexobj(covmean):
+        covmean = covmean.real
     # calculate score
-    # fid = ssdiff + np.trace(sigma1 + sigma2 - 2.0 * covmean)
-    tf.print("######################")
-    tf.print('sigma1', sigma1)
-    tf.print('sigma2', sigma2)
-    tf.print('dot', tf.experimental.numpy.dot(sigma1, sigma2))
-    tf.print('covmean', covmean)
-    tf.print(tf.linalg.trace(sigma1 + sigma2 - 2.0 * covmean))
-    tf.print("######################")
-    fid = ssdiff + tf.linalg.trace(sigma1 + sigma2 - 2.0 * covmean)
-
+    fid = ssdiff + np.trace(sigma1 + sigma2 - 2.0 * covmean)
+    # fid = ssdiff + tf.linalg.trace(sigma1 + sigma2 - 2.0 * covmean)
     return fid

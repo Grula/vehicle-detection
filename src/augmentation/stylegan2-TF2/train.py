@@ -189,7 +189,6 @@ class Trainer(object):
 
             # combine
             g_loss = g_gan_loss + pl_penalty
-            tf.print('g_loss', g_loss)
 
         g_gradients = g_tape.gradient(g_loss, self.generator.trainable_variables)
         self.g_optimizer.apply_gradients(zip(g_gradients, self.generator.trainable_variables))
@@ -205,7 +204,6 @@ class Trainer(object):
 
             # scale loss
             g_fid_loss = tf.reduce_sum(g_fid_loss) * self.global_batch_scaler
-            tf.print('g_fid_loss', g_fid_loss)
 
         g_gradients = g_tape.gradient(g_fid_loss, self.generator.trainable_variables)
         self.g_optimizer.apply_gradients(zip(g_gradients, self.generator.trainable_variables))

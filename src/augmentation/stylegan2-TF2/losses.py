@@ -124,7 +124,7 @@ def g_logistic_ns_pathreg(real_images, generator, discriminator, z_dim,
 
 
 def _tf_cov(x):
-    mean_x = tf.reduce_mean(x, axis=0, keep_dims=True)
+    mean_x = tf.reduce_mean(x, axis=0, keepdims=True)
     mx = tf.matmul(tf.transpose(mean_x), mean_x)
     vx = tf.matmul(tf.transpose(x), x)/tf.cast(tf.shape(x)[0], tf.float32)
     cov_xx = vx - mx

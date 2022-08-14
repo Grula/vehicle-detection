@@ -204,6 +204,7 @@ class Trainer(object):
 
             # scale loss
             g_fid_loss = tf.reduce_sum(g_fid_loss) * self.global_batch_scaler
+            tf.print('g_fid_loss', g_fid_loss)
 
         g_gradients = g_tape.gradient(g_fid_loss, self.generator.trainable_variables)
         self.g_optimizer.apply_gradients(zip(g_gradients, self.generator.trainable_variables))

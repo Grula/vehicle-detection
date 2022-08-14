@@ -154,8 +154,8 @@ def g_fid(real_images, interception, generator, discriminator, z_dim, policy, la
 
     assert tf.distribute.get_replica_context() is not None  # default
     # fake_scores = discriminator([fake_images, labels], training=True)
-    act1 = interception.predict(real_images)
-    act2 = interception.predict(fake_images)
+    act1 = interception(real_images)
+    act2 = interception(fake_images)
 
     # act1 = tf.make_tensor_proto(act1)  
     # act2 = tf.make_tensor_proto(act2)

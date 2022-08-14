@@ -157,10 +157,10 @@ def g_fid(real_images, interception, generator, discriminator, z_dim, policy, la
     act1 = interception(real_images)
     act2 = interception(fake_images)
 
-    act1 = tf.make_tensor_proto(act1)  
+    # act1 = tf.make_tensor_proto(act1)  
     act1 = tf.make_ndarray(act1) 
 
-    act2 = tf.make_tensor_proto(act2)
+    # act2 = tf.make_tensor_proto(act2)
     act2 = tf.make_ndarray(act2)
 
     # mu1, sigma1 = tf.reduce_mean(act1, axis=0), tfp.stats.covariance(act1)

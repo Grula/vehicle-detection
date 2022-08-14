@@ -149,9 +149,18 @@ def g_fid(real_images, interception, generator, discriminator, z_dim, policy, la
     replica_context = tf.distribute.get_replica_context()  # for strategy
 
     
-    with replica_context as ctx:
-        act1 = interception.predict(real_images)
-        act2 = interception.predict(fake_images)
+    act1 = interception(real_images)
+    act2 = interception(fake_images)
+
+    # how to convert to fucking numpy 
+    act1 = tf.convert_to_tensor(act1)
+    act2 = tf.convert_to_tensor(act2)
+    # i need numpy array
+    # act1 = act1.numpy() # doesnt work with tensorflow
+    # act2 = act2.numpy() # doesnt work with tensorflow
+    act1 = act1.eval() # doesnt work with tensorflow
+    act2 = act2.eval() # doesnt work with tensorflow
+
 
 
     # act1 = tf.make_tensor_proto(act1)  

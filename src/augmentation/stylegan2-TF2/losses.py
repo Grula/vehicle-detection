@@ -155,13 +155,14 @@ def g_fid(real_images, interception, generator, discriminator, z_dim, policy, la
     assert tf.distribute.get_replica_context() is not None  # default
     # fake_scores = discriminator([fake_images, labels], training=True)
     replica_context = tf.distribute.get_replica_context()  # for strategy
-    
-    tf.print("Replica id: ", replica_context.replica_id_in_sync_group,
-            " of ", replica_context.num_replicas_in_sync)
 
     
+
     act1 = interception.predict(real_images)
+    replica_context.merge_call(lambda: act1 = interception.predict(real_images))
     act2 = interception.predict(fake_images)
+    replica_context.merge_call(lambda: act2 = interception.predict(fake_images))
+
 
     # act1 = tf.make_tensor_proto(act1)  
     # act2 = tf.make_tensor_proto(act2)

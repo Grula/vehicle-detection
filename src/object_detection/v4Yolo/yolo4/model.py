@@ -546,7 +546,6 @@ def yolo_loss(args, num_classes, iou_loss_thresh, anchors):
     tf.print("conv_mbbox ", conv_mbbox[0][0][0])
     tf.print("conv_lbbox ", conv_lbbox[0][0][0])
     tf.print("############################")
-    exit()
     # DEBUG END
     #HACK: all NaN values in arrays are replaced with K.epsilon()
     # conv_sbbox = tf.where(tf.math.is_nan(conv_sbbox), K.epsilon(), conv_sbbox)

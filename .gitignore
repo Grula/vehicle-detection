@@ -135,6 +135,7 @@ dmypy.json
 *.jpeg
 *.csv
 *.ipynb
+*.zip
 
 # models
 models*/ 

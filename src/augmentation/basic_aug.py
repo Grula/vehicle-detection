@@ -23,9 +23,7 @@ def load_data(paths, undersamples = [], set = 'train'):
     Returns:
         [type]: [description]
     """
-    data = []
-    labels = []
-    bboxes =  []
+    data = {}
     i = 0
     for csv_path in paths:
         with open(csv_path) as csv_file:
@@ -37,77 +35,63 @@ def load_data(paths, undersamples = [], set = 'train'):
                 # Skip validation set
                 if 'valid' in filename:
                     continue
+                if label not in data:
+                    data[label] = []
+                
+                data[label].append((filename, np.array([int(startX), int(startY), int(w), int(h)]), ))
 
-                data.append(filename)
-                labels.append(label)
-                bboxes.append((startX, startY, w, h))
-              
-    data = np.array(data)
-    labels = np.array(labels)
-    bboxes = np.array(bboxes, dtype=np.float64)
+    return data
 
 
-    return data, labels, bboxes
+data  = load_data(['data/data.csv'])
 
 
-# datas  = list(zip(load_data(['data/data.csv'])))
-images, labels, bboxes  = load_data(['data/data.csv'])
-
+augmented_folder = 'data/augmented_basic/'
+max_n = 0
+for label in data.keys():
 # Creaing folders with appropiate names
-augmented_folder = 'data/augmented/'
-unique = np.unique(labels)
-for i in unique:
-    if not os.path.exists(augmented_folder+str(i)):
-        os.makedirs(augmented_folder+str(i))
+    if not os.path.exists(augmented_folder+str(label)):
+        os.makedirs(augmented_folder+str(label))
+    # calculate how many unique images for laber there is
+    _n = len(data[label])
+    if _n > max_n:
+        max_n = _n
+
+
+# Note: we need to create set number of images for each label
+#       those numbers are based on highest amount of images that exist to keep 
+#       balance of the set
+create_max = max_n * 2
+create_count = {}
+for label in data.keys():
+    create_count[label] = create_max - len(data[label])
+
+print(create_count)
 
 # Open csv for appending synthetic images
-csv_data = open('data/augmented.csv','w')
-csv_data.write('im_path,label,x,y,w,h\n')
+csv_fw = open('data/augmented_basic.csv','w')
+csv_fw.write('im_path,label,x,y,w,h\n')
 
+for label, im_bbox in data.items():
+    # shuffle im_bbox
+    print("creating synthetic images for label: ", label)
+    random.shuffle(im_bbox)
+    for i in range(create_count[label]):
+        # Get random image from label
+        filename, bbox = random.choice(im_bbox)
+        # Load image
+        img = cv2.imread(filename)
+        # Augment image
+        img, bbox = augment_image(img, bbox)
 
-# we need to create set number of images for each label
-# those numbers are based on highest amount of images that exist to keep 
-# balance of the set
-count = {'motorbike' : 869,
-         'car' : 937,
-         'bus' : 1732,
-         'truck' : 1729,}
-
-# Create dictionary with labels being keys and values beeing imagse with bboxes
-
-data_dict = {}
-for i in range(len(labels)):
-    if labels[i] not in data_dict:
-        data_dict[labels[i]] = []
-    data_dict[labels[i]].append((images[i], bboxes[i]))
-
-for key in data_dict.keys():
-    # select that one label and based on label create that many images
-    img_count = count[key]
-    img_idx = 0
-    print("working on label: ", key)
-    while img_count > 0:
-        aug_path = augmented_folder+str(key)+'/'+str(img_idx)+'.png'
-        
-        # select random image from that label
-        filename, bbox = random.choice(data_dict[key])
-
-        # load image
-        img = load_img(filename)
-        img = img_to_array(img)
-        w, h = img.shape[:2]
-
-
-            
-        # cv2.rectangle(current_img, (startX, startY), (int(noisy_bbox[2]*w), int(noisy_bbox[3]*h)), (0, 255, 0), 2)
-        cv2.imwrite(aug_path, aug_img)
-
+        # draw bbox on image
+        # cv2.rectangle(img, (bbox[0], bbox[1]), (bbox[0]+bbox[2], bbox[1]+bbox[3]), (0, 255, 0), 2)
+        # Save image
+        _tmp_path = os.path.join(augmented_folder, str(label), str(i)+'.jpg')
+        cv2.imwrite(_tmp_path, img)
         # Write to csv
-        # csv_data.write(aug_path+','+str(key)+','+str(startX)+','+str(startY)+','+str(w)+','+str(h)+'\n')
-        csv_data.write('{},{},{},{},{},{}\n'.format(aug_path, key, int(bbox[0]), int(bbox[1]), int(bbox[2]), int(bbox[3])))
-        # Updated index and count
-        img_idx += 1
-        img_count -= 1
+        csv_fw.write(f'{_tmp_path},{label},{bbox[0]},{bbox[1]},{bbox[2]},{bbox[3]}\n')
 
+        if i % 200 == 0:
+            print(f"finised {i} images")
 
-csv_data.close()

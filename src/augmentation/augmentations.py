@@ -6,7 +6,7 @@ import numpy as np
 
 
 
-def flip(image: np.array, **kwargs) -> np.array:
+def _flip(image: np.array, **kwargs) -> np.array:
     """Flip image.
     Args:
         image (np.array): Image to flip.
@@ -17,7 +17,7 @@ def flip(image: np.array, **kwargs) -> np.array:
         return cv2.flip(image, 1)
     return cv2.flip(image, 0)
 
-def rotation(image: np.array, **kwargs) -> np.array:
+def _rotation(image: np.array, **kwargs) -> np.array:
     """Rotate image.
     Args:
         image (np.array): Image to rotate.
@@ -35,7 +35,7 @@ def rotation(image: np.array, **kwargs) -> np.array:
     result = cv2.warpAffine(image, rot_mat, image.shape[1::-1], flags=flag)
     return result
     
-def zoom(image: np.array, **kwargs) -> np.array:
+def _zoom(image: np.array, **kwargs) -> np.array:
     """Scale image but keep original shape.
     Args:
         image (np.array): Image to scale.
@@ -53,7 +53,7 @@ def zoom(image: np.array, **kwargs) -> np.array:
     result = cv2.warpAffine(image, scale_mat, image.shape[1::-1], flags=flag, borderMode=cv2.BORDER_REPLICATE)
     return result
 
-def crop(image: np.array, **kwargs) -> np.array:
+def _crop(image: np.array, **kwargs) -> np.array:
     """Crop image.
     Args:
         image (np.array): Image to crop.
@@ -72,7 +72,7 @@ def crop(image: np.array, **kwargs) -> np.array:
     image = cv2.resize(image, (col, row))
     return image
 
-def translation(image: np.array, **kwargs) -> np.array:
+def _translation(image: np.array, **kwargs) -> np.array:
     """Translate image.
     Args:
         image (np.array): Image to translate.
@@ -85,15 +85,15 @@ def translation(image: np.array, **kwargs) -> np.array:
     row, col, ch = image.shape
     if translation_size > row or translation_size > col:
         translation_size = min(row, col)
-    start_row = random.randint(0, row - translation_size)
-    start_col = random.randint(0, col - translation_size)
-    translation_mat = np.float32([[1, 0, start_col], [0, 1, start_row]])
+    start_row = random.randint(0, translation_size)
+    start_col = random.randint(0, translation_size)
+    translation_mat = np.float32([[1, 0, start_row], [0, 1, start_col]])
     flags = [cv2.INTER_LINEAR, cv2.INTER_CUBIC, cv2.INTER_AREA, cv2.INTER_NEAREST, cv2.INTER_LANCZOS4]
     flag = random.choice(flags)
     result = cv2.warpAffine(image, translation_mat, (col, row), flags=flag, borderMode=cv2.BORDER_REPLICATE)
     return result
 
-def guassian_noise(image: np.array, **kwargs) -> np.array:
+def _guassian_noise(image: np.array, **kwargs) -> np.array:
     """Add guassian noise to image.
     Args:
         image (np.array): Image to add noise to.
@@ -109,7 +109,7 @@ def guassian_noise(image: np.array, **kwargs) -> np.array:
     gaussian_img = gaussian_img.astype(np.uint8)
     return gaussian_img
 
-def guassian_blur(image: np.array, **kwargs) -> np.array:
+def _guassian_blur(image: np.array, **kwargs) -> np.array:
     """Blur image with guassian blur.
     Args:
         image (np.array): Image to blur.
@@ -122,7 +122,7 @@ def guassian_blur(image: np.array, **kwargs) -> np.array:
     gaussian_blur = cv2.GaussianBlur(image, (ksize, ksize), 0)
     return gaussian_blur
 
-def brightness(image: np.array, **kwargs) -> np.array:
+def _brightness(image: np.array, **kwargs) -> np.array:
     """Change brightness of image.
     Args:
         image (np.array): Image to change brightness of.
@@ -134,7 +134,7 @@ def brightness(image: np.array, **kwargs) -> np.array:
     brightness_img = cv2.multiply(image, np.array([brightness]))
     return brightness_img
 
-def contrast(image: np.array, **kwargs) -> np.array:
+def _contrast(image: np.array, **kwargs) -> np.array:
     """Change contrast of image.
     Args:
         image (np.array): Image to change contrast of.
@@ -162,7 +162,7 @@ def contrast(image: np.array, **kwargs) -> np.array:
     # Stacking the original image with the enhanced image
     return enhanced_image
 
-def saturation(image: np.array, **kwargs) -> np.array:
+def _saturation(image: np.array, **kwargs) -> np.array:
     """Change saturation of image.
     Args:
         image (np.array): Image to change saturation of.
@@ -179,7 +179,7 @@ def saturation(image: np.array, **kwargs) -> np.array:
     image = cv2.cvtColor(imghsv.astype("uint8"), cv2.COLOR_HSV2BGR)
     return image
 
-def hue(image: np.array, **kwargs) -> np.array:
+def _hue(image: np.array, **kwargs) -> np.array:
     """Change hue of image.
     Args:
         image (np.array): Image to change hue of.
@@ -202,49 +202,49 @@ def augment_image(image: np.array, bbox : np.array) -> np.array:
     Augment image with random transformations.
     Args:
         image (np.array): Image to augment.
-        bbox (np.array): Bounding box of image. (x, y, w, h)
+        bbox (np.array): Bounding box of image. [x, y, w, h]
     Returns:
         Augmented image and bounding box.
     """
-    color_augmentations = [brightness, contrast, saturation, hue]
-    affine_augmentations = [flip, translation, zoom]
-    noise_augmentations = [guassian_noise, guassian_blur]
+    color_augmentations = [_brightness, _contrast, _saturation, _hue]
+    affine_augmentations = [_flip, _translation, _zoom]
+    noise_augmentations = [_guassian_noise, _guassian_blur]
 
 
-    augmentation = color_augmentations + affine_augmentations + noise_augmentations
-    augmentation = random.sample(augmentation, 5)
+    augmentation =  random.sample(color_augmentations,2) +\
+                [random.choice(affine_augmentations)] +\
+                [random.choice(noise_augmentations)]
 
     kwargs = {'flipcode': 1,
               'translation_size': 10,
-              'scale' : random.uniform(0.8, 1.2),
+              'scale' : random.uniform(0.95, 1),
               'rotation': random.randint(0, 3),
               'brightness': random.uniform(0.5, 1.5),
-              'sat_delta': random.uniform(0.5, 1.5),
-              'hue_delta': random.uniform(0.5, 1.5),
+              'sat_delta': random.uniform(0.0, 10.0),
+              'hue_delta': random.uniform(0.0, 10.0),
             }
 
     for aug in augmentation:
-        if aug.__name__ == 'flip': # flip the coordiantes horizontally
-            bbox[:, 0] = image.shape[1] - bbox[:, 0]
-            bbox[:, 2] = image.shape[1] - bbox[:, 2]
+        # bbox is type np.array, [x, y, w, h]
+        if 'flip' in aug.__name__ : # flip the coordiantes horizontally
+            bbox[0] = image.shape[1] - bbox[0] - bbox[2]
             kwargs['flipcode'] = 1
-        elif aug.__name__ == 'translation': # translate the coordinates by a random amount
-            bbox[:, 0] = bbox[:, 0] + np.random.randint(-kwargs['translation_size'], kwargs['translation_size'])
-            bbox[:, 1] = bbox[:, 1] + np.random.randint(-kwargs['translation_size'], kwargs['translation_size'])
-            bbox[:, 2] = bbox[:, 2] + np.random.randint(-kwargs['translation_size'], kwargs['translation_size'])
-            bbox[:, 3] = bbox[:, 3] + np.random.randint(-kwargs['translation_size'], kwargs['translation_size'])
-        elif aug.__name__ == 'zoom':  # scale the coordiantes by a random amount
-            bbox[:, 0] = bbox[:, 0] * kwargs['scale']
-            bbox[:, 1] = bbox[:, 1] * kwargs['scale']
-            bbox[:, 2] = bbox[:, 2] * kwargs['scale']
-            bbox[:, 3] = bbox[:, 3] * kwargs['scale']
-            bbox[:, 0] = np.clip(bbox[:, 0], 0, image.shape[1])
-            bbox[:, 1] = np.clip(bbox[:, 1], 0, image.shape[0])
-            bbox[:, 2] = np.clip(bbox[:, 2], 0, image.shape[1])
-            bbox[:, 3] = np.clip(bbox[:, 3], 0, image.shape[0])
+        elif 'translation' in aug.__name__: # translate the coordinates by a random amount
+            bbox[0] += random.randint(-kwargs['translation_size'], kwargs['translation_size'])
+            bbox[0] = max(0, min(image.shape[1] ,bbox[0]))
+            bbox[1] += random.randint(-kwargs['translation_size'], kwargs['translation_size'])
+            bbox[1] = max(0, min(image.shape[0] ,bbox[1]))
+        elif 'zoom' in aug.__name__:  # scale the coordiantes by a random amount
+            bbox[0] = int(bbox[0] * kwargs['scale'])
+            bbox[0] = max(0, min(image.shape[1] ,bbox[0]))
+            
+            bbox[1] = int(bbox[1] * kwargs['scale'])
+            bbox[1] = max(0, min(image.shape[0] ,bbox[1]))
 
+            bbox[2] = int(bbox[2] * kwargs['scale'])
+            bbox[3] = int(bbox[3] * kwargs['scale'])
 
-        image = eval(aug)(image, kwargs)
+        image = aug(image, **kwargs)
         
 
     
@@ -255,86 +255,11 @@ if __name__ == '__main__':
     
     #load test image
     image = cv2.imread('test.jpg')
+    image = cv2.resize(image, (512, 512))
     
-
-    scale_percent = 20
-    width = int(image.shape[1] * scale_percent / 100)
-    height = int(image.shape[0] * scale_percent / 100)
-    image = cv2.resize(image, (width, height))
-
-    #add noise to image
-    # augmented = add_noise(image, 'gaussian')
+    for _ in range(5):
+        tmp = augment_image(image, np.array([[0, 0, image.shape[1], image.shape[0]]]))
+        cv2.imshow('image', tmp[0])
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
     
-    #flip image horizontally
-    aug_flip_1 = flip(image, 1)
-    aug_flip_0 = flip(image, 0)
-    img = np.hstack((image, aug_flip_0, aug_flip_1))
-    cv2.imwrite('flip.jpg', img)
-
-
-    #rotate image
-    # augmented = rotate(image, np.random.randint(0, 360))
-    aug_rot45 = rotation(image, 45)
-    aug_rot120 = rotation(image, 120)
-    img = cv2.hconcat([image, aug_rot45, aug_rot120])
-    cv2.imwrite('rotate.jpg', img)
-
-
-    #scale image
-    aug_scale2 = zoom(image, 2)
-    aug_scale0_5 = zoom(image, 0.5)
-    img = cv2.hconcat([image, aug_scale2, aug_scale0_5])
-    cv2.imwrite('scale.jpg', img)
-
-
-    #crop image
-    aug_crop256 = crop(image, 256)
-    aug_crop128 = crop(image, 128)
-    img = cv2.hconcat([image, aug_crop256, aug_crop128])
-    cv2.imwrite('crop.jpg', img)
-
-    #translate image
-    aug_trans256 = translation(image, 256)
-    aug_trans64 = translation(image, 64)
-    img = cv2.hconcat([image, aug_trans256, aug_trans64])
-    cv2.imwrite('translate.jpg', img)
-
-
-    #add guassian noise to image
-    aug_noise_1 = guassian_noise(image)
-    aug_noise_2 = guassian_noise(image)
-    img = cv2.hconcat([image, aug_noise_1, aug_noise_2])
-    cv2.imwrite('noise.jpg', img)
-
-    #blur image with guassian blur
-    aug_blur7 = guassian_blur(image, (3,3))
-    aug_blur11 = guassian_blur(image, (5,5))
-    img = cv2.hconcat([image, aug_blur7, aug_blur11])
-    cv2.imwrite('blur.jpg', img)
-
-    #change brightness of image
-    aug_brighness0_5 = brightness(image, 0.5)
-    aug_brighness2 = brightness(image, 2.0)
-    img = cv2.hconcat([image, aug_brighness0_5, aug_brighness2])
-    cv2.imwrite('brightness.jpg', img)
-
-
-
-    #change contrast of image
-    aug_contrast_1 = contrast(image)
-    aug_contrast_2 = contrast(image)
-    img = cv2.hconcat([image, aug_contrast_1, aug_contrast_2])
-    cv2.imwrite('contrast.jpg', img)
-
-
-    #change saturation of image
-    aug_sat1 = saturation(image, 1.5)
-    aug_sat2 = saturation(image, 4.0)
-    img = cv2.hconcat([image, aug_sat1, aug_sat2])
-    cv2.imwrite('saturation.jpg', img)
-
-    #change hue of image
-    aug_hue_1 = hue(image, 0.5)
-    aug_hue_2 = hue(image, 2.0)
-    img = cv2.hconcat([image, aug_hue_1, aug_hue_2])
-    cv2.imwrite('hue.jpg', img)

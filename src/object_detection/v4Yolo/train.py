@@ -93,10 +93,7 @@ def _main():
 
     with open(annotation_train_path) as f:
         lines_train = f.readlines()
-        # DEBUG START
-        # using just for testing
-        # lines_train = lines_train[:(2**4)]
-        # DEBUG END
+
 
     np.random.seed(42)
     np.random.shuffle(lines_train)
@@ -106,10 +103,6 @@ def _main():
 
     with open(annotation_val_path) as f:
         lines_val = f.readlines()
-        # DEBUG START
-        # using just for testing
-        # lines_val = lines_val[:2]
-        # DEBUG END
 
     np.random.seed(42)
     np.random.shuffle(lines_val)

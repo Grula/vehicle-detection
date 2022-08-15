@@ -144,21 +144,9 @@ def g_fid(real_images, interception, generator, discriminator, z_dim, policy, la
 
     fake_images = preprocess_input(fake_images)
 
-    assert tf.distribute.get_replica_context() is not None  # default
-    # fake_scores = discriminator([fake_images, labels], training=True)
-    replica_context = tf.distribute.get_replica_context()  # for strategy
-
-    
     act1 = interception(real_images)
     act2 = interception(fake_images)
-    with tf.Session() as sess:
-        act1 = act1.eval() 
-        act2 = act2.eval() 
 
-
-
-    # act1 = tf.make_tensor_proto(act1)  
-    # act2 = tf.make_tensor_proto(act2)
 
     # mu1, sigma1 = tf.reduce_mean(act1, axis=0), tfp.stats.covariance(act1)
     # mu2, sigma2 = tf.reduce_mean(act2, axis=0), tfp.stats.covariance(act2)

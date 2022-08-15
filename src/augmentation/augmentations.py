@@ -6,7 +6,7 @@ import numpy as np
 
 
 
-def flip(image: np.array, flipcode = 1) -> np.array:
+def flip(image: np.array, **kwargs) -> np.array:
     """Flip image.
     Args:
         image (np.array): Image to flip.
@@ -14,7 +14,9 @@ def flip(image: np.array, flipcode = 1) -> np.array:
     Returns:
         np.array: Flipped image.
     """
-    return cv2.flip(image, 1)
+    if kwargs['flipcode'] == 1:
+        return cv2.flip(image, 1)
+    return cv2.flip(image, 0)
 
 def rotation(image: np.array, angle: int = 90) -> np.array:
     """Rotate image.

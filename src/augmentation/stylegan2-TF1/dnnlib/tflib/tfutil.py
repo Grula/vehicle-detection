@@ -153,6 +153,9 @@ def create_session(config_dict: dict = None, force_as_default: bool = False) -> 
 
     # Create session.
     session = tf.Session(config=config_proto)
+    physical_devices = tf.config.experimental.list_physical_devices('GPU')
+    assert len(physical_devices) > 0, "Not enough GPU hardware devices available"
+    tf.config.experimental.set_memory_growth(physical_devices[0], True)
     if force_as_default:
         # pylint: disable=protected-access
         session._default_session = session.as_default()

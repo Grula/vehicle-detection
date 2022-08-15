@@ -365,6 +365,7 @@ def data_generator(annotation_lines, batch_size, anchors, num_classes, max_bbox_
             tf.print("mbboxes ", mbboxes)
             tf.print("lbboxes ", lbboxes)
             tf.print("############################")
+            exit()
             batch_image[num, :, :, :] = image
             if exist_boxes:
                 batch_label_sbbox[num, :, :, :, :] = label_sbbox

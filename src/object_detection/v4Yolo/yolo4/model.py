@@ -58,7 +58,7 @@ def DarknetConv2D(*args, **kwargs):
 
 def DarknetConv2D_BN_Leaky(*args, **kwargs):
     """Darknet Convolution2D followed by BatchNormalization and LeakyReLU."""
-    no_bias_kwargs = {'use_bias': True}
+    no_bias_kwargs = {'use_bias': False}
     no_bias_kwargs.update(kwargs)
     return compose(
         DarknetConv2D(*args, **no_bias_kwargs),
@@ -124,12 +124,12 @@ def yolo4_body(inputs, num_anchors, num_classes):
     y19 = DarknetConv2D_BN_Leaky(512, (1,1))(y19)
 
     #! it was flipped in original weights
-    maxpool3 = MaxPooling2D(pool_size=(5,5), strides=(1,1), padding='same')(y19)
-    maxpool2 = MaxPooling2D(pool_size=(9,9), strides=(1,1), padding='same')(y19)
-    maxpool1 = MaxPooling2D(pool_size=(13,13), strides=(1,1), padding='same')(y19)
-    # maxpool1 = MaxPooling2D(pool_size=(13,13), strides=(1,1), padding='same')(y19)
-    # maxpool2 = MaxPooling2D(pool_size=(9,9), strides=(1,1), padding='same')(y19)
     # maxpool3 = MaxPooling2D(pool_size=(5,5), strides=(1,1), padding='same')(y19)
+    # maxpool2 = MaxPooling2D(pool_size=(9,9), strides=(1,1), padding='same')(y19)
+    # maxpool1 = MaxPooling2D(pool_size=(13,13), strides=(1,1), padding='same')(y19)
+    maxpool1 = MaxPooling2D(pool_size=(13,13), strides=(1,1), padding='same')(y19)
+    maxpool2 = MaxPooling2D(pool_size=(9,9), strides=(1,1), padding='same')(y19)
+    maxpool3 = MaxPooling2D(pool_size=(5,5), strides=(1,1), padding='same')(y19)
 
     y19 = Concatenate()([maxpool1, maxpool2, maxpool3, y19])
     y19 = DarknetConv2D_BN_Leaky(512, (1,1))(y19)
@@ -189,8 +189,8 @@ def yolo4_body(inputs, num_anchors, num_classes):
     y19_output = DarknetConv2D(num_anchors*(num_classes+5), (1,1))(y19_output)
     
     #! it was flipped in original weights
-    # yolo4_model = Model(inputs, [y19_output, y38_output, y76_output])
-    yolo4_model = Model(inputs, [y76_output, y38_output, y19_output])
+    yolo4_model = Model(inputs, [y19_output, y38_output, y76_output])
+    # yolo4_model = Model(inputs, [y76_output, y38_output, y19_output])
 
     return yolo4_model
 

@@ -296,7 +296,7 @@ def image_preprocess(image, target_size, gt_boxes):
     scale_y = float(ih) / h
     image = cv2.resize(image, None, None, fx=scale_x, fy=scale_y, interpolation=method)
 
-    pimage = image.astype(np.float32) / 255.
+    pimage = image.astype(np.float32) #/ 255.
     if gt_boxes is None:
         return pimage
     else:

@@ -542,9 +542,9 @@ def yolo_loss(args, num_classes, iou_loss_thresh, anchors):
 
     # DEBUG START
     tf.print("############## AFTER NETWORK ##############")
-    tf.print("true_sbboxes ", true_sbboxes)
-    tf.print("true_mbboxes ", true_mbboxes)
-    tf.print("true_lbboxes ", true_lbboxes)
+    tf.print("true_sbboxes ", true_sbboxes[0])
+    tf.print("true_mbboxes ", true_mbboxes[0])
+    tf.print("true_lbboxes ", true_lbboxes[0])
     tf.print("############################")
     # tf.print("conv_sbbox ", conv_sbbox[0][0][0])
     # tf.print("conv_mbbox ", conv_mbbox[0][0][0])

@@ -119,7 +119,7 @@ def _main():
     if True:
         # model.compile(optimizer=adam_v2.Adam(learning_rate=1e-2), loss={'yolo_loss': lambda y_true, y_pred: y_pred})
         model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-2), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
-        batch_size = 16
+        batch_size = 1
         print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
         model.fit(data_generator_wrapper(lines_train, batch_size, anchors_stride_base, num_classes, max_bbox_per_scale, 'train'),
                 steps_per_epoch=max(1, num_train//batch_size),

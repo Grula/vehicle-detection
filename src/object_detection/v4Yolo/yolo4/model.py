@@ -447,8 +447,8 @@ def loss_layer(conv, pred, label, bboxes, stride, num_class, iou_loss_thresh):
     conv = tf.reshape(conv, (batch_size, output_size, output_size,
                              3, 5 + num_class))
     conv_raw_prob = conv[:, :, :, :, 5:]
-    print()
-    print(conv_raw_prob)
+    tf.print()
+    tf.print(conv_raw_prob)
     pred_xywh = pred[:, :, :, :, 0:4]
     pred_conf = pred[:, :, :, :, 4:5]
 

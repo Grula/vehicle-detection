@@ -441,14 +441,14 @@ def bbox_iou(boxes1, boxes2):
 
 def loss_layer(conv, pred, label, bboxes, stride, num_class, iou_loss_thresh):
     conv_shape = tf.shape(conv)
-    tf.print(conv_shape)
     batch_size = conv_shape[0]
     output_size = conv_shape[1]
     input_size = stride * output_size
     conv = tf.reshape(conv, (batch_size, output_size, output_size,
                              3, 5 + num_class))
     conv_raw_prob = conv[:, :, :, :, 5:]
-
+    print()
+    print(conv_raw_prob)
     pred_xywh = pred[:, :, :, :, 0:4]
     pred_conf = pred[:, :, :, :, 4:5]
 

@@ -60,7 +60,7 @@ def _main():
     class_index = ['{}'.format(i) for i in range(num_classes)]
     anchors = get_anchors(anchors_path)
 
-    max_bbox_per_scale = 4
+    max_bbox_per_scale = 1
 
     anchors_stride_base = np.array([
         [[12, 16], [19, 36], [40, 28]],
@@ -115,9 +115,9 @@ def _main():
     # Train with frozen layers first, to get a stable loss.
     # Adjust num epochs to your dataset. This step is enough to obtain a not bad model.
     if True:
-        # model.compile(optimizer=adam_v2.Adam(learning_rate=1e-2), loss={'yolo_loss': lambda y_true, y_pred: y_pred})
-        model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-2), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
-        batch_size = 1
+        # model.compile(optimizer=adam_v2.Adam(learning_rate=1e-4), loss={'yolo_loss': lambda y_true, y_pred: y_pred})
+        model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-9), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
+        batch_size = 16
         print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
         model.fit(data_generator_wrapper(lines_train, batch_size, anchors_stride_base, num_classes, max_bbox_per_scale, 'train'),
                 steps_per_epoch=max(1, num_train//batch_size),
@@ -130,8 +130,8 @@ def _main():
     if True:
         for i in range(len(model.layers)):
             model.layers[i].trainable = True
-        # model.compile(optimizer=adam_v2.Adam(learning_rate=1e-3), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
-        model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-3), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
+        # model.compile(optimizer=adam_v2.Adam(learning_rate=1e-5), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
+        model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-11), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
         print('Unfreeze all of the layers.')
 
         batch_size = 8 # note that more GPU memory is required after unfreezing the body
@@ -320,7 +320,7 @@ def parse_annotation(annotation, train_input_size, annotation_type):
     else:
         bboxes = np.array([list(map(lambda x: int(float(x)), box.split(','))) for box in line[1:]])
     if annotation_type == 'train':
-        image, bboxes = random_fill(np.copy(image), np.copy(bboxes))    # Open when dataset lacks small objects
+        # image, bboxes = random_fill(np.copy(image), np.copy(bboxes))    # Open when dataset lacks small objects
         image, bboxes = random_horizontal_flip(np.copy(image), np.copy(bboxes))
         image, bboxes = random_crop(np.copy(image), np.copy(bboxes))
         image, bboxes = random_translate(np.copy(image), np.copy(bboxes))
@@ -357,14 +357,13 @@ def data_generator(annotation_lines, batch_size, anchors, num_classes, max_bbox_
         for num in range(batch_size):
             if i == 0:
                 np.random.shuffle(annotation_lines)
-
             image, bboxes, exist_boxes = parse_annotation(annotation_lines[i], train_input_size, annotation_type)
             label_sbbox, label_mbbox, label_lbbox, sbboxes, mbboxes, lbboxes = preprocess_true_boxes(bboxes, train_output_sizes, strides, num_classes, max_bbox_per_scale, anchors)
-            tf.print("############  BEFORE NETWORK ################")
-            tf.print("sbboxes ", sbboxes)
-            tf.print("mbboxes ", mbboxes)
-            tf.print("lbboxes ", lbboxes)
-            tf.print("############################")
+            # tf.print("############  BEFORE NETWORK ################")
+            # tf.print("sbboxes ", sbboxes)
+            # tf.print("mbboxes ", mbboxes)
+            # tf.print("lbboxes ", lbboxes)
+            # tf.print("############################")
             batch_image[num, :, :, :] = image
             if exist_boxes:
                 batch_label_sbbox[num, :, :, :, :] = label_sbbox

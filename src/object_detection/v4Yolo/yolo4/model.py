@@ -323,10 +323,7 @@ def preprocess_true_boxes(bboxes, train_output_sizes, strides, num_classes, max_
         bbox_class_ind = bbox[4]
         onehot = np.zeros(num_classes, dtype=np.float)
         onehot[bbox_class_ind] = 1.0
-        print(bbox_coor)
         bbox_xywh = np.concatenate([(bbox_coor[2:] + bbox_coor[:2]) * 0.5, bbox_coor[2:] - bbox_coor[:2]], axis=-1)
-        print(bbox_xywh)
-        exit()
         bbox_xywh_scaled = 1.0 * bbox_xywh[np.newaxis, :] / strides[:, np.newaxis]
         iou = []
         for i in range(3):
@@ -544,21 +541,16 @@ def yolo_loss(args, num_classes, iou_loss_thresh, anchors):
     true_lbboxes = args[8]   # (?, 150, 4)
 
     # DEBUG START
-    tf.print("############## AFTER NETWORK ##############")
-    # tf.print("true_sbboxes ", true_sbboxes[0])
-    # tf.print("true_mbboxes ", true_mbboxes[0])
-    # tf.print("true_lbboxes ", true_lbboxes[0])
+    # tf.print("############## AFTER NETWORK ##############")
+    # tf.print("conv_sbbox ", conv_sbbox[0][0][0][0:3])
+    # tf.print("conv_mbbox ", conv_mbbox[0][0][0][0:3])
+    # tf.print("conv_lbbox ", conv_lbbox[0][0][0][0:3])
     # tf.print("############################")
-    tf.print("conv_sbbox ", conv_sbbox[0][0])
-    tf.print("conv_mbbox ", conv_mbbox[0][0])
-    tf.print("conv_lbbox ", conv_lbbox[0][0])
-    tf.print("############################")
     # DEBUG END
-    #HACK: all NaN values in arrays are replaced with K.epsilon()
-    # conv_sbbox = tf.where(tf.math.is_nan(conv_sbbox), K.epsilon(), conv_sbbox)
-    # conv_mbbox = tf.where(tf.math.is_nan(conv_mbbox), K.epsilon(), conv_mbbox)
-    # conv_lbbox = tf.where(tf.math.is_nan(conv_lbbox), K.epsilon(), conv_lbbox)
-
+    #HACK: all NaN values in arrays are replaced with 0.0
+    # conv_sbbox = tf.where(tf.math.is_nan(conv_sbbox), 1.0, conv_sbbox)
+    # conv_mbbox = tf.where(tf.math.is_nan(conv_mbbox), 1.0, conv_mbbox)
+    # conv_lbbox = tf.where(tf.math.is_nan(conv_lbbox), 1.0, conv_lbbox)
 
     pred_sbbox = decode(conv_sbbox, anchors[0], 8, num_classes)
     pred_mbbox = decode(conv_mbbox, anchors[1], 16, num_classes)

@@ -60,7 +60,7 @@ def _main():
     class_index = ['{}'.format(i) for i in range(num_classes)]
     anchors = get_anchors(anchors_path)
 
-    max_bbox_per_scale = 1
+    max_bbox_per_scale = 2
 
     anchors_stride_base = np.array([
         [[12, 16], [19, 36], [40, 28]],
@@ -73,9 +73,9 @@ def _main():
     anchors_stride_base[1] /= 16
     anchors_stride_base[2] /= 32
 
-    input_shape = (608, 608) # multiple of 32, hw
+    # input_shape = (608, 608) # multiple of 32, hw
     # input_shape = (416, 416) #/ multiple of 32, hw
-    # input_shape = (512, 512) # multiple of 32, hw
+    input_shape = (512, 512) # multiple of 32, hw
 
     model, model_body = create_model(input_shape, anchors_stride_base, num_classes,
                                     load_pretrained=True, freeze_body=2,
@@ -296,7 +296,7 @@ def image_preprocess(image, target_size, gt_boxes):
     scale_y = float(ih) / h
     image = cv2.resize(image, None, None, fx=scale_x, fy=scale_y, interpolation=method)
 
-    pimage = image.astype(np.float32) #/ 255.
+    pimage = image.astype(np.float32) / 255.
     if gt_boxes is None:
         return pimage
     else:
@@ -331,8 +331,8 @@ def data_generator(annotation_lines, batch_size, anchors, num_classes, max_bbox_
     '''data generator for fit_generator'''
     n = len(annotation_lines)
     i = 0
-    train_input_sizes = [320, 352, 384, 416, 448, 480, 512, 544, 576, 608]
-    # train_input_sizes = [224, 256, 288, 320, 352, 384, 416, 448, 480, 512]
+    # train_input_sizes = [320, 352, 384, 416, 448, 480, 512, 544, 576, 608]
+    train_input_sizes = [224, 256, 288, 320, 352, 384, 416, 448, 480, 512]
     # train_input_sizes = [416, 448, 480, 512]
     strides = np.array([8, 16, 32])
 

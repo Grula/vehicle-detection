@@ -525,7 +525,7 @@ def yolo_loss(args, num_classes, iou_loss_thresh, anchors):
     # conv_mbbox = args[1]   # (?, ?, ?, 3*(num_classes+5))
     # conv_sbbox = args[2]   # (?, ?, ?, 3*(num_classes+5))
 
-    # Note: was flipped large and small
+    #! Note: was flipped large and small, NOT OK
     conv_sbbox = args[0]   # (?, ?, ?, 3*(num_classes+5))
     conv_mbbox = args[1]   # (?, ?, ?, 3*(num_classes+5))
     conv_lbbox = args[2]   # (?, ?, ?, 3*(num_classes+5))

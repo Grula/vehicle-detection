@@ -189,8 +189,8 @@ def yolo4_body(inputs, num_anchors, num_classes):
     y19_output = DarknetConv2D(num_anchors*(num_classes+5), (1,1))(y19_output)
     
     #! it was flipped in original weights
-    yolo4_model = Model(inputs, [y19_output, y38_output, y76_output])
-    # yolo4_model = Model(inputs, [y76_output, y38_output, y19_output])
+    # yolo4_model = Model(inputs, [y19_output, y38_output, y76_output])
+    yolo4_model = Model(inputs, [y76_output, y38_output, y19_output])
 
     return yolo4_model
 

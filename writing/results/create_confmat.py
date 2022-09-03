@@ -82,7 +82,6 @@ for folder in folders:
   
   
         score_threshold = 0.5
-
         filter_score_data = {}
         for img_path, img_data in _dict_data.items():
             # filter low scores
@@ -101,6 +100,9 @@ for folder in folders:
                                     }
 
         confusion_matrix = np.zeros( (len(classes)+1, len(classes))+1 )
+        
+        # https://stackoverflow.com/questions/46110545/whats-the-correct-way-to-compute-a-confusion-matrix-for-object-detection/52732119#52732119
+
         filter_iou_data = {}
         iou_threshold = 0.5
         for img_path, img_data in filter_score_data.items():

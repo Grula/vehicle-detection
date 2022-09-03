@@ -83,6 +83,7 @@ for folder in folders:
   
         score_threshold = 0.5
         filter_score_data = {}
+        undetected_data = {}
         for img_path, img_data in _dict_data.items():
             # filter low scores
             for _d in img_data:
@@ -91,13 +92,18 @@ for folder in folders:
                     if img_path not in filter_score_data:
                         filter_score_data[img_path] = []
                     filter_score_data[img_path].append(_d)
+                else:
+                    if img_path not in undetected_data:
+                        undetected_data[img_path] = []
+                    undetected_data[img_path].append(_d)
         print("Number of images: ", len(filter_score_data))
+        print("Number of undetected images: ", len(undetected_data))
 
-        confusion_matrix = {'car': {'car': 0, 'motorbike': 0, 'bus': 0, 'truck': 0},
-                                    'motorbike': {'car': 0, 'motorbike': 0, 'bus': 0, 'truck': 0},
-                                    'bus': {'car': 0, 'motorbike': 0, 'bus': 0, 'truck': 0}, 
-                                    'truck': {'car': 0, 'motorbike': 0, 'bus': 0, 'truck': 0}
-                                    }
+        # confusion_matrix = {'car': {'car': 0, 'motorbike': 0, 'bus': 0, 'truck': 0},
+        #                             'motorbike': {'car': 0, 'motorbike': 0, 'bus': 0, 'truck': 0},
+        #                             'bus': {'car': 0, 'motorbike': 0, 'bus': 0, 'truck': 0}, 
+        #                             'truck': {'car': 0, 'motorbike': 0, 'bus': 0, 'truck': 0}
+        #                             }
 
         confusion_matrix = np.zeros( (len(classes)+1, len(classes))+1 )
         

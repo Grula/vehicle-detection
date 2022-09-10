@@ -59,8 +59,8 @@ for folder in folders:
         continue
     for csvf in csv_files:
 
-        if 'NO' not in csvf:
-            continue
+        # if 'NO' not in csvf:
+        #     continue
         
         print("###################################################")
         print("Current file: ", csvf)
@@ -71,7 +71,6 @@ for folder in folders:
         lines = list(map(lambda x: x.strip().split(','), lines))
         data.close()
 
-        print(len(lines))
 
         _dict_data = {}
         for line in lines:
@@ -79,8 +78,9 @@ for folder in folders:
                 _dict_data[line[0]] = []
             _dict_data[line[0]].append(line[1:])
 
+        print("Number of total images: ", len(_dict_data))
   
-  
+
         score_threshold = 0.5
         filter_score_data = {}
         undetected_data = {}
@@ -94,18 +94,21 @@ for folder in folders:
                     filter_score_data[img_path].append(_d)
                 else:
                     if img_path not in undetected_data:
-                        undetected_data[img_path] = []
-                    undetected_data[img_path].append(_d)
-        print("Number of images: ", len(filter_score_data))
+                        undetected_data[img_path] = _d
+        print("Number of detected images: ", len(filter_score_data))
         print("Number of undetected images: ", len(undetected_data))
 
-        # confusion_matrix = {'car': {'car': 0, 'motorbike': 0, 'bus': 0, 'truck': 0},
-        #                             'motorbike': {'car': 0, 'motorbike': 0, 'bus': 0, 'truck': 0},
-        #                             'bus': {'car': 0, 'motorbike': 0, 'bus': 0, 'truck': 0}, 
-        #                             'truck': {'car': 0, 'motorbike': 0, 'bus': 0, 'truck': 0}
-        #                             }
+        confusion_matrix = {'car': {'car': 0, 'motorbike': 0, 'bus': 0, 'truck': 0, 'none': 0},
+                            'motorbike': {'car': 0, 'motorbike': 0, 'bus': 0, 'truck': 0, 'none': 0},
+                            'bus': {'car': 0, 'motorbike': 0, 'bus': 0, 'truck': 0, 'none': 0}, 
+                            'truck': {'car': 0, 'motorbike': 0, 'bus': 0, 'truck': 0, 'none': 0},
+                            'none': {'car': 0, 'motorbike': 0, 'bus': 0, 'truck': 0, 'none': 0},
+                        }
 
-        confusion_matrix = np.zeros( (len(classes)+1, len(classes))+1 )
+        for img_path, img_data in undetected_data.items():
+                confusion_matrix['none'][img_data[0].strip()] += 1
+
+        # confusion_matrix = np.zeros( (len(classes)+1, len(classes))+1 )
         
         # https://stackoverflow.com/questions/46110545/whats-the-correct-way-to-compute-a-confusion-matrix-for-object-detection/52732119#52732119
 
@@ -127,6 +130,13 @@ for folder in folders:
                         if filter_iou_data[img_path]['iou_score'] < iou_current:
                             filter_iou_data[img_path] = {'true_label': _d[0], 'pred_label': _d[1], 'iou_score':iou_current, 'gt': gt, 'pred': pred}
         print("Number of images after iou filter: ", len(filter_iou_data))
+
+        for img_path, img_data in filter_iou_data.items():
+            if img_data['true_label'] == img_data['pred_label']:
+                confusion_matrix[img_data['pred_label'].strip()][img_data['true_label'].strip()] += 1
+            else:
+                confusion_matrix[img_data['pred_label'].strip()][img_data['true_label'].strip()] += 1
+
 
         # for line in lines:
             # line = list(map(lambda x: x.strip(), line))
@@ -161,12 +171,11 @@ for folder in folders:
             #     confusion_matrix[true_label][pred_label] += 1
 
 
-
+        classes = ['car', 'motorbike', 'bus', 'truck', 'none']
         # print confusion matrix nicely
         print("Confusion Matrix:")
-        print("{:<10} {:<10} {:<10} {:<10} {:<10}".format("", "car", "motorbike", "bus", "truck"))
+        print("{:<10} {:<10} {:<10} {:<10} {:<10} {:<10}".format("", "car", "motorbike", "bus", "truck", "none"))
         for cls in classes:
-            print("{:<10} {:<10} {:<10} {:<10} {:<10}".format(cls, confusion_matrix[cls]['car'], confusion_matrix[cls]['motorbike'], confusion_matrix[cls]['bus'], confusion_matrix[cls]['truck']))
+            print("{:<10} {:<10} {:<10} {:<10} {:<10} {:<10}".format(cls, confusion_matrix[cls]['car'], confusion_matrix[cls]['motorbike'], confusion_matrix[cls]['bus'], confusion_matrix[cls]['truck'], confusion_matrix[cls]['none']))
         print("###################################################")
         print("")
-        exit()

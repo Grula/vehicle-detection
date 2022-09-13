@@ -432,8 +432,8 @@ Tokom razvijanja generativnih suparničkih mreža najviše se radilo na poboljš
 Generator modela zasnovan na stilu se sastoji iz dva dela i prikazan je na slici \ref{fig:section2_augmentation_stylegan}. 
 % IZMENA naziva se mreža mapiranja -> naziva se mreža preslikavanja (3.3-6)
 Prvi deo čini duboko povezanu mrežu sa osam slojeva. Mreža je predstavljena kao funkcija \(f: Z\to W\) i naziva se mreža preslikavanja (eng.~\textit{mapping network}). Ulaz mreže predstavlja normalizovani latentni kod \(z \in Z\). Latentni kod (eng.~\textit{latent code}) ili z-vektor \(z\), je vektor koji sadrži slučajne vrednosti iz Gausove raspodele. Prostor u kome se nalaze svi z-vektori se naziva Z-prostor (eng.~\textit{Z-space}) i obeležava se sa \(Z\). Kao izlaz mreže se dobija vektor \(w\) koji pripada latentnom prostoru \(W\). Latentni prostor (eng.~\textit{latent space}) je apstraktni višedimenzionalni prostor koji sadrži vrednosti karakteristika koje se ne mogu direktno interpretirati.
-% IZMENA uz pomoć konstantnog vektora, ... -> uz pomoć konstantnog vektora sa nasumičnim vrednostima iz Gausove raspodele, ... (3.3-7)
-Drugi deo generatora predstavlja mrežu koja uz pomoć konstantnog vektora sa nasumičnim vrednostima iz Gausove raspodele, slučajnog šuma i vektora \(w\) transformisanog afinim transformacijama generiše sliku. 
+% IZMENA uz pomoć konstantnog vektora, ... -> uz pomoć konstantnog vektora sa nasumičnim vrednostima iz Gausove raspodele, ... (3.3-7), 2(1) 
+Drugi deo generatora predstavlja mrežu koja uz pomoć vektora sa nasumičnim vrednostima iz Gausove raspodele, slučajnog šuma i vektora \(w\) transformisanog afinim transformacijama generiše sliku. 
 
 Vektor \(w\) transformisan afinim transformacijama služi za prilagođavanje stila sintetički generisanim slikama pomoću adaptivne normalizacije instance (eng.~\textit{adaptive instance normalization, AdaIN}). Stil slike predstavlja vektor u latentnom prostoru koji je razdvojen od vektora semantičkog sadržaja slike \cite{huang2017arbitrary}. Primer prenosa stila sa jedne slike na drugu je dat na slici \ref{fig:section2_augmentation_adain}.
 
@@ -465,11 +465,12 @@ Da bi se takav problem ublažio, uvedena je metoda diferencijabilne augmentacije
 \section{Učenje sa prenosom znanja}
 \label{section3_trasnferucenje}
 % #######################################
+% IZMENA Modeli razvijeni na ovaj nacin davace bolje -> Modeli ce na ovaj nacin davati dobre 2(.2) 
+U nadgledanom učenju, modeli se obučavaju da nauče odnose koji važe između datih ulaza i izlaza. Modeli zatim mogu da vrše predviđanja izlaza nad novim podacima. Modeli će na ovaj način davati dobre rezultate kada rešavaju problem koji se nalazi u istom domenu kao i podaci za obučavanje. Rezultat će se pogoršati ako se domen problema promeni. U najgorem slučaju, može da bude potrebno obučavati novi model čak i kada su domeni problema slični \cite{zhuang2020comprehensive}.
 
-U nadgledanom učenju, modeli se obučavaju da nauče odnose koji važe između datih ulaza i izlaza. Modeli zatim mogu da vrše predviđanja izlaza nad novim podacima. Modeli razvijeni na ovaj način davaće bolje rezultate kada rešavaju problem koji se nalazi u istom domenu kao i podaci za obučavanje. Rezultat će se pogoršati ako se domen problema promeni. U najgorem slučaju, može da bude potrebno obučavati novi model čak i kada su domeni problema slični \cite{zhuang2020comprehensive}.
-
-% IZMENA (3.4-sve)
-Učenje sa prenosom znanja predstavlja tehniku mašinskog učenja, gde se znanje iz postojećeg obučenog modela prenosi u novi model koji treba da rešava sličan zadatak. Tehnika se najčešće koristi kada za obuku novog modela nije na raspolaganju dovoljna količina podataka ili resursa. Korišćenje učenja sa prenosom znanja donosi niz prednosti od kojih su glavne ušteda resursa, smanjivanje greške tokom obuke i generalizacija modela \cite{zhuang2020comprehensive}.
+% IZMENA (3.4-sve) 
+% Ucenje sa prenosom znanja predstavlja tehniku mašinskog ucenja... -> Ucenje sa prenosom znanja predstavlja oblast mašinskog ucenja koja se bavi iskoriscavanjem znanja iz postojeceg obucenog modela pri obucavanju novog modela koji treba da resava slican zadatak. 2(3)
+Učenje sa prenosom znanja predstavlja oblast mašinskog učenja koja se bavi iskorišćavanjem znanja iz postojećeg obučenog modela pri obučavanju novog modela koji treba da rešava sličan zadatak. Tehnika se najčešće koristi kada za obuku novog modela nije na raspolaganju dovoljna količina podataka ili resursa. Korišćenje učenja sa prenosom znanja donosi niz prednosti od kojih su glavne ušteda resursa, smanjivanje greške tokom obuke i generalizacija modela \cite{zhuang2020comprehensive}.
 
 
 % Obuka sa prenosom znanja se često koristi kada obuka modela za rešavanje novog problema zahteva veliku količinu resursa. Korišćenje tehnike transfernog učenja donosi niz prednosti od kojih su glavne ušteda resursa i smanjivanje greške tokom obuke modela \cite{zhuang2020comprehensive}. 

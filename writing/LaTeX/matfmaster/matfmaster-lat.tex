@@ -619,33 +619,33 @@ U praktičnoj upotrebi, distribucije slika se dobijaju računanjem srednjih vred
 
 
 
-% +++++++++++++++++++++++++++++++
-\section{Funkcija greške za generativne suparničke mreže}
-% +++++++++++++++++++++++++++++++
-Funkcije grešaka za generativne suparničke mreže mogu se formulisati preko igre nulte sume \cite{goodfellow2020generative, hodgson2006microeconomics}. Generator pokušava da minimizuje funkciju dok diskriminator pokušava da maksimizuje. Za dati generator $G$ i diskriminator $D$ problem igre nulte sume se definiše kao \cite{goodfellow2020generative, ml2019}:
+% % +++++++++++++++++++++++++++++++
+% \section{Funkcija greške za generativne suparničke mreže}
+% % +++++++++++++++++++++++++++++++
+% Funkcije grešaka za generativne suparničke mreže mogu se formulisati preko igre nulte sume \cite{goodfellow2020generative, hodgson2006microeconomics}. Generator pokušava da minimizuje funkciju dok diskriminator pokušava da maksimizuje. Za dati generator $G$ i diskriminator $D$ problem igre nulte sume se definiše kao \cite{goodfellow2020generative, ml2019}:
 
-\begin{equation}
-   \min_{G}\max_{D}\mathbb{E}_{x}[\log{D(x)}] +  \mathbb{E}_{z}[1 - \log{D(G(z))}]
-\end{equation}
-U datoj formuli:
-\begin{itemize}
-    \item $D(x)$ predstavlja procenu diskriminatora da je pravi podatak $x$ stvaran,
-    \item $\mathbb{E}_{x}$ je očekivanje po raspodeli stvarnih podataka,
-    \item $G(z)$ je izlaz generatora za vrednost $z$ iz latentnog prostora,
-    \item $D(G(z))$ predstavlja procenu diskriminatora da je lažni podatak stvaran,
-    \item $\mathbb{E}_{z}$ je očekivanje po raspodeli podataka u latentnom prostoru.
-\end{itemize}
+% \begin{equation}
+%   \min_{G}\max_{D}\mathbb{E}_{x}[\log{D(x)}] +  \mathbb{E}_{z}[1 - \log{D(G(z))}]
+% \end{equation}
+% U datoj formuli:
+% \begin{itemize}
+%     \item $D(x)$ predstavlja procenu diskriminatora da je pravi podatak $x$ stvaran,
+%     \item $\mathbb{E}_{x}$ je očekivanje po raspodeli stvarnih podataka,
+%     \item $G(z)$ je izlaz generatora za vrednost $z$ iz latentnog prostora,
+%     \item $D(G(z))$ predstavlja procenu diskriminatora da je lažni podatak stvaran,
+%     \item $\mathbb{E}_{z}$ je očekivanje po raspodeli podataka u latentnom prostoru.
+% \end{itemize}
 
-\noindent Funkcija greške za generator se definiše sa:
-\begin{equation}
-\label{eq:generator}
-    \min\log{(1-D(G(z)))}
-\end{equation}
-i za diskriminator sa:
-\begin{equation}
-\label{eq:discriminator}
-    \max\log{D(x)}+\log{(1-D(G(z)))}
-\end{equation}
+% \noindent Funkcija greške za generator se definiše sa:
+% \begin{equation}
+% \label{eq:generator}
+%     \min\log{(1-D(G(z)))}
+% \end{equation}
+% i za diskriminator sa:
+% \begin{equation}
+% \label{eq:discriminator}
+%     \max\log{D(x)}+\log{(1-D(G(z)))}
+% \end{equation}
 
 % ------------------------------------------------------------------------------
 \chapter{Implementacija i rezultati}

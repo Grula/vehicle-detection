@@ -70,7 +70,7 @@ def _main():
     class_index = ['{}'.format(i) for i in range(num_classes)]
     anchors = get_anchors(anchors_path)
 
-    max_bbox_per_scale = 150
+    max_bbox_per_scale = 15
 
     anchors_stride_base = np.array([
         [[12, 16], [19, 36], [40, 28]],
@@ -192,8 +192,8 @@ def create_model(input_shape, anchors_stride_base, num_classes, load_pretrained=
     h, w = input_shape  
     num_anchors = len(anchors_stride_base)
 
-    max_bbox_per_scale = 150
-    iou_loss_thresh = 0.2
+    max_bbox_per_scale = 15
+    iou_loss_thresh = 0.5
 
     # model_body = yolo4_body(image_input, num_anchors, num_classes)
     model_body = load_model(weights_path, custom_objects={'Mish':Mish})

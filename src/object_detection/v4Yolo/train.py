@@ -94,7 +94,7 @@ def _main():
     # input_shape = (512, 512) # multiple of 32, hw
 
     model, model_body = create_model(input_shape, anchors_stride_base, num_classes,
-                                    load_pretrained=True, freeze_body=3,
+                                    load_pretrained=True, freeze_body=2,
                                     weights_path=weights_path)
 
     logging = TensorBoard(log_dir=log_dir)
@@ -110,7 +110,6 @@ def _main():
     with open(annotation_train_path) as f:
         lines_train = f.readlines()
 
-    
 
     np.random.seed(42)
     np.random.shuffle(lines_train)
@@ -140,7 +139,7 @@ def _main():
         print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
         model.fit(data_generator_wrapper(lines_train, batch_size, anchors_stride_base, num_classes, max_bbox_per_scale, 'train'),
                 steps_per_epoch=max(1, num_train//batch_size),
-                epochs=1,
+                epochs=10,
                 initial_epoch=0,
                 callbacks=[logging, checkpoint, early_stopping])
 

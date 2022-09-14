@@ -488,10 +488,12 @@ def loss_layer(conv, pred, label, bboxes, stride, num_class, iou_loss_thresh):
     conf_loss = pos_loss + neg_loss
     # Looking back at respond_bgd, the iou of a prediction box and a gt exceeds iou_loss_thresh and is not regarded as a negative example. When participating in "binary cross-entropy of predicted confidence level and true confidence level", this box may not be a positive example (if the box is not marked as 1 in the label). This box may not participate in the calculation of confidence loss.
     # This kind of box is generally the box near the gt box, or the other two boxes in the grid where the gt box is located. It is neither a positive example nor a negative example and does not participate in the calculation of the confidence loss. (called ignore in the paper)
-
     ciou_loss = tf.reduce_mean(tf.reduce_sum(ciou_loss, axis=[1, 2, 3, 4]))  # Each sample calculates its own ciou_loss separately, and then averages
     conf_loss = tf.reduce_mean(tf.reduce_sum(conf_loss, axis=[1, 2, 3, 4]))  # Each sample calculates its own conf_loss separately, and then averages
     prob_loss = tf.reduce_mean(tf.reduce_sum(prob_loss, axis=[1, 2, 3, 4]))  # Each sample calculates its own prob_loss separately, and then averages
+    
+
+    
     return ciou_loss, conf_loss, prob_loss
 
 def decode(conv_output, anchors, stride, num_class):
@@ -520,37 +522,38 @@ def decode(conv_output, anchors, stride, num_class):
     return tf.concat([pred_xywh, pred_conf, pred_prob], axis=-1)
 
 def yolo_loss(args, num_classes, iou_loss_thresh, anchors):
+
     #! NOT OK
     # conv_lbbox = args[0]   # (?, ?, ?, 3*(num_classes+5))
     # conv_mbbox = args[1]   # (?, ?, ?, 3*(num_classes+5))
     # conv_sbbox = args[2]   # (?, ?, ?, 3*(num_classes+5))
-
     #! Note: was flipped large and small, NOT OK
     conv_sbbox = args[0]   # (?, ?, ?, 3*(num_classes+5))
     conv_mbbox = args[1]   # (?, ?, ?, 3*(num_classes+5))
     conv_lbbox = args[2]   # (?, ?, ?, 3*(num_classes+5))
     
+    tf.print("####################################################")
+    tf.print("conv_sbbox.shape: ", conv_sbbox.shape)    
+    tf.print("conv_mbbox.shape: ", conv_mbbox.shape)
+    tf.print("conv_lbbox.shape: ", conv_lbbox.shape)
+    tf.print("conv_sbbox ", conv_sbbox[0][0])
+    tf.print("conv_mbbox ", conv_mbbox[0][0])
+    tf.print("conv_lbbox ", conv_lbbox[0][0])
+    tf.print("####################################################")
+    
     #Note OK
     label_sbbox = args[3]   # (?, ?, ?, 3, num_classes+5)
     label_mbbox = args[4]   # (?, ?, ?, 3, num_classes+5)
     label_lbbox = args[5]   # (?, ?, ?, 3, num_classes+5)
+    # label_sbbox = args[0]   # (?, ?, ?, 3, num_classes+5)
+    # label_mbbox = args[1]   # (?, ?, ?, 3, num_classes+5)
+    # label_lbbox = args[2]   # (?, ?, ?, 3, num_classes+5)
 
     #Note OK
     true_sbboxes = args[6]   # (?, 150, 4)
     true_mbboxes = args[7]   # (?, 150, 4)
     true_lbboxes = args[8]   # (?, 150, 4)
 
-    # DEBUG START
-    # tf.print("############## AFTER NETWORK ##############")
-    # tf.print("conv_sbbox ", conv_sbbox[0][0][0][0:3])
-    # tf.print("conv_mbbox ", conv_mbbox[0][0][0][0:3])
-    # tf.print("conv_lbbox ", conv_lbbox[0][0][0][0:3])
-    # tf.print("############################")
-    # DEBUG END
-    #HACK: all NaN values in arrays are replaced with 0.0
-    # conv_sbbox = tf.where(tf.math.is_nan(conv_sbbox), 1.0, conv_sbbox)
-    # conv_mbbox = tf.where(tf.math.is_nan(conv_mbbox), 1.0, conv_mbbox)
-    # conv_lbbox = tf.where(tf.math.is_nan(conv_lbbox), 1.0, conv_lbbox)
 
     pred_sbbox = decode(conv_sbbox, anchors[0], 8, num_classes)
     pred_mbbox = decode(conv_mbbox, anchors[1], 16, num_classes)

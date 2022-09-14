@@ -17,7 +17,7 @@ import numpy as np
 
 import keras.backend as K
 from keras.layers import Input, Lambda
-from keras.models import Model
+from keras.models import Model, load_model
 from keras.optimizers import adam_v2
 from keras.callbacks import TensorBoard, ModelCheckpoint, ReduceLROnPlateau, EarlyStopping
 import keras.layers as layers
@@ -70,19 +70,19 @@ def _main():
     class_index = ['{}'.format(i) for i in range(num_classes)]
     anchors = get_anchors(anchors_path)
 
-    max_bbox_per_scale = 2
-
-    # anchors_stride_base = np.array([
-    #     [[12, 16], [19, 36], [40, 28]],
-    #     [[36, 75], [76, 55], [72, 146]],
-    #     [[142, 110], [192, 243], [459, 401]]
-    # ])
+    max_bbox_per_scale = 1
 
     anchors_stride_base = np.array([
-        [[142, 110]],
-        [[192, 243]],
-        [[459, 401]]
+        [[12, 16], [19, 36], [40, 28]],
+        [[36, 75], [76, 55], [72, 146]],
+        [[142, 110], [192, 243], [459, 401]]
     ])
+
+    # anchors_stride_base = np.array([
+    #     [[142, 110]],
+    #     [[192, 243]],
+    #     [[459, 401]]
+    # ])
 
     anchors_stride_base = anchors_stride_base.astype(np.float32)
     anchors_stride_base[0] /= 8
@@ -94,7 +94,7 @@ def _main():
     input_shape = (512, 512) # multiple of 32, hw
 
     model, model_body = create_model(input_shape, anchors_stride_base, num_classes,
-                                    load_pretrained=True, freeze_body=2,
+                                    load_pretrained=True, freeze_body=3,
                                     weights_path=weights_path)
 
     logging = TensorBoard(log_dir=log_dir)
@@ -106,10 +106,11 @@ def _main():
     evaluation = Evaluate(model_body=model_body, anchors=anchors, class_names=class_index,
          score_threshold=0.05, tensorboard=logging, weighted_average=True, eval_file=annotation_val_path, log_dir=log_dir,
          image_shape = input_shape, eval_path = args['log_dir'])
-
+    
     with open(annotation_train_path) as f:
         lines_train = f.readlines()
 
+    lines_train = lines_train[:10]
 
     np.random.seed(42)
     np.random.shuffle(lines_train)
@@ -132,12 +133,12 @@ def _main():
     # Adjust num epochs to your dataset. This step is enough to obtain a not bad model.
     if True:
         # model.compile(optimizer=adam_v2.Adam(learning_rate=1e-4), loss={'yolo_loss': lambda y_true, y_pred: y_pred})
-        model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-4), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
-        batch_size = 4
+        model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-1), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
+        batch_size = 1
         print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
         model.fit(data_generator_wrapper(lines_train, batch_size, anchors_stride_base, num_classes, max_bbox_per_scale, 'train'),
                 steps_per_epoch=max(1, num_train//batch_size),
-                epochs=10,
+                epochs=1,
                 initial_epoch=0,
                 callbacks=[logging, checkpoint, early_stopping])
 
@@ -189,15 +190,16 @@ def create_model(input_shape, anchors_stride_base, num_classes, load_pretrained=
     h, w = input_shape  
     num_anchors = len(anchors_stride_base)
 
-    max_bbox_per_scale = 2
+    max_bbox_per_scale = 1
     iou_loss_thresh = 0.4
 
-    model_body = yolo4_body(image_input, num_anchors, num_classes)
+    # model_body = yolo4_body(image_input, num_anchors, num_classes)
+    model_body = load_model(weights_path, custom_objects={'Mish':Mish})
 
     print('Create YOLOv4 model with {} anchors and {} classes.'.format(num_anchors*3, num_classes))
 
     if load_pretrained:
-        model_body.load_weights(weights_path, by_name=False, skip_mismatch=False)
+        model_body.load_weights(weights_path, by_name=True, skip_mismatch=False)
         print('Load weights {}.'.format(weights_path))
         if freeze_body in [1, 2]:
             # Freeze darknet53 body or freeze all but 3 output layers.
@@ -347,9 +349,9 @@ def data_generator(annotation_lines, batch_size, anchors, num_classes, max_bbox_
     '''data generator for fit_generator'''
     n = len(annotation_lines)
     i = 0
-    # train_input_sizes = [320, 352, 384, 416, 448, 480, 512, 544, 576, 608]
-    train_input_sizes = [224, 256, 288, 320, 352, 384, 416, 448, 480, 512]
-    # train_input_sizes = [416, 448, 480, 512]
+    train_input_sizes = [320, 352, 384, 416, 448, 480, 512, 544, 576, 608]
+    # train_input_sizes = [320, 352, 384, 416, 448, 480, 512]
+    train_input_sizes = [608]
     strides = np.array([8, 16, 32])
 
     while True:
@@ -375,11 +377,7 @@ def data_generator(annotation_lines, batch_size, anchors, num_classes, max_bbox_
                 np.random.shuffle(annotation_lines)
             image, bboxes, exist_boxes = parse_annotation(annotation_lines[i], train_input_size, annotation_type)
             label_sbbox, label_mbbox, label_lbbox, sbboxes, mbboxes, lbboxes = preprocess_true_boxes(bboxes, train_output_sizes, strides, num_classes, max_bbox_per_scale, anchors)
-            # tf.print("############  BEFORE NETWORK ################")
-            # tf.print("sbboxes ", sbboxes)
-            # tf.print("mbboxes ", mbboxes)
-            # tf.print("lbboxes ", lbboxes)
-            # tf.print("############################")
+         
             batch_image[num, :, :, :] = image
             if exist_boxes:
                 batch_label_sbbox[num, :, :, :, :] = label_sbbox

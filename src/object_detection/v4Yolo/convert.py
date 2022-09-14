@@ -42,7 +42,7 @@ def main():
 
     parser = argparse.ArgumentParser(description='')
 
-    parser.add_argument('--img_size', type=int , default=512, help='size of images')
+    parser.add_argument('--img_size', type=int , default=608, help='size of images')
     parser.add_argument('--cfg', type=str , default="yolov4_custom.cfg", )
     parser.add_argument('--type', type=str , default='weights', help='type of model')
 
@@ -57,8 +57,8 @@ def main():
     # output_path = 'model_data/yolo4_weight.h5'
     weights_path = 'model_data/yolov4.weights'
     weights_only = False
-    if args['type'] == 'weights':
-        weights_only = True
+    # if args['type'] == 'weights':
+    #     weights_only = True
 
     print('Loading weights.')
     weights_file = open(weights_path, 'rb')
@@ -226,6 +226,7 @@ def main():
         model.save_weights(output_path)
         print('Saved Keras weights to {}'.format(output_path))
     else:
+        model.compile(optimizer='adam')
         model.save(output_path)
         print('Saved Keras model to {}'.format(output_path))
 

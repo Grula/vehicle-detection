@@ -89,9 +89,9 @@ def _main():
     anchors_stride_base[1] /= 16
     anchors_stride_base[2] /= 32
 
-    input_shape = (608, 608) # multiple of 32, hw
+    # input_shape = (608, 608) # multiple of 32, hw
     # input_shape = (416, 416) #/ multiple of 32, hw
-    # input_shape = (512, 512) # multiple of 32, hw
+    input_shape = (512, 512) # multiple of 32, hw
 
     model, model_body = create_model(input_shape, anchors_stride_base, num_classes,
                                     load_pretrained=True, freeze_body=2,
@@ -110,7 +110,7 @@ def _main():
     with open(annotation_train_path) as f:
         lines_train = f.readlines()
 
-    lines_train = lines_train[:10]
+    lines_train = lines_train
 
     np.random.seed(42)
     np.random.shuffle(lines_train)
@@ -135,7 +135,7 @@ def _main():
     # Adjust num epochs to your dataset. This step is enough to obtain a not bad model.
     if True:
         # model.compile(optimizer=adam_v2.Adam(learning_rate=1e-4), loss={'yolo_loss': lambda y_true, y_pred: y_pred})
-        model.compile(optimizer=tf.keras.optimizers.SGD(learning_rate=1e-2), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
+        model.compile(optimizer=tf.keras.optimizers.SGD(learning_rate=1e-1), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
         batch_size = 16
         print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
         model.fit(data_generator_wrapper(lines_train, batch_size, anchors_stride_base, num_classes, max_bbox_per_scale, 'train'),
@@ -192,7 +192,7 @@ def create_model(input_shape, anchors_stride_base, num_classes, load_pretrained=
     h, w = input_shape  
     num_anchors = len(anchors_stride_base)
 
-    max_bbox_per_scale = 1
+    max_bbox_per_scale = 150
     iou_loss_thresh = 0.4
 
     # model_body = yolo4_body(image_input, num_anchors, num_classes)

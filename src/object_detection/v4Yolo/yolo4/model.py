@@ -416,6 +416,22 @@ def bbox_ciou(boxes1, boxes2):
     ciou = iou - 1.0 * p2 / enclose_c2 - 1.0 * a * v
     return ciou
 
+
+def _iou(gt_box, pred_box):
+    inter_box_top_left = [max(gt_box[0], pred_box[0]), max(gt_box[1], pred_box[1])]
+    inter_box_bottom_right = [min(gt_box[0]+gt_box[2], pred_box[0]+pred_box[2]), min(gt_box[1]+gt_box[3], pred_box[1]+pred_box[3])]
+
+    inter_box_w = inter_box_bottom_right[0] - inter_box_top_left[0]
+    inter_box_h = inter_box_bottom_right[1] - inter_box_top_left[1]
+
+    intersection = inter_box_w * inter_box_h
+    union = gt_box[2] * gt_box[3] + pred_box[2] * pred_box[3] - intersection
+    
+    iou = intersection / union
+
+    return iou*1.0
+
+
 def bbox_iou(boxes1, boxes2):
     '''
     预测框          boxes1 (?, grid_h, grid_w, 3,   1, 4)，神经网络的输出(tx, ty, tw, th)经过了后处理求得的(bx, by, bw, bh)
@@ -423,7 +439,6 @@ def bbox_iou(boxes1, boxes2):
     '''
     boxes1_area = boxes1[..., 2] * boxes1[..., 3]  # 所有格子的3个预测框的面积
     boxes2_area = boxes2[..., 2] * boxes2[..., 3]  # 所有ground truth的面积
-
     # (x, y, w, h)变成(x0, y0, x1, y1)
     boxes1 = tf.concat([boxes1[..., :2] - boxes1[..., 2:] * 0.5,
                         boxes1[..., :2] + boxes1[..., 2:] * 0.5], axis=-1)
@@ -438,6 +453,7 @@ def bbox_iou(boxes1, boxes2):
     inter_area = inter_section[..., 0] * inter_section[..., 1]  # 相交矩形的面积            (?, grid_h, grid_w, 3, 150)
     union_area = boxes1_area + boxes2_area - inter_area  # union_area      (?, grid_h, grid_w, 3, 150)
     iou = 1.0 * inter_area / union_area  # iou                             (?, grid_h, grid_w, 3, 150)
+   
     return iou
 
 def loss_layer(conv, pred, label, bboxes, stride, num_class, iou_loss_thresh):
@@ -532,6 +548,11 @@ def yolo_loss(args, num_classes, iou_loss_thresh, anchors):
     conv_mbbox = args[1]   # (?, ?, ?, 3*(num_classes+5))
     conv_lbbox = args[2]   # (?, ?, ?, 3*(num_classes+5))
     
+    # tf.print("####################################################")
+    # tf.print("conv_sbbox ", conv_sbbox[0][0][0])
+    # tf.print("conv_mbbox ", conv_mbbox[0][0][0])
+    # tf.print("conv_lbbox ", conv_lbbox[0][0][0])
+    # tf.print("####################################################\n")
     
     #Note OK
     label_sbbox = args[3]   # (?, ?, ?, 3, num_classes+5)

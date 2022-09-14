@@ -70,7 +70,7 @@ def _main():
     class_index = ['{}'.format(i) for i in range(num_classes)]
     anchors = get_anchors(anchors_path)
 
-    max_bbox_per_scale = 1
+    max_bbox_per_scale = 150
 
     anchors_stride_base = np.array([
         [[12, 16], [19, 36], [40, 28]],
@@ -110,6 +110,7 @@ def _main():
     with open(annotation_train_path) as f:
         lines_train = f.readlines()
 
+    lines_train = lines_train[:10]
 
     np.random.seed(42)
     np.random.shuffle(lines_train)
@@ -134,7 +135,7 @@ def _main():
     # Adjust num epochs to your dataset. This step is enough to obtain a not bad model.
     if True:
         # model.compile(optimizer=adam_v2.Adam(learning_rate=1e-4), loss={'yolo_loss': lambda y_true, y_pred: y_pred})
-        model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-4), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
+        model.compile(optimizer=tf.keras.optimizers.SGD(learning_rate=1e-2), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
         batch_size = 16
         print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
         model.fit(data_generator_wrapper(lines_train, batch_size, anchors_stride_base, num_classes, max_bbox_per_scale, 'train'),
@@ -149,7 +150,7 @@ def _main():
         for i in range(len(model.layers)):
             model.layers[i].trainable = True
         # model.compile(optimizer=adam_v2.Adam(learning_rate=1e-5), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
-        model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-5), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
+        model.compile(optimizer=tf.keras.optimizers.SGD(learning_rate=1e-5), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
         print('Unfreeze all of the layers.')
 
         batch_size = 8 # note that more GPU memory is required after unfreezing the body
@@ -350,7 +351,7 @@ def data_generator(annotation_lines, batch_size, anchors, num_classes, max_bbox_
     '''data generator for fit_generator'''
     n = len(annotation_lines)
     i = 0
-    train_input_sizes = [320, 352, 384, 416, 448, 480, 512, 544, 576, 608]
+    # train_input_sizes = [320, 352, 384, 416, 448, 480, 512, 544, 576, 608]
     # train_input_sizes = [320, 352, 384, 416, 448, 480, 512]
     train_input_sizes = [608]
     strides = np.array([8, 16, 32])
@@ -378,7 +379,7 @@ def data_generator(annotation_lines, batch_size, anchors, num_classes, max_bbox_
                 np.random.shuffle(annotation_lines)
             image, bboxes, exist_boxes = parse_annotation(annotation_lines[i], train_input_size, annotation_type)
             label_sbbox, label_mbbox, label_lbbox, sbboxes, mbboxes, lbboxes = preprocess_true_boxes(bboxes, train_output_sizes, strides, num_classes, max_bbox_per_scale, anchors)
-         
+
             batch_image[num, :, :, :] = image
             if exist_boxes:
                 batch_label_sbbox[num, :, :, :, :] = label_sbbox

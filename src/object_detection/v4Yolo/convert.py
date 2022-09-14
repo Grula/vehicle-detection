@@ -221,7 +221,8 @@ def main():
         out_index.append(len(all_layers) - 1)
 
     model = Model(inputs=input_layer, outputs=[all_layers[i] for i in out_index])
-    
+
+    model.summary()
     if weights_only:
         model.save_weights(output_path)
         print('Saved Keras weights to {}'.format(output_path))

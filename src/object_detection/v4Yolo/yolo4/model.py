@@ -72,8 +72,8 @@ def DarknetConv2D_BN_Mish(*args, **kwargs):
     return compose(
         DarknetConv2D(*args, **no_bias_kwargs),
         BatchNormalization(),
-        LeakyReLU())
-        # Mish())
+        # LeakyReLU())
+        Mish())
 
 def resblock_body(x, num_filters, num_blocks, all_narrow=True):
     '''A series of resblocks starting with a downsampling Convolution2D'''

@@ -89,9 +89,9 @@ def _main():
     anchors_stride_base[1] /= 16
     anchors_stride_base[2] /= 32
 
-    # input_shape = (608, 608) # multiple of 32, hw
+    input_shape = (608, 608) # multiple of 32, hw
     # input_shape = (416, 416) #/ multiple of 32, hw
-    input_shape = (512, 512) # multiple of 32, hw
+    # input_shape = (512, 512) # multiple of 32, hw
 
     model, model_body = create_model(input_shape, anchors_stride_base, num_classes,
                                     load_pretrained=True, freeze_body=3,
@@ -133,8 +133,8 @@ def _main():
     # Adjust num epochs to your dataset. This step is enough to obtain a not bad model.
     if True:
         # model.compile(optimizer=adam_v2.Adam(learning_rate=1e-4), loss={'yolo_loss': lambda y_true, y_pred: y_pred})
-        model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-1), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
-        batch_size = 1
+        model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-4), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
+        batch_size = 16
         print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
         model.fit(data_generator_wrapper(lines_train, batch_size, anchors_stride_base, num_classes, max_bbox_per_scale, 'train'),
                 steps_per_epoch=max(1, num_train//batch_size),
@@ -151,7 +151,7 @@ def _main():
         model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-5), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
         print('Unfreeze all of the layers.')
 
-        batch_size = 2 # note that more GPU memory is required after unfreezing the body
+        batch_size = 8 # note that more GPU memory is required after unfreezing the body
         print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
         model.fit(data_generator_wrapper(lines_train, batch_size, anchors_stride_base, num_classes, max_bbox_per_scale, 'train'),
             steps_per_epoch=max(1, num_train//batch_size),

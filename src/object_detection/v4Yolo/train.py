@@ -110,16 +110,18 @@ def _main():
     with open(annotation_train_path) as f:
         lines_train = f.readlines()
 
-    lines_train = lines_train[:10]
+    
 
     np.random.seed(42)
     np.random.shuffle(lines_train)
     np.random.seed(None)
 
+    lines_val = lines_train[:int(len(lines_train)*0.1)]
+    lines_train = lines_train[int(len(lines_train)*0.1):]
     num_train = len(lines_train)
 
-    with open(annotation_val_path) as f:
-        lines_val = f.readlines()
+    # with open(annotation_val_path) as f:
+    #     lines_val = f.readlines()
 
     np.random.seed(42)
     np.random.shuffle(lines_val)

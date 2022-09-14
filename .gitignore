@@ -141,7 +141,7 @@ dmypy.json
 models*/ 
 *.h5
 *.weights
-logs/
+*logs*/
 *pickle*
 
 #tmp 

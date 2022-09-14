@@ -183,7 +183,7 @@ def create_model(input_shape, anchors_stride_base, num_classes, load_pretrained=
     print('Create YOLOv4 model with {} anchors and {} classes.'.format(num_anchors*3, num_classes))
 
     if load_pretrained:
-        model_body.load_weights(weights_path, by_name=True, skip_mismatch=False)
+        model_body.load_weights(weights_path, by_name=False, skip_mismatch=False)
         print('Load weights {}.'.format(weights_path))
         if freeze_body in [1, 2]:
             # Freeze darknet53 body or freeze all but 3 output layers.

@@ -110,7 +110,7 @@ def _main():
     with open(annotation_train_path) as f:
         lines_train = f.readlines()
 
-    lines_train = lines_train
+    lines_train = lines_train[:10]
 
     np.random.seed(42)
     np.random.shuffle(lines_train)
@@ -135,7 +135,7 @@ def _main():
     # Adjust num epochs to your dataset. This step is enough to obtain a not bad model.
     if True:
         # model.compile(optimizer=adam_v2.Adam(learning_rate=1e-4), loss={'yolo_loss': lambda y_true, y_pred: y_pred})
-        model.compile(optimizer=tf.keras.optimizers.SGD(learning_rate=1e-1), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
+        model.compile(optimizer=tf.keras.optimizers.SGD(learning_rate=1), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
         batch_size = 16
         print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
         model.fit(data_generator_wrapper(lines_train, batch_size, anchors_stride_base, num_classes, max_bbox_per_scale, 'train'),

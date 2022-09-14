@@ -110,7 +110,7 @@ def _main():
     with open(annotation_train_path) as f:
         lines_train = f.readlines()
 
-    lines_train = lines_train[:10]
+    lines_train = lines_train
 
     np.random.seed(42)
     np.random.shuffle(lines_train)
@@ -136,7 +136,7 @@ def _main():
     if True:
         # model.compile(optimizer=adam_v2.Adam(learning_rate=1e-4), loss={'yolo_loss': lambda y_true, y_pred: y_pred})
         model.compile(optimizer=tf.keras.optimizers.SGD(learning_rate=1), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
-        batch_size = 16
+        batch_size = 64
         print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
         model.fit(data_generator_wrapper(lines_train, batch_size, anchors_stride_base, num_classes, max_bbox_per_scale, 'train'),
                 steps_per_epoch=max(1, num_train//batch_size),
@@ -193,7 +193,7 @@ def create_model(input_shape, anchors_stride_base, num_classes, load_pretrained=
     num_anchors = len(anchors_stride_base)
 
     max_bbox_per_scale = 150
-    iou_loss_thresh = 0.4
+    iou_loss_thresh = 0.2
 
     # model_body = yolo4_body(image_input, num_anchors, num_classes)
     model_body = load_model(weights_path, custom_objects={'Mish':Mish})
@@ -222,6 +222,7 @@ def create_model(input_shape, anchors_stride_base, num_classes, load_pretrained=
                            arguments={'num_classes': num_classes, 'iou_loss_thresh': iou_loss_thresh,
                                       'anchors': anchors_stride_base})([*model_body.output, *y_true])
 
+    print(*model_body.output, *y_true)
     # sys.stdout = open('train_summ.txt', 'w')
     # model_body.summary()
     # sys.stdout.close()

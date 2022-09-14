@@ -548,11 +548,6 @@ def yolo_loss(args, num_classes, iou_loss_thresh, anchors):
     conv_mbbox = args[1]   # (?, ?, ?, 3*(num_classes+5))
     conv_lbbox = args[2]   # (?, ?, ?, 3*(num_classes+5))
     
-    # tf.print("####################################################")
-    # tf.print("conv_sbbox ", conv_sbbox[0][0][0])
-    # tf.print("conv_mbbox ", conv_mbbox[0][0][0])
-    # tf.print("conv_lbbox ", conv_lbbox[0][0][0])
-    # tf.print("####################################################\n")
     
     #Note OK
     label_sbbox = args[3]   # (?, ?, ?, 3, num_classes+5)

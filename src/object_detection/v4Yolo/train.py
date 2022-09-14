@@ -30,6 +30,14 @@ from callback_eval import Evaluate
 def get_relative_path(path):
     return os.path.join(sys.path[-1], path)
 
+
+# python src/object_detection/v4Yolo/train.py --model_data src/object_detection/v4Yolo/model_data  --weights_name 512_yolo4_weights.h5 --log_dir  src/object_detection/v4Yolo/yolo_logs/
+
+
+
+
+
+
 def _main():
      # global program arguments parser
     parser = argparse.ArgumentParser(description='')
@@ -64,10 +72,16 @@ def _main():
 
     max_bbox_per_scale = 2
 
+    # anchors_stride_base = np.array([
+    #     [[12, 16], [19, 36], [40, 28]],
+    #     [[36, 75], [76, 55], [72, 146]],
+    #     [[142, 110], [192, 243], [459, 401]]
+    # ])
+
     anchors_stride_base = np.array([
-        # [[12, 16], [19, 36], [40, 28]],
-        # [[36, 75], [76, 55], [72, 146]],
-        [[142, 110], [192, 243], [459, 401]]
+        [[142, 110]],
+        [[192, 243]],
+        [[459, 401]]
     ])
 
     anchors_stride_base = anchors_stride_base.astype(np.float32)

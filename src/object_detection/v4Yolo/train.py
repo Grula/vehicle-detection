@@ -355,7 +355,7 @@ def parse_annotation(annotation, train_input_size, annotation_type):
         raise KeyError("%s does not exist ... " %image_path)
     image = np.array(cv2.imread(image_path))
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-
+    tf.print(image_path)
     # No items are marked, that is, each grid is treated as a background
     exist_boxes = True
     if len(line) == 1:

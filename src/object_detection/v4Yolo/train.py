@@ -89,14 +89,14 @@ def _main():
 
     lines_train = lines_train
 
-    np.random.seed(42)
+    np.random.seed(7)
     np.random.shuffle(lines_train)
     np.random.seed(None)   
 
 
     # We have to be carefull here, what if all instances of class go to one set
-    lines_val = lines_train[:int(len(lines_train)*0.1)]
-    lines_train = lines_train[int(len(lines_train)*0.1):]
+    lines_val = lines_train[:int(len(lines_train)*0.2)]
+    lines_train = lines_train[int(len(lines_train)*0.2):]
     # get all unique classes in lines_val ( last number in each line )
     val_classes = set([line.split(',')[-1].strip() for line in lines_val])
     print("In validation set we have classes: ", val_classes)
@@ -135,7 +135,7 @@ def _main():
     # Train with frozen layers first, to get a stable loss.
     # Adjust num epochs to your dataset. This step is enough to obtain a not bad model.
     if True:
-        model.compile(optimizer=adam_v2.Adam(learning_rate=1e-2), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
+        model.compile(optimizer=adam_v2.Adam(learning_rate=1e-4), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
         # model.compile(optimizer=tf.keras.optimizers.SGD(learning_rate=0.25), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
         batch_size = 32
         print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))

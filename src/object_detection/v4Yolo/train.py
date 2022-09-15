@@ -119,8 +119,8 @@ def _main():
     checkpoint = ModelCheckpoint(os.path.join(args['log_dir'], 'best_weights.h5'),
         monitor='loss', save_weights_only=True, save_best_only=True, save_freq='epoch')
    
-    reduce_lr_1 = ReduceLROnPlateau(monitor='loss', factor=0.1, patience=2, verbose=1)
-    reduce_lr_2 = ReduceLROnPlateau(monitor='loss', factor=0.5, patience=3, verbose=1)
+    reduce_lr_1 = ReduceLROnPlateau(monitor='loss', factor=0.5, patience=2, verbose=1)
+    reduce_lr_2 = ReduceLROnPlateau(monitor='loss', factor=0.7, patience=3, verbose=1)
     
     early_stopping = EarlyStopping(monitor='loss', min_delta=0, patience=7, verbose=1)
 
@@ -133,7 +133,7 @@ def _main():
     # Train with frozen layers first, to get a stable loss.
     # Adjust num epochs to your dataset. This step is enough to obtain a not bad model.
     if True:
-        model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-3), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
+        model.compile(optimizer=tf.keras.optimizers.SGD(learning_rate=1e-2), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
         batch_size = 64
         print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
         model.fit(data_generator_wrapper(lines_train, batch_size, anchors_stride_base, num_classes, max_bbox_per_scale, 'train'),

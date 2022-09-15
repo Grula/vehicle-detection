@@ -106,7 +106,7 @@ def _main():
     with open(annotation_train_path) as f:
         lines_train = f.readlines()
 
-    lines_train = lines_train[:10]
+    lines_train = lines_train
 
     np.random.seed(42)
     np.random.shuffle(lines_train)

@@ -214,12 +214,6 @@ def create_model(input_shape, anchors_stride_base, num_classes, load_pretrained=
     # model_body = load_model(weights_path, custom_objects={'Mish':Mish})
     model_body = load_model(model_path, custom_objects={'Mish':Mish})
     
-    # save model config to json file
-    import json
-    model_config = model_body.to_json()
-    with open(os.path.join('model_config.json'), 'w') as json_file:
-        json.dump(model_config, json_file)
-    
     print('Create YOLOv4 model with {} anchors and {} classes.'.format(num_anchors*3, num_classes))
 
     if load_pretrained:

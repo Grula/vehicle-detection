@@ -139,6 +139,7 @@ def _main():
                 epochs=10,
                 initial_epoch=0,
                 callbacks=[logging, checkpoint, early_stopping, reduce_lr_1])
+    
     # Unfreeze and continue training, to fine-tune.
     # Train longer if the result is not good.
     if True:

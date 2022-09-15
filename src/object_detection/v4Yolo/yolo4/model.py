@@ -417,35 +417,21 @@ def bbox_ciou(boxes1, boxes2):
     return ciou
 
 
-def _iou(gt_box, pred_box):
-    inter_box_top_left = [max(gt_box[0], pred_box[0]), max(gt_box[1], pred_box[1])]
-    inter_box_bottom_right = [min(gt_box[0]+gt_box[2], pred_box[0]+pred_box[2]), min(gt_box[1]+gt_box[3], pred_box[1]+pred_box[3])]
-
-    inter_box_w = inter_box_bottom_right[0] - inter_box_top_left[0]
-    inter_box_h = inter_box_bottom_right[1] - inter_box_top_left[1]
-
-    intersection = inter_box_w * inter_box_h
-    union = gt_box[2] * gt_box[3] + pred_box[2] * pred_box[3] - intersection
-    
-    iou = intersection / union
-
-    return iou*1.0
-
 
 def bbox_iou(boxes1, boxes2):
     '''
     预测框          boxes1 (?, grid_h, grid_w, 3,   1, 4)，神经网络的输出(tx, ty, tw, th)经过了后处理求得的(bx, by, bw, bh)
     图片中所有的gt  boxes2 (?,      1,      1, 1, 150, 4)
     '''
-    boxes1_area = boxes1[..., 2] * boxes1[..., 3]  # 所有格子的3个预测框的面积
-    boxes2_area = boxes2[..., 2] * boxes2[..., 3]  # 所有ground truth的面积
+    boxes1_area = boxes1[..., 2] * boxes1[..., 3]  # Areas of 3 prediction boxes for all grids
+    boxes2_area = boxes2[..., 2] * boxes2[..., 3]  # Area of all ground truth
     # (x, y, w, h)变成(x0, y0, x1, y1)
     boxes1 = tf.concat([boxes1[..., :2] - boxes1[..., 2:] * 0.5,
                         boxes1[..., :2] + boxes1[..., 2:] * 0.5], axis=-1)
     boxes2 = tf.concat([boxes2[..., :2] - boxes2[..., 2:] * 0.5,
                         boxes2[..., :2] + boxes2[..., 2:] * 0.5], axis=-1)
 
-    # 所有格子的3个预测框 分别 和  150个ground truth  计算iou。 所以left_up和right_down的shape = (?, grid_h, grid_w, 3, 150, 2)
+    # Calculate iou for 3 prediction boxes of all grids and 150 ground truths respectively. So shape of left_up and right_down = (?, grid_h, grid_w, 3, 150, 2)
     left_up = tf.maximum(boxes1[..., :2], boxes2[..., :2])  # 相交矩形的左上角坐标
     right_down = tf.minimum(boxes1[..., 2:], boxes2[..., 2:])  # 相交矩形的右下角坐标
 
@@ -478,7 +464,6 @@ def loss_layer(conv, pred, label, bboxes, stride, num_class, iou_loss_thresh):
     bbox_loss_scale = 2.0 - 1.0 * label_xywh[:, :, :, :, 2:3] * label_xywh[:, :, :, :, 3:4] / (input_size ** 2)
 
     # 1. Respond_bbox is used as a mask, and xxxiou_loss is calculated only if there is an object
-
     ciou_loss = respond_bbox * bbox_loss_scale * (1 - ciou)  
     # 2. Respond_bbox is used as a mask, and the category loss is calculated only if there is an object
     prob_loss = respond_bbox * tf.nn.sigmoid_cross_entropy_with_logits(labels=label_prob, logits=conv_raw_prob)
@@ -540,23 +525,21 @@ def decode(conv_output, anchors, stride, num_class):
 def yolo_loss(args, num_classes, iou_loss_thresh, anchors):
 
     #! NOT OK
-    # conv_lbbox = args[0]   # (?, ?, ?, 3*(num_classes+5))
-    # conv_mbbox = args[1]   # (?, ?, ?, 3*(num_classes+5))
-    # conv_sbbox = args[2]   # (?, ?, ?, 3*(num_classes+5))
-    
+    conv_lbbox = args[0]   # (?, ?, ?, 3*(num_classes+5))
+    conv_mbbox = args[1]   # (?, ?, ?, 3*(num_classes+5))
+    conv_sbbox = args[2]   # (?, ?, ?, 3*(num_classes+5))
+
     #! Note: was flipped large and small, NOT OK
     conv_sbbox = args[0]   # (?, ?, ?, 3*(num_classes+5))
     conv_mbbox = args[1]   # (?, ?, ?, 3*(num_classes+5))
     conv_lbbox = args[2]   # (?, ?, ?, 3*(num_classes+5))
     
 
+
     #Note OK
     label_sbbox = args[3]   # (?, ?, ?, 3, num_classes+5)
     label_mbbox = args[4]   # (?, ?, ?, 3, num_classes+5)
     label_lbbox = args[5]   # (?, ?, ?, 3, num_classes+5)
-    # label_sbbox = args[0]   # (?, ?, ?, 3, num_classes+5)
-    # label_mbbox = args[1]   # (?, ?, ?, 3, num_classes+5)
-    # label_lbbox = args[2]   # (?, ?, ?, 3, num_classes+5)
 
     #Note OK
     true_sbboxes = args[6]   # (?, 150, 4)
@@ -575,12 +558,21 @@ def yolo_loss(args, num_classes, iou_loss_thresh, anchors):
         loss_layer(conv_mbbox, pred_mbbox, label_mbbox, true_mbboxes, 16, num_classes, iou_loss_thresh)
     lbbox_ciou_loss, lbbox_conf_loss, lbbox_prob_loss = \
         loss_layer(conv_lbbox, pred_lbbox, label_lbbox, true_lbboxes, 32, num_classes, iou_loss_thresh)
-  
+    
+
+
+
+    # if output of tensor is NAN or INF, change it to 0
+    # conv_lbbox = tf.where(tf.math.is_nan(conv_lbbox), tf.zeros_like(conv_lbbox), conv_lbbox)
+    # conv_mbbox = tf.where(tf.math.is_nan(conv_mbbox), tf.zeros_like(conv_mbbox), conv_mbbox)
+    # conv_sbbox = tf.where(tf.math.is_nan(conv_sbbox), tf.zeros_like(conv_sbbox), conv_sbbox)
 
 
     ciou_loss = sbbox_ciou_loss + mbbox_ciou_loss + lbbox_ciou_loss
     conf_loss = sbbox_conf_loss + mbbox_conf_loss + lbbox_conf_loss
     prob_loss = sbbox_prob_loss + mbbox_prob_loss + lbbox_prob_loss
+
+
 
     loss = ciou_loss + conf_loss + prob_loss
 

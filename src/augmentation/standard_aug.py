@@ -46,7 +46,7 @@ def load_data(paths, undersamples = [], set = 'train'):
 data  = load_data(['data/data.csv'])
 
 
-augmented_folder = 'data/augmented_basic/'
+augmented_folder = 'data/augmented_standard/'
 max_n = 0
 for label in data.keys():
 # Creaing folders with appropiate names
@@ -69,7 +69,7 @@ for label in data.keys():
 print(create_count)
 
 # Open csv for appending synthetic images
-csv_fw = open('data/augmented_basic.csv','w')
+csv_fw = open('data/augmented_standard.csv','w')
 csv_fw.write('im_path,label,x,y,w,h\n')
 
 for label, im_bbox in data.items():

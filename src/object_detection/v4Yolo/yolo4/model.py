@@ -530,7 +530,6 @@ def yolo_loss(args, num_classes, iou_loss_thresh, anchors):
     conv_lbbox = args[2]   # (?, ?, ?, 3*(num_classes+5))
     
 
-
     #Note OK
     label_sbbox = args[3]   # (?, ?, ?, 3, num_classes+5)
     label_mbbox = args[4]   # (?, ?, ?, 3, num_classes+5)
@@ -555,12 +554,19 @@ def yolo_loss(args, num_classes, iou_loss_thresh, anchors):
         loss_layer(conv_lbbox, pred_lbbox, label_lbbox, true_lbboxes, 32, num_classes, iou_loss_thresh)
     
 
+    tf.print("##############################################################")
+    # Check if any values are NaN and if so print them
+    tf.print("sbbox_ciou_loss", sbbox_ciou_loss)
+    tf.print("sbbox_conf_loss", sbbox_conf_loss)
+    tf.print("sbbox_prob_loss", sbbox_prob_loss)
+    tf.print("mbbox_ciou_loss", mbbox_ciou_loss)
+    tf.print("mbbox_conf_loss", mbbox_conf_loss)
+    tf.print("mbbox_prob_loss", mbbox_prob_loss)
+    tf.print("lbbox_ciou_loss", lbbox_ciou_loss)
+    tf.print("lbbox_conf_loss", lbbox_conf_loss)
+    tf.print("lbbox_prob_loss", lbbox_prob_loss)
+    tf.print("##############################################################")
 
-
-    # if output of tensor is NAN or INF, change it to 0
-    # conv_lbbox = tf.where(tf.math.is_nan(conv_lbbox), tf.zeros_like(conv_lbbox), conv_lbbox)
-    # conv_mbbox = tf.where(tf.math.is_nan(conv_mbbox), tf.zeros_like(conv_mbbox), conv_mbbox)
-    # conv_sbbox = tf.where(tf.math.is_nan(conv_sbbox), tf.zeros_like(conv_sbbox), conv_sbbox)
 
 
     ciou_loss = sbbox_ciou_loss + mbbox_ciou_loss + lbbox_ciou_loss

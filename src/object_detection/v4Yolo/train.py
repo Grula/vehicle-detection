@@ -93,7 +93,7 @@ def _main():
     np.random.shuffle(lines_train)
     np.random.seed(None)   
 
-    # lines_train = lines_train[:10]
+    lines_train = lines_train[:10]
 
 
 

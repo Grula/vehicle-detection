@@ -74,19 +74,12 @@ def _main():
         [[142, 110], [192, 243], [459, 401]]
     ])
 
-    # anchors_stride_base = np.array([
-    #     [[142, 110]],
-    #     [[192, 243]],
-    #     [[459, 401]]
-    # ])
-
     anchors_stride_base = anchors_stride_base.astype(np.float32)
     anchors_stride_base[0] /= 8
     anchors_stride_base[1] /= 16
     anchors_stride_base[2] /= 32
 
-    # input_shape = (608, 608) # multiple of 32, hw
-    # input_shape = (416, 416) #/ multiple of 32, hw
+
     input_shape = (512, 512) # multiple of 32, hw
 
     model, model_body = create_model(input_shape, anchors_stride_base, num_classes,
@@ -95,7 +88,10 @@ def _main():
     logging = TensorBoard(log_dir=log_dir)
     checkpoint = ModelCheckpoint(os.path.join(args['log_dir'], 'best_weights.h5'),
         monitor='loss', save_weights_only=True, save_best_only=True, save_freq='epoch')
-    reduce_lr = ReduceLROnPlateau(monitor='loss', factor=0.1, patience=3, verbose=1)
+   
+    reduce_lr_1 = ReduceLROnPlateau(monitor='loss', factor=0.1, patience=2, verbose=1)
+    reduce_lr_2 = ReduceLROnPlateau(monitor='loss', factor=0.5, patience=3, verbose=1)
+    
     early_stopping = EarlyStopping(monitor='loss', min_delta=0, patience=10, verbose=1)
 
     evaluation = Evaluate(model_body=model_body, anchors=anchors, class_names=class_index,
@@ -115,36 +111,30 @@ def _main():
     lines_train = lines_train[int(len(lines_train)*0.3):]
     num_train = len(lines_train)
 
-    # with open(annotation_val_path) as f:
-    #     lines_val = f.readlines()
 
     np.random.seed(42)
     np.random.shuffle(lines_val)
     np.random.seed(None)
-    
     num_val = len(lines_val)
-
     np.random.seed(42)
 
     # Train with frozen layers first, to get a stable loss.
     # Adjust num epochs to your dataset. This step is enough to obtain a not bad model.
     if True:
-        # model.compile(optimizer=adam_v2.Adam(learning_rate=1e-7), loss={'yolo_loss': lambda y_true, y_pred: y_pred})
-        model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-3), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
+        model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-1), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
         batch_size = 8
         print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
         model.fit(data_generator_wrapper(lines_train, batch_size, anchors_stride_base, num_classes, max_bbox_per_scale, 'train'),
                 steps_per_epoch=max(1, num_train//batch_size),
                 epochs=10,
                 initial_epoch=0,
-                callbacks=[logging, checkpoint, early_stopping])
+                callbacks=[logging, checkpoint, early_stopping, reduce_lr_1])
 
     # Unfreeze and continue training, to fine-tune.
     # Train longer if the result is not good.
     if True:
         for i in range(len(model.layers)):
             model.layers[i].trainable = True
-        # model.compile(optimizer=adam_v2.Adam(learning_rate=1e-5), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
         model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-5), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
         print('Unfreeze all of the layers.')
 
@@ -155,7 +145,7 @@ def _main():
             epochs=100,
             initial_epoch=0,
             # callbacks=[logging, checkpoint, reduce_lr, early_stopping])
-            callbacks=[logging, checkpoint, reduce_lr, early_stopping, evaluation])
+            callbacks=[logging, checkpoint, reduce_lr_2, early_stopping, evaluation])
 
     # Further training if needed.
 

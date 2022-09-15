@@ -138,7 +138,7 @@ def _main():
         print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
         model.fit(data_generator_wrapper(lines_train, batch_size, anchors_stride_base, num_classes, max_bbox_per_scale, 'train'),
                 steps_per_epoch=max(1, num_train//batch_size),
-                epochs=250,
+                epochs=350,
                 initial_epoch=0,
                 callbacks=[logging, checkpoint, early_stopping, reduce_lr_1])
     
@@ -154,7 +154,7 @@ def _main():
         print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
         model.fit(data_generator_wrapper(lines_train, batch_size, anchors_stride_base, num_classes, max_bbox_per_scale, 'train'),
             steps_per_epoch=max(1, num_train//batch_size),
-            epochs=200,
+            epochs=300,
             initial_epoch=0,
             # callbacks=[logging, checkpoint, reduce_lr, early_stopping])
             callbacks=[logging, checkpoint, reduce_lr_2, early_stopping, evaluation])

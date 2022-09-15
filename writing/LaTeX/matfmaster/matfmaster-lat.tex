@@ -577,7 +577,8 @@ Srednja težinska $F_1$-mera se računa sledećom formulom:
 \label{eq:f1wa}
     F_{1wavg} = \frac{1}{n}\sum_{k=0}^{k=n-1} (F_{1k} S_{k})
 \end{equation}
-gde su \(F_{1k}\) i \(S_{k}\) vrednost $F_1$-mere i ukupan broj instanci u \(k\)-toj klasi.
+% IZMENA (5.4-9) ovde sam pogrešno rekao nije ukupan broj nego broj propocijalan ukupnom broju instanci
+gde su \(F_{1k}\) i \(S_{k}\) vrednost $F_1$-mere i proporcijalan broj instanci \(k\)-te klase u odnosu na ukupn broj instanci u skupu podataka.
 
 % +++++++++++++++++++++++++++++++
 \section{Srednja prosečna preciznost}
@@ -655,7 +656,7 @@ U praktičnoj upotrebi, distribucije slika se dobijaju računanjem srednjih vred
 
 U okviru implementacije, dostupan skup podataka se proširuje metodama augmentacije i sintetičkim podacima koje generiše model \textit{StlyeGAN2}.
 Da bi se ocenilo da li primenjene tehnike omogućavaju poboljšanje, vrši se i obučavanje modela na osnovnom skupu podataka i njegovo poređenje sa modelima koji su obučeni na proširenom skupu podataka.
-Kod koji je razvijen u okviru rada na tezi je dostupan na adresi  \underline{\href{https://github.com/Grula/vehicle-detection}{\textit{github}-a za detekciju objekata}} \cite{vehicleGit2022}. Podaci korišćeni i generisani u ovom radu su dostupni na \href{https://drive.google.com/file/d/1EkrO28-iBCVWyPqy5mJXn8P8EoKQ6xUH/view?usp=sharing}{\underline{ovoj adresi}} \cite{vehicleData2022}. Za obuku modela korišćena je platforma \href{https://research.google.com/colaboratory/}{\underline{\textit{Google Colab}}}. Platforma je obezbeđivala grafičku kartu NVIDIA Tesla P100-PCIE sa 16GB RAM memorije. 
+Kod koji je razvijen u okviru rada na tezi je dostupan na adresi  \underline{\href{https://github.com/Grula/vehicle-detection}{\textit{github}-a za detekciju objekata}}\footnote{https://github.com/Grula/vehicle-detection} \cite{vehicleGit2022}. Podaci korišćeni i generisani u ovom radu su dostupni na \href{https://drive.google.com/file/d/1EkrO28-iBCVWyPqy5mJXn8P8EoKQ6xUH/view?usp=sharing}{\underline{ovoj adresi}}\footnote{https://drive.google.com/file/d/1EkrO28-iBCVWyPqy5mJXn8P8EoKQ6xUH/view?usp=sharing} \cite{vehicleData2022}. Za obuku modela korišćena je platforma \href{https://research.google.com/colaboratory/}{\underline{\textit{Google Colab}}}\footnote{https://research.google.com/colaboratory}. Platforma je obezbeđivala grafičku kartu NVIDIA Tesla P100-PCIE sa 16GB RAM memorije. 
 
 
 % #######################################
@@ -742,7 +743,8 @@ Skup augmentacija koje se primenjuju su:
     \item refleksija --- vrši se samo u horizontalnom smeru i vodi se računa o promeni koordinata graničnih okvira, 
     \item rotacija --- vrši sa nasumičnim uglom između jednog i pet stepeni i prazan prostor se dopunjava bojama graničnih piksela,
     \item translacija ---  pomera sliku u nasumičnom smeru za deset piksela i prazan prostor se dopunjava bojama graničnih piksela,
-    \item Gausov šum --- dodaje šum na sliku sa konstantnom standardnom devijacijom 0.1 i srednjom vrednošću 1.0,
+    % IZMENA (5.2-1)
+    \item Gausov šum --- slika se pretvara u interval -1 do 1 i na nju se dodaje šum sa konstantnom standardnom devijacijom 0.1 i srednjom vrednošću 0, nakon dodavanja se slika vraća u interval 0 do 255.
     \item Gausovo zamućenje --- primenjuje se na sliku sa konstantom standardnom devijacijom koja iznosi 7. Vrednost standardne devijacije je izabrana zbog rezolucije slika u skupu \bvs. Korišćenjem vrednosti 7 za standardnu devijaciju, slike se zamućuju dok je i dalje moguće prepoznati objekat na slici.
     \item augmentacija boja --- Parametar osvetljenja se nasumično bira iz uniformne raspodele iz intervala 0.5 do 1.5. Parametri kontrasta, intenziteta i nijanse se nasumično biraju iz uniformne raspodele iz intervala 0.0 do 10.0. Intervali augmentacija boja su izabrani nakon testiranja intervala različitih opsega. Zaključeno je da se najbolji rezultati dobijaju korišćenjem navedenih intervala.
 \end{itemize}
@@ -771,11 +773,11 @@ Skup podataka \bvs{} se proširuje i sintetičkim podacima generisanim od strane
 
 Međutim, problem male količine podataka se takođe javlja za generisanje novih slika modelom \textit{StyleGAN2}. Korišćenjem metode diferencijabilne augmentacije koja je navedena u poglavlju \ref{section3_increasedata_gan} prevazilazi se problem male količine podataka i model uspešno generiše slike. Implementirani metod diferencijabilne augmentacije je testiran nad skupom podataka CIFAR-10 \cite{2020diffaugment_report}.
 
-Arhitektura modela \textit{StyleGAN2} je implementirana pomoću biblioteke \textit{Tensorflow} 2.0\footnote{Biblioteka \textit{Tensorflow} 2.0 je otvorenog koda i pruža sveobuhvatan ekosistem alata. Objavljena je 2015. godine, a objavio ju jehttps://www.overleaf.com/project/61012a88798d391d153ca901 tim \textit{Google Brain}. Osnovna namena je pravljenje modela mašinskog učenja. Biblioteka je namenjena za korišćenje u programskom jeziku \textit{Python}.}.
+Arhitektura modela \textit{StyleGAN2} je implementirana pomoću biblioteke \textit{Tensorflow} 2.0\footnote{Biblioteka \textit{Tensorflow} 2.0 je otvorenog koda i pruža sveobuhvatan ekosistem alata. Objavljena je 2015. godine, a objavio ju je tim \textit{Google Brain}. Osnovna namena je pravljenje modela mašinskog učenja. Biblioteka je namenjena za korišćenje u programskom jeziku \textit{Python}.}.
 Generisane slike su dimenzija 512\(\times\)512. Obuka modela je trajala dvanaest do četrdeset osam sati u zavisnosti od same klase. Na svakih šest sati obuke ili, tačnije, na dvadeset pet hiljada epoha, pravljena je tačka provere (eng.~\textit{checkpoint}). Nakon svake tačke provere generisane su slike za računanje Fréchet-ove udaljenosti.
 
 
-Za evaluaciju modela \textit{StyleGAN2} koristila se metrika Fréchet-ove udaljenosti i funkcije grešaka za generativne suparničke mreže. Nakon svake tačke provere, pomoću Fréchet-ove udaljenosti procenjivana je sličnost između dva skupa slika: generisane slike pomoću modela poređene su sa pravim slikama iz validacionog skupa \bvs. Računanje Fréchet-ova udaljenosti odvijalo se na grafičkoj karti NVIDIA 780Ti i trajalo bi ukupno deset minuta. Kada se na generisanoj slici mogao prepoznati objekat i kada se funkcija greške diskriminatora i generatora nije znatno smanjivala, dalja obuka modela je prekidana. Tačan broj epoha svake klase je dat dalje u tekstu.
+Za evaluaciju modela \textit{StyleGAN2} koristila se metrika Fréchet-ove udaljenosti i funkcije grešaka za generativne suparničke mreže. Nakon svake tačke provere, pomoću Fréchet-ove udaljenosti procenjivana je sličnost između dva skupa slika: generisane slike pomoću modela poređene su sa pravim slikama iz validacionog skupa \bvs. Računanje Fréchet-ova udaljenosti odvijalo se na grafičkoj karti NVIDIA 780Ti i trajala je ukupno deset minuta. Kada se na generisanoj slici mogao prepoznati objekat i kada se funkcija greške diskriminatora i generatora nije znatno smanjivala, dalja obuka modela je prekidana. Tačan broj epoha svake klase je dat dalje u tekstu.
 
 
 %___________________
@@ -812,7 +814,8 @@ Rezultati Fréchet-ove udaljenosti su dati u tabelama \ref{tab:section4_fid_t}, 
 
 Obuka modela je trajala dvadeset četiri sata. Za obuku modela je generisano dvesta hiljada slika pomoću metode diferencijabilne augmentacije. Originalan skup slika za obuku klase \textit{bus} je sadržao šest slika, a skup za obuku klase \textit{truck} je sadržao devet slika.
 
-Iz funkcije greške (slika \ref{fig:section4_stylegan_truck_loss}) i rezultata Fréchet-ove udaljenosti (tabela \ref{tab:section4_fid_t}) za klasu \textit{truck} može se zaključiti da se daljom obukom za narednih dvadeset pet hiljada epoha ne dobijaju znatno bolji rezultati. Primeri generisanih slika klase \textit{truck} su prikazani na slici \ref{fig:section4_stylegan_truck_images}.
+% IZMENA (5.2-5) dodao objašnjenje
+Za klasu \textit{truck} funkcija greške je data na slici \ref{fig:section4_stylegan_truck_loss} i rezultat Fréchet-ove udaljenosti za dve tačke provere je dat u tabeli \ref{tab:section4_fid_t}. Iz funkcije greške za diskriminator može se zapaziti da daljom obukom je moglo doći do poboljšanja diskriminatora. Sa slika generisanih poslednjim težinama modela, moguće je uočiti glavne karakteristike objekata. Kako se objekti na slici mogu prepoznati i zbog uštede resursa obuka se prekinula. Primeri generisanih slika klase \textit{truck} su prikazani na slici \ref{fig:section4_stylegan_truck_images}.
 Za klasu \textit{bus} iz funkcije greške (slika \ref{fig:section4_stylegan_bus_loss}) i rezultata Fréchet-ove udaljenosti (tabela \ref{tab:section4_fid_b}) može se zaključiti da se daljom obukom za narednih dvadeset pet hiljada epoha ne dobijaju znatno bolji rezultati. Primeri generisanih slika klase \textit{bus} su prikazani na slici \ref{fig:section4_stylegan_bus_images}.
 
 
@@ -924,15 +927,18 @@ Generisane slike nisu savršene, ali je moguće prepoznati glavne karakteristike
 
 Osnovni model VGG16 je ograničen na klasifikaciju slika bez predviđanja graničnih okvira i u okviru ovog rada osnovni model je proširen odgovarajućim mrežama da se omogući predviđanje graničnih okvira. Osnovni model je proširen na sledeći način:
 \begin{itemize}
-\item Na poslednji sloj dodato je račvanje na dve nove duboko povezane mreže dubine četiri.
+%IZMENA (5.3-2)
+\item Na poslednji sloj dodato je račvanje na dve nove duboko povezane mreže dubine četiri sa po četiri izlazna neurona.
 \item Na izlazu prve mreže dodata je aktivaciona funkcija \textit{softmax}, koja se tumači kao dodeljivanje verovatnoće da objekat pripada jednoj od četiri klase.
-\item Na izlazu druge mreže dodata je \textit{sigmoid}-na aktivaciona funkcija, koja se tumači kao dodeljivanje relativnih graničnih okvira predviđenim objektima.
+\item Na izlazu druge mreže dodata je sigmoidna aktivaciona funkcija, koja se tumači kao dodeljivanje relativnih graničnih okvira predviđenim objektima.
 \end{itemize}
 Prošireni osnovni model je obučen na skupu podataka \bvs{} u trajanju od oko deset minuta.
 
 Zbog problema neizbalansiranosti klasa koji se javlja u skupu podataka \bvs, dobija se rezultat modela koji ima visoku pristrasnost ka klasi \textit{car}, kao što se vidi iz tabele \ref{tab:section4_vgg16_confusionmatrix}. Model pogrešno daje izlaze graničnih okvira, kao što je prikazano na slici \ref{fig:section4_vgg16prediction}.
 
-Rezultati evaluacije modela su dati u tabeli \ref{tab:section4_vgg16_results}. Iz rezultata se vidi da se model ponaša loše nad celim skupom podataka. Neki od razloga koji utiču da model daje loše rezultate je visoka neizbalansiranost između klasa, mala količina dostupnih podataka i model je suviše jednostavan i ne može da obradi sve moguće karakteristike koje se nalaze na slikama. Preciznost klasa u odnosu na IoU prag je prikazana na slici \ref{fig:section4_vgg16_prc}.
+% IZMENA (5.3-3) na osnovu cega je model jednostavan? treba obrsati
+Rezultati evaluacije modela su dati u tabeli \ref{tab:section4_vgg16_results}. Iz rezultata se vidi da se model ponaša loše nad celim skupom podataka. Neki od razloga koji utiču da model daje loše rezultate je visoka neizbalansiranost između klasa i mala količina dostupnih podataka.%i model je suviše jednostavan i ne može da obradi sve moguće karakteristike koje se nalaze na slikama.
+Preciznost klasa u odnosu na IoU prag je prikazana na slici \ref{fig:section4_vgg16_prc}.
 
 %Kako je osnovni model VGG16 proširen, ne postoje slobodno dostupne odgovarajuće težine drugog modela koje mogu da se koriste za metodu transfernog učenja. IZMENA (0.0-3)
 Kako je osnovni model VGG16 proširen, ne postoje slobodno dostupne odgovarajuće težine drugog modela koje mogu da se koriste za učenje sa prenosom znanja.
@@ -1108,13 +1114,20 @@ Na slici \ref{fig:section4_yolo4base_images} su prikazana neka predviđanja mode
 % +++++++++++++++++++++++++++++++
 Radi poboljšanja rezultata, naredni modeli su obučeni koristeći težine modela obučene na skupu podataka COCO. Kako postoji razlika u broju klasa između skupa podataka BVS i COCO skupa, neki delovi težina su odbačeni.
 
-Modeli su obučeni na slikama rezolucije do 512$\times$512. Slikama je nasumično menjana veličina iz intervala 224$\times$224 do 512$\times$512, sa korakom 32$\times$32. Obuka modela je bila ograničena na sto deset epoha. U prvih deset epoha obuka modela je vršena u samo poslednja tri sloja, dok su ostali slojevi bili zamrznuti. Nakon deset epoha, odmrznuti su ostali slojevi i nastavljeno je sa normalnom obukom modela. U prvih deset epoha, stopa obuke optimizatora modela se umanjivala svake tri epohe za konstantu vrednost 0.001, u slučaju da se funkcija greške nije smanjivala. Nakon deset epoha stopa obuke optimizatora modela se umanjivala za 0.00001. Time se postizalo usavršavanje modela. Takođe, postavljena je zastavica za rano zaustavljanje ukoliko se u deset uzastopnih epoha funkcija greške nije umanjila.
+% IZMENA (5.4-3)
+Modeli su obučeni na slikama rezolucije do 512$\times$512. Slikama je nasumično menjana veličina iz intervala 224$\times$224 do 512$\times$512, sa korakom 32$\times$32. Obuka modela je bila ograničena na sto deset epoha. U prvih deset epoha obuka modela je vršena u samo poslednja tri sloja, dok su ostali slojevi bili zamrznuti. Nakon deset epoha, odmrznuti su ostali slojevi i nastavljeno je sa normalnom obukom modela. U prvih deset epoha, stopa obuke optimizatora modela je iznosila $1e^{-5}$, dok je za model obučen na skupu podataka \bvs{style} iznosila $1e^{-7}$. Tokom obuke drugog dela mreže, u slučaju da se funkcija greške nije smanjivala stopa obuke je množena sa 0.1. Time se postizalo usavršavanje modela. Takođe, postavljena je zastavica za rano zaustavljanje ukoliko se u deset uzastopnih epoha funkcija greške nije umanjila.
 
 
 %_______________________________________________________________________________________
 % \subsubsection{Obuka modela pomoću tehnike transfernog učenja na skupu podataka BVS} IZMENA (0.0-3)
 \subsubsection{Obuka modela pomoću prenosa znanja na skupu podataka BVS}
 %_______________________________________________________________________________________
+
+% Nova obuka
+% lr = 1e-2 , plato_stopa = 0.1
+% prvih 10 epoha, zamrznuto 250
+%
+%
 Koristi se model YOLO koji je obučen na skupu podataka \bvs{} koji sadrži četiri klase i 1872 slike. Dalje u radu model YOLO obučen na skupu podataka \bvs{} se označava sa $\yolo_{\bvs}$. Funkcija greške modela je prikazana na slici \ref{fig:section4_yolo4noaug_loss}. Iz funkcije greške se vidi da je došlo do ranog zaustavljanja obuke modela nakon dvadeset sedam epoha. Obuka modela je trajala oko dva sata.
 
 
@@ -1392,8 +1405,8 @@ Rezultati koji se dobijaju nakon obuke modela YOLO na skupovima podataka \bvs{st
 Bolji rezultati za detekcije objekta mogu da se dobiju povećanjem količine podataka koja je dostupna modelima \textit{StlyeGAN2} i njihovom obukom duži vremenski period. Time se skup za obuku proširuje kvalitetnijim i raznovrsnijim slikama koje su generisane od strane modela \textit{StlyeGAN2}.
 Unapređenje takođe može da se postigne korišćenjem unije skupova podataka \bvs{standard} i \bvs{style}.
 
-
-Na osnovu razvijanja novih tehnologija, može da bude moguće generisati sintetičke podatke potpuno novim metodama. Na primer, modeli \textit{DALLE-2} \cite{reddy2021dall} i \textit{MidJourney} \cite{midjourney2022} su u stanju da generišu realistične slike na osnovu njihovih opisa u tekstualnom obliku. Ovakav pristup, međutim, zahteva nove podatke, tj.~tekstualne opise slika.
+% IZMENA (6-1)
+Zahvaljujući razvoju novih tehnologija, možda će biti moguće generisati sintetičke podatke potpuno novim metodama. Na primer, modeli \textit{DALL-E 2} \cite{reddy2021dall} i \textit{MidJourney} \cite{midjourney2022} su u stanju da generišu realistične slike na osnovu njihovih opisa u tekstualnom obliku. Ovakav pristup, međutim, zahteva nove podatke, tj.~tekstualne opise slika.
 
 % Na slici \ref{fig:section5_generatedfromtext} su dati primeri trenutno aktuelnih modela (DALLE 2 \cite{reddy2021dall} i MidJourney\cite{}) koji su u stanju da naprave slike koje približno odgovaraju našem skupu podataka.
 

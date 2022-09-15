@@ -90,7 +90,7 @@ def _main():
     input_shape = (512, 512) # multiple of 32, hw
 
     model, model_body = create_model(input_shape, anchors_stride_base, num_classes,
-                                    load_pretrained=True, freeze_body=0,
+                                    load_pretrained=True, freeze_body=1,
                                     weights_path=weights_path)
 
     logging = TensorBoard(log_dir=log_dir)

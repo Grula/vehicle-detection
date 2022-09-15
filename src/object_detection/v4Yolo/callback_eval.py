@@ -282,7 +282,7 @@ class Evaluate(keras.callbacks.Callback):
 
     def on_epoch_end(self, epoch, logs=None):
         weight_latest = search_all_files_return_by_time_reversed(self.log_dir)[0]
-        print("Epoch end eval mAP on weight {}".format(weight_latest))
+        print("\nEpoch end eval mAP on weight {}".format(weight_latest))
         self.model_body.load_weights(weight_latest)
         self.calc_result(epoch)
 

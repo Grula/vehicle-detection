@@ -85,7 +85,7 @@ def _main():
     with open(annotation_train_path) as f:
         lines_train = f.readlines()
 
-    lines_train = lines_train[:100]
+    lines_train = lines_train
 
     np.random.seed(42)
     np.random.shuffle(lines_train)
@@ -105,8 +105,8 @@ def _main():
 
 
     model, model_body = create_model(input_shape, anchors_stride_base, num_classes,
-                                    load_pretrained=True, freeze_body=0, weights_path=weights_path,
-                                    model_path = model_path)
+                                    load_pretrained=True, freeze_body=0,
+                                     weights_path=weights_path, model_path = model_path)
 
     logging = TensorBoard(log_dir=log_dir)
     checkpoint = ModelCheckpoint(os.path.join(args['log_dir'], 'best_weights.h5'),
@@ -189,8 +189,6 @@ def create_model(input_shape, anchors_stride_base, num_classes, load_pretrained=
 
     # model_body = yolo4_body(image_input, num_anchors, num_classes)
     # model_body = load_model(weights_path, custom_objects={'Mish':Mish})
-    print(weights_path)
-    print(model_path)
     model_body = load_model(model_path, custom_objects={'Mish':Mish})
 
     print('Create YOLOv4 model with {} anchors and {} classes.'.format(num_anchors*3, num_classes))

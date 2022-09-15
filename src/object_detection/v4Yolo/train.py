@@ -129,14 +129,13 @@ def _main():
     evaluation = Evaluate(model_body=model_body, anchors=anchors, class_names=class_index,
          score_threshold=0.05, tensorboard=logging, weighted_average=True, eval_lines=lines_val, log_dir=log_dir,
          image_shape = input_shape)
-    
-
+    stop_on_nan = tf.keras.callbacks.TerminateOnNaN()
 
     # Train with frozen layers first, to get a stable loss.
     # Adjust num epochs to your dataset. This step is enough to obtain a not bad model.
     if True:
-        # adam = tf.keras.optimizers.Adam(learning_rate=0.5)
-        sgd  = tf.keras.optimizers.SGD(learning_rate=0.25)
+        adam = tf.keras.optimizers.Adam(learning_rate=0.5)
+        # sgd  = tf.keras.optimizers.SGD(learning_rate=0.25)
         model.compile(optimizer=sgd, loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
         batch_size = 64
         print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
@@ -144,8 +143,10 @@ def _main():
                 steps_per_epoch=max(1, num_train//batch_size),
                 epochs=350,
                 initial_epoch=0,
-                callbacks=[logging, checkpoint, early_stopping, reduce_lr_1])
-    
+                callbacks=[logging, checkpoint, early_stopping, reduce_lr_1, stop_on_nan])
+
+
+
     # Unfreeze and continue training, to fine-tune.
     # Train longer if the result is not good.
     if True:

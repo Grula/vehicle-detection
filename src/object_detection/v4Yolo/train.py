@@ -142,7 +142,7 @@ def _main():
     if True:
         epoch = 200
         lr_schedule = keras.optimizers.schedules.ExponentialDecay(
-            initial_learning_rate=1e-2,
+            initial_learning_rate=1e-3,
             decay_steps=1000,
             decay_rate=0.9
             )

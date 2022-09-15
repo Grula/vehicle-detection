@@ -186,7 +186,7 @@ if __name__ == '__main__':
     print("loaded/created model")
 
     train_list = 'data/train_data.txt'
-    valid_list = 'data/valid_data.txt'
+    # valid_list = 'data/valid_data.txt'
 
     with open(train_list) as f:
         lines_train = f.readlines()
@@ -194,10 +194,12 @@ if __name__ == '__main__':
     np.random.shuffle(lines_train)
     np.random.seed(None)
 
-    
+    lines_val = lines_train[:int(len(lines_train)*0.1)]
+    lines_train = lines_train[int(len(lines_train)*0.1):]
 
-    with open(valid_list) as f:
-        lines_val = f.readlines()
+
+    # with open(valid_list) as f:
+        # lines_val = f.readlines()
     np.random.seed(42)
     np.random.shuffle(lines_val)
     np.random.seed(None)

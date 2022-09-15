@@ -124,7 +124,8 @@ def _main():
     reduce_lr_1 = ReduceLROnPlateau(monitor='loss', factor=0.5, patience=2, verbose=1)
     reduce_lr_2 = ReduceLROnPlateau(monitor='loss', factor=0.7, patience=3, verbose=1)
     
-    early_stopping = EarlyStopping(monitor='loss', min_delta=0, patience=7, verbose=1)
+    early_stopping_1 = EarlyStopping(monitor='loss', min_delta=0, patience=5, verbose=1)
+    early_stopping_2 = EarlyStopping(monitor='loss', min_delta=0, patience=10, verbose=1)
 
     evaluation = Evaluate(model_body=model_body, anchors=anchors, class_names=class_index,
          score_threshold=0.05, tensorboard=logging, weighted_average=True, eval_lines=lines_val, log_dir=log_dir,
@@ -134,22 +135,21 @@ def _main():
     # Train with frozen layers first, to get a stable loss.
     # Adjust num epochs to your dataset. This step is enough to obtain a not bad model.
     if True:
-        # sgd  = 
         # model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.5), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
         model.compile(optimizer=tf.keras.optimizers.SGD(learning_rate=0.5), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
         batch_size = 64
         print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
         model.fit(data_generator_wrapper(lines_train, batch_size, anchors_stride_base, num_classes, max_bbox_per_scale, 'train'),
                 steps_per_epoch=max(1, num_train//batch_size),
-                epochs=350,
+                epochs=100,
                 initial_epoch=0,
-                callbacks=[logging, checkpoint, early_stopping, reduce_lr_1, stop_on_nan])
+                callbacks=[logging, checkpoint, early_stopping_1, reduce_lr_1, stop_on_nan])
 
 
 
     # Unfreeze and continue training, to fine-tune.
     # Train longer if the result is not good.
-    if True:
+    if False:
         for i in range(len(model.layers)):
             model.layers[i].trainable = True
         model.compile(optimizer=adam_v2.Adam(learning_rate=1e-5), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
@@ -162,7 +162,7 @@ def _main():
             epochs=300,
             initial_epoch=0,
             # callbacks=[logging, checkpoint, reduce_lr, early_stopping])
-            callbacks=[logging, checkpoint, reduce_lr_2, early_stopping, evaluation])
+            callbacks=[logging, checkpoint, reduce_lr_2, early_stopping_2, evaluation])
 
     # Further training if needed.
 

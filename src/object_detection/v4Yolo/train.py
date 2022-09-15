@@ -133,7 +133,7 @@ def _main():
 
     # Train with frozen layers first, to get a stable loss.
     # Adjust num epochs to your dataset. This step is enough to obtain a not bad model.
-    if True:
+    if False:
         # sgd  = 
         # model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.5), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
         model.compile(optimizer=tf.keras.optimizers.SGD(learning_rate=0.25), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
@@ -152,7 +152,7 @@ def _main():
     if True:
         for i in range(len(model.layers)):
             model.layers[i].trainable = True
-        model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-5), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
+        model.compile(optimizer=adam_v2.Adam(learning_rate=1e-5), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
         print('Unfreeze all of the layers.')
 
         batch_size = 16 # note that more GPU memory is required after unfreezing the body

@@ -32,7 +32,7 @@ class Evaluate(keras.callbacks.Callback):
         log_dir='logs/000/',
         verbose=1,
         image_shape = (608, 608),
-        eval_path  = '.'
+        eval_lines  = []
     ):
         """ Evaluate a given dataset using a given model at the end of every epoch during training.
 
@@ -53,11 +53,11 @@ class Evaluate(keras.callbacks.Callback):
         self.max_boxes       = max_boxes
         self.tensorboard     = tensorboard
         self.weighted_average = weighted_average
-        self.eval_file       = eval_file
+        self.eval_lines       = eval_lines
         self.log_dir         = log_dir
         self.verbose         = verbose
         self.image_shape     = image_shape
-        self.eval_path       = '{:s}'.format(os.path.join(eval_path, 'eval_result_{}.txt'))
+        self.eval_path       = '{:s}'.format('eval_result_{}.txt')
 
 
 
@@ -82,14 +82,16 @@ class Evaluate(keras.callbacks.Callback):
         return boxes, scores, classes
 
     def calc_result(self, epoch):
-        with open(self.eval_file) as f:
-            lines = f.readlines()
-
+        # with open(self.eval_file) as f:
+        #     lines = f.readlines()
         #np.random.shuffle(lines)
 
         result_file = open(self.eval_path.format(epoch+1), 'w')
+        
+        
         count = 0
-        for annotation_line in lines[:500]:
+        np.random.shuffle(self.eval_lines)
+        for annotation_line in self.eval_lines[:500]:
             #print(count)
             annotation = annotation_line.split()
             image = cv2.imread(annotation[0])
@@ -154,8 +156,8 @@ class Evaluate(keras.callbacks.Callback):
 
     def map_eval(self,
                  result_path,
-                 anno_path,
                  classname,
+                 anno_path = None,
                  ovthresh=0.5,
                  use_07_metric=False):
         """rec, prec, ap = voc_eval(detpath,
@@ -180,9 +182,11 @@ class Evaluate(keras.callbacks.Callback):
         # first load gt
         recs = {}
         imagenames = []
-        with open(anno_path, 'r') as f:
-            lines = f.readlines()
-        for annotation_line in lines:
+        # with open(anno_path, 'r') as f:
+        #     lines = f.readlines()
+
+        
+        for annotation_line in self.eval_lines:
             annotation = annotation_line.split()
             imagename = annotation[0]
             imagenames.append(imagename)
@@ -287,7 +291,7 @@ class Evaluate(keras.callbacks.Callback):
         counts = []
         for classname in self.class_names:
             # rec, prec, ap, count = self.map_eval('eval_result_{}.txt'.format(epoch+1), self.eval_file, classname)
-            rec, prec, ap, count = self.map_eval(self.eval_path.format(epoch+1), self.eval_file, classname)
+            rec, prec, ap, count = self.map_eval(self.eval_path.format(epoch+1), classname)
             aps.append(ap)
             counts.append(count)
 

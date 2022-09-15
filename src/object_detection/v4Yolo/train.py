@@ -47,7 +47,7 @@ def _main():
     args = vars(parser.parse_args())
 
     annotation_train_path = 'data/train_data.txt'
-    annotation_val_path = 'data/valid_data.txt'
+    # annotation_val_path = 'data/valid_data.txt'
     # annotation_train_path = '2012_train.txt'
     # annotation_val_path = '2012_val.txt'
     log_dir = args['log_dir']
@@ -82,22 +82,6 @@ def _main():
 
     input_shape = (512, 512) # multiple of 32, hw
 
-    model, model_body = create_model(input_shape, anchors_stride_base, num_classes,
-                                    load_pretrained=True, freeze_body=0, weights_path=weights_path)
-
-    logging = TensorBoard(log_dir=log_dir)
-    checkpoint = ModelCheckpoint(os.path.join(args['log_dir'], 'best_weights.h5'),
-        monitor='loss', save_weights_only=True, save_best_only=True, save_freq='epoch')
-   
-    reduce_lr_1 = ReduceLROnPlateau(monitor='loss', factor=0.1, patience=2, verbose=1)
-    reduce_lr_2 = ReduceLROnPlateau(monitor='loss', factor=0.5, patience=3, verbose=1)
-    
-    early_stopping = EarlyStopping(monitor='loss', min_delta=0, patience=10, verbose=1)
-
-    evaluation = Evaluate(model_body=model_body, anchors=anchors, class_names=class_index,
-         score_threshold=0.05, tensorboard=logging, weighted_average=True, eval_file=annotation_val_path, log_dir=log_dir,
-         image_shape = input_shape, eval_path = args['log_dir'])
-    
     with open(annotation_train_path) as f:
         lines_train = f.readlines()
 
@@ -117,6 +101,26 @@ def _main():
     np.random.seed(None)
     num_val = len(lines_val)
     np.random.seed(42)
+
+
+
+    model, model_body = create_model(input_shape, anchors_stride_base, num_classes,
+                                    load_pretrained=True, freeze_body=0, weights_path=weights_path)
+
+    logging = TensorBoard(log_dir=log_dir)
+    checkpoint = ModelCheckpoint(os.path.join(args['log_dir'], 'best_weights.h5'),
+        monitor='loss', save_weights_only=True, save_best_only=True, save_freq='epoch')
+   
+    reduce_lr_1 = ReduceLROnPlateau(monitor='loss', factor=0.1, patience=2, verbose=1)
+    reduce_lr_2 = ReduceLROnPlateau(monitor='loss', factor=0.5, patience=3, verbose=1)
+    
+    early_stopping = EarlyStopping(monitor='loss', min_delta=0, patience=10, verbose=1)
+
+    evaluation = Evaluate(model_body=model_body, anchors=anchors, class_names=class_index,
+         score_threshold=0.05, tensorboard=logging, weighted_average=True, eval_file=lines_val, log_dir=log_dir,
+         image_shape = input_shape, eval_path = args['log_dir'])
+    
+
 
     # Train with frozen layers first, to get a stable loss.
     # Adjust num epochs to your dataset. This step is enough to obtain a not bad model.

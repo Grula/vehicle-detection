@@ -355,7 +355,6 @@ def parse_annotation(annotation, train_input_size, annotation_type):
         raise KeyError("%s does not exist ... " %image_path)
     image = np.array(cv2.imread(image_path))
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    tf.print(image_path)
     # No items are marked, that is, each grid is treated as a background
     exist_boxes = True
     if len(line) == 1:
@@ -401,6 +400,7 @@ def data_generator(annotation_lines, batch_size, anchors, num_classes, max_bbox_
         for num in range(batch_size):
             if i == 0:
                 np.random.shuffle(annotation_lines)
+            tf.print(annotation_lines[i] + '\n')
             image, bboxes, exist_boxes = parse_annotation(annotation_lines[i], train_input_size, annotation_type)
             label_sbbox, label_mbbox, label_lbbox, sbboxes, mbboxes, lbboxes = preprocess_true_boxes(bboxes, train_output_sizes, strides, num_classes, max_bbox_per_scale, anchors)
             # tf.print("###################################")

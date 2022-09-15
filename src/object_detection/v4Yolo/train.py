@@ -141,34 +141,36 @@ def _main():
     # Train with frozen layers first, to get a stable loss.
     # Adjust num epochs to your dataset. This step is enough to obtain a not bad model.
     if True:
+        epoch = 100
         lr_schedule = keras.optimizers.schedules.ExponentialDecay(
             initial_learning_rate=0.50,
-            decay_steps=0.50/100,
+            decay_steps=0.50/epoch,
             decay_rate=0.9
             )
         # model.compile(optimizer=adam_v2.Adam(learning_rate=1e-4), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
         model.compile(optimizer=tf.keras.optimizers.SGD(learning_rate=lr_schedule), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
-        batch_size = 32 
+        batch_size = 64 
         print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
         model.fit(data_generator_wrapper(lines_train, batch_size, anchors_stride_base, num_classes, max_bbox_per_scale, 'train'),
                 steps_per_epoch=max(1, num_train//batch_size),
-                epochs=100,
+                epochs=epoch,
                 initial_epoch=0,
                 callbacks=[logging, checkpoint, early_stopping_1, stop_on_nan])
 
     if True:
+        epoch = 100
         lr_schedule = keras.optimizers.schedules.ExponentialDecay(
             initial_learning_rate=1e-3,
-            decay_steps=1e-3/100,
+            decay_steps=1e-3/epoch,
             decay_rate=0.9
             )
         model.compile(optimizer=adam_v2.Adam(learning_rate=lr_schedule), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
         # model.compile(optimizer=tf.keras.optimizers.SGD(learning_rate=1e-1), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
-        batch_size = 16 
+        batch_size = 32 
         print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
         model.fit(data_generator_wrapper(lines_train, batch_size, anchors_stride_base, num_classes, max_bbox_per_scale, 'train'),
                 steps_per_epoch=max(1, num_train//batch_size),
-                epochs=100,
+                epochs=epoch,
                 initial_epoch=0,
                 callbacks=[logging, checkpoint, early_stopping_1, stop_on_nan])
 
@@ -176,6 +178,7 @@ def _main():
     # Unfreeze and continue training, to fine-tune.
     # Train longer if the result is not good.
     if True:
+        epoch = 200
         for i in range(len(model.layers)):
             model.layers[i].trainable = True
         model.compile(optimizer=adam_v2.Adam(learning_rate=1e-5), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
@@ -185,7 +188,7 @@ def _main():
         print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
         model.fit(data_generator_wrapper(lines_train, batch_size, anchors_stride_base, num_classes, max_bbox_per_scale, 'train'),
             steps_per_epoch=max(1, num_train//batch_size),
-            epochs=200,
+            epochs=epoch,
             initial_epoch=0,
             # callbacks=[logging, checkpoint, reduce_lr, early_stopping])
             callbacks=[logging, checkpoint, reduce_lr, early_stopping_2, evaluation, stop_on_nan])

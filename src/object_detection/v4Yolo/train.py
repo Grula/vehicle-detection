@@ -87,11 +87,16 @@ def _main():
 
     lines_train = lines_train
 
-    np.random.seed(42)
+    np.random.seed(7)
     np.random.shuffle(lines_train)
-    np.random.seed(None)
+    np.random.seed(None)   
 
+
+    # We have to be carefull here, what if all instances of class go to one set
     lines_val = lines_train[:int(len(lines_train)*0.2)]
+    # get all unique classes in lines_val ( last number in each line )
+    val_classes = set([line.split(',')[-1].strip() for line in lines_val])
+    print("In validation set we have classes: ", val_classes)
     lines_train = lines_train[int(len(lines_train)*0.2):]
     num_train = len(lines_train)
 
@@ -105,7 +110,7 @@ def _main():
 
 
     model, model_body = create_model(input_shape, anchors_stride_base, num_classes,
-                                    load_pretrained=True, freeze_body=0,
+                                    load_pretrained=True, freeze_body=2, # freeze from 1 or 2
                                      weights_path=weights_path, model_path = model_path)
 
     logging = TensorBoard(log_dir=log_dir)
@@ -134,7 +139,6 @@ def _main():
                 epochs=10,
                 initial_epoch=0,
                 callbacks=[logging, checkpoint, early_stopping, reduce_lr_1])
-
     # Unfreeze and continue training, to fine-tune.
     # Train longer if the result is not good.
     if True:

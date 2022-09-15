@@ -126,7 +126,7 @@ def _main():
     # Train with frozen layers first, to get a stable loss.
     # Adjust num epochs to your dataset. This step is enough to obtain a not bad model.
     if True:
-        model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-1), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
+        model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-2), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
         batch_size = 8
         print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
         model.fit(data_generator_wrapper(lines_train, batch_size, anchors_stride_base, num_classes, max_bbox_per_scale, 'train'),
@@ -194,11 +194,13 @@ def create_model(input_shape, anchors_stride_base, num_classes, load_pretrained=
     print('Create YOLOv4 model with {} anchors and {} classes.'.format(num_anchors*3, num_classes))
 
     if load_pretrained:
+
         try:
             model_body.load_weights(weights_path, by_name=True, skip_mismatch=True)
             print('Load weights {}.'.format(weights_path))
         except:
             print('Load weights failed.')
+        
         if freeze_body in [1, 2]:   
             # Freeze darknet53 body or freeze all but 3 output layers.
             num = (250, len(model_body.layers)-3)[freeze_body-1]

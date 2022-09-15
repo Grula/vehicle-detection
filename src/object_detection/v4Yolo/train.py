@@ -14,6 +14,7 @@ import argparse
 
 import tensorflow as tf
 import numpy as np
+from tensorflow import keras
 
 import keras.backend as K
 from keras.layers import Input
@@ -87,11 +88,13 @@ def _main():
     with open(annotation_train_path) as f:
         lines_train = f.readlines()
 
-    lines_train = lines_train
 
     np.random.seed(7)
     np.random.shuffle(lines_train)
     np.random.seed(None)   
+
+    lines_train = lines_train[:10]
+
 
 
     # We have to be carefull here, what if all instances of class go to one set
@@ -120,9 +123,9 @@ def _main():
     logging = TensorBoard(log_dir=log_dir)
     checkpoint = ModelCheckpoint(os.path.join(args['log_dir'], 'best_weights.h5'),
         monitor='loss', save_weights_only=True, save_best_only=True, save_freq='epoch')
-   
-    reduce_lr_1 = ReduceLROnPlateau(monitor='loss', factor=0.5, patience=2, verbose=1)
-    reduce_lr_2 = ReduceLROnPlateau(monitor='loss', factor=0.7, patience=3, verbose=1)
+
+    # reduce_lr_1 = ReduceLROnPlateau(monitor='loss', factor=0.1, patience=2, verbose=1)
+    reduce_lr = ReduceLROnPlateau(monitor='loss', factor=0.7, patience=3, verbose=1)
     
     early_stopping_1 = EarlyStopping(monitor='loss', min_delta=0, patience=5, verbose=1)
     early_stopping_2 = EarlyStopping(monitor='loss', min_delta=0, patience=10, verbose=1)
@@ -132,23 +135,36 @@ def _main():
          image_shape = input_shape)
     stop_on_nan = tf.keras.callbacks.TerminateOnNaN()
 
+
+
+
     # Train with frozen layers first, to get a stable loss.
     # Adjust num epochs to your dataset. This step is enough to obtain a not bad model.
     if True:
+        lr_schedule = keras.optimizers.schedules.ExponentialDecay(
+            initial_learning_rate=0.50,
+            decay_steps=0.50/100,
+            decay_rate=0.9
+            )
         # model.compile(optimizer=adam_v2.Adam(learning_rate=1e-4), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
-        model.compile(optimizer=tf.keras.optimizers.SGD(learning_rate=1e-1), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
-        batch_size = 64 
+        model.compile(optimizer=tf.keras.optimizers.SGD(learning_rate=lr_schedule), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
+        batch_size = 32 
         print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
         model.fit(data_generator_wrapper(lines_train, batch_size, anchors_stride_base, num_classes, max_bbox_per_scale, 'train'),
                 steps_per_epoch=max(1, num_train//batch_size),
                 epochs=100,
                 initial_epoch=0,
-                callbacks=[logging, checkpoint, early_stopping_1, reduce_lr_1, stop_on_nan])
+                callbacks=[logging, checkpoint, early_stopping_1, stop_on_nan])
 
     if True:
+        lr_schedule = keras.optimizers.schedules.ExponentialDecay(
+            initial_learning_rate=1e-3,
+            decay_steps=1e-3/100,
+            decay_rate=0.9
+            )
         model.compile(optimizer=adam_v2.Adam(learning_rate=1e-3), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
         # model.compile(optimizer=tf.keras.optimizers.SGD(learning_rate=1e-1), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
-        batch_size = 32 
+        batch_size = 16 
         print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
         model.fit(data_generator_wrapper(lines_train, batch_size, anchors_stride_base, num_classes, max_bbox_per_scale, 'train'),
                 steps_per_epoch=max(1, num_train//batch_size),
@@ -159,7 +175,7 @@ def _main():
 
     # Unfreeze and continue training, to fine-tune.
     # Train longer if the result is not good.
-    if False:
+    if True:
         for i in range(len(model.layers)):
             model.layers[i].trainable = True
         model.compile(optimizer=adam_v2.Adam(learning_rate=1e-5), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
@@ -169,10 +185,10 @@ def _main():
         print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
         model.fit(data_generator_wrapper(lines_train, batch_size, anchors_stride_base, num_classes, max_bbox_per_scale, 'train'),
             steps_per_epoch=max(1, num_train//batch_size),
-            epochs=300,
+            epochs=200,
             initial_epoch=0,
             # callbacks=[logging, checkpoint, reduce_lr, early_stopping])
-            callbacks=[logging, checkpoint, reduce_lr_2, early_stopping_2, evaluation])
+            callbacks=[logging, checkpoint, reduce_lr, early_stopping_2, evaluation])
 
     # Further training if needed.
 

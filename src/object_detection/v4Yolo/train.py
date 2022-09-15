@@ -89,7 +89,7 @@ def _main():
 
     lines_train = lines_train
 
-    np.random.seed(7)
+    np.random.seed(42)
     np.random.shuffle(lines_train)
     np.random.seed(None)   
 

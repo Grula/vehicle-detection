@@ -110,7 +110,7 @@ def _main():
 
 
     model, model_body = create_model(input_shape, anchors_stride_base, num_classes,
-                                    load_pretrained=True, freeze_body=2, # freeze from 1 or 2
+                                    load_pretrained=True, freeze_body=1, # freeze from 1 or 2
                                      weights_path=weights_path, model_path = model_path)
 
     logging = TensorBoard(log_dir=log_dir)

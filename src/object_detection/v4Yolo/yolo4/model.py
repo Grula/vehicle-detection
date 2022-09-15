@@ -546,22 +546,7 @@ def yolo_loss(args, num_classes, iou_loss_thresh, anchors):
     pred_lbbox = decode(conv_lbbox, anchors[2], 32, num_classes)
 
 
-    tf.print("##############################################################")
-    # Check if any values are NaN and if so print them
-    tf.print("conv_sbbox", tf.math.is_nan(conv_sbbox)[0][0][0])
-    tf.print("conv_mbbox", tf.math.is_nan(conv_mbbox)[0][0][0])
-    tf.print("conv_lbbox", tf.math.is_nan(conv_lbbox)[0][0][0])
-    tf.print("label_sbbox", tf.math.is_nan(label_sbbox)[0][0][0])
-    tf.print("label_mbbox", tf.math.is_nan(label_mbbox)[0][0][0])
-    tf.print("label_lbbox", tf.math.is_nan(label_lbbox)[0][0][0])
-    tf.print("true_sbboxes", tf.math.is_nan(true_sbboxes)[0][0][0])
-    tf.print("true_mbboxes", tf.math.is_nan(true_mbboxes)[0][0][0])
-    tf.print("true_lbboxes", tf.math.is_nan(true_lbboxes)[0][0][0])
-    tf.print("pred_sbbox", tf.math.is_nan(pred_sbbox)[0][0][0])
-    tf.print("pred_mbbox", tf.math.is_nan(pred_mbbox)[0][0][0])
-    tf.print("pred_lbbox", tf.math.is_nan(pred_lbbox)[0][0][0])
-    tf.print("##############################################################")
-    
+
     sbbox_ciou_loss, sbbox_conf_loss, sbbox_prob_loss = \
         loss_layer(conv_sbbox, pred_sbbox, label_sbbox, true_sbboxes, 8, num_classes, iou_loss_thresh)
     mbbox_ciou_loss, mbbox_conf_loss, mbbox_prob_loss = \

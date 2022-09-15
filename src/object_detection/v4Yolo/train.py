@@ -401,7 +401,7 @@ def data_generator(annotation_lines, batch_size, anchors, num_classes, max_bbox_
         for num in range(batch_size):
             if i == 0:
                 np.random.shuffle(annotation_lines)
-            tf.print(annotation_lines[i] + '\n')
+            # tf.print(annotation_lines[i] + '\n')
             image, bboxes, exist_boxes = parse_annotation(annotation_lines[i], train_input_size, annotation_type)
             label_sbbox, label_mbbox, label_lbbox, sbboxes, mbboxes, lbboxes = preprocess_true_boxes(bboxes, train_output_sizes, strides, num_classes, max_bbox_per_scale, anchors)
             batch_image[num, :, :, :] = image

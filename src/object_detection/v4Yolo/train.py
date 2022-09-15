@@ -117,14 +117,13 @@ def _main():
 
 
     model, model_body = create_model(input_shape, anchors_stride_base, num_classes,
-                                    load_pretrained=True, freeze_body=1, # freeze from 1 or 2
+                                    load_pretrained=True, freeze_body=0, # freeze from 1 or 2
                                      weights_path=weights_path, model_path = model_path)
 
     logging = TensorBoard(log_dir=log_dir)
     checkpoint = ModelCheckpoint(os.path.join(args['log_dir'], 'best_weights.h5'),
         monitor='loss', save_weights_only=True, save_best_only=True, save_freq='epoch')
 
-    # reduce_lr_1 = ReduceLROnPlateau(monitor='loss', factor=0.1, patience=2, verbose=1)
     reduce_lr = ReduceLROnPlateau(monitor='loss', factor=0.7, patience=3, verbose=1)
     
     early_stopping_1 = EarlyStopping(monitor='loss', min_delta=0, patience=5, verbose=1)
@@ -143,30 +142,13 @@ def _main():
     if True:
         epoch = 100
         lr_schedule = keras.optimizers.schedules.ExponentialDecay(
-            initial_learning_rate=0.50,
-            decay_steps=0.50/epoch,
+            initial_learning_rate=0.25,
+            decay_steps=1000,
             decay_rate=0.9
             )
         # model.compile(optimizer=adam_v2.Adam(learning_rate=1e-4), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
         model.compile(optimizer=tf.keras.optimizers.SGD(learning_rate=lr_schedule), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
         batch_size = 64 
-        print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
-        model.fit(data_generator_wrapper(lines_train, batch_size, anchors_stride_base, num_classes, max_bbox_per_scale, 'train'),
-                steps_per_epoch=max(1, num_train//batch_size),
-                epochs=epoch,
-                initial_epoch=0,
-                callbacks=[logging, checkpoint, early_stopping_1, stop_on_nan])
-
-    if True:
-        epoch = 100
-        lr_schedule = keras.optimizers.schedules.ExponentialDecay(
-            initial_learning_rate=1e-3,
-            decay_steps=1e-3/epoch,
-            decay_rate=0.9
-            )
-        model.compile(optimizer=adam_v2.Adam(learning_rate=lr_schedule), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
-        # model.compile(optimizer=tf.keras.optimizers.SGD(learning_rate=1e-1), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
-        batch_size = 32 
         print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
         model.fit(data_generator_wrapper(lines_train, batch_size, anchors_stride_base, num_classes, max_bbox_per_scale, 'train'),
                 steps_per_epoch=max(1, num_train//batch_size),

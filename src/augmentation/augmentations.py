@@ -100,14 +100,18 @@ def _guassian_noise(image: np.array, **kwargs) -> np.array:
     Returns:
         np.array: Image with noise.
     """
-    mean = 1 if 'mean' not in kwargs else kwargs['mean']
+    mean = 0 if 'mean' not in kwargs else kwargs['mean']
     stddev = 0.1 if 'stddev' not in kwargs else kwargs['stddev']
 
     row, col, ch = image.shape
     gaussian = np.random.normal(mean, stddev, (row, col, ch)).astype(np.float32)
-    gaussian_img = cv2.addWeighted(image.astype(np.float32), 0.75, gaussian, 100, 0)
-    gaussian_img = gaussian_img.astype(np.uint8)
-    return gaussian_img
+    image = image / 127.5 - 1
+    noisy_image = image + gaussian
+    noisy_image = np.clip(noisy_image, -1, 1)
+    noisy_image = (noisy_image + 1) * 127.5
+    noisy_image = noisy_image.astype(np.uint8)
+    return noisy_image
+
 
 def _guassian_blur(image: np.array, **kwargs) -> np.array:
     """Blur image with guassian blur.
@@ -256,10 +260,16 @@ if __name__ == '__main__':
     #load test image
     image = cv2.imread('test.jpg')
     image = cv2.resize(image, (512, 512))
-    
-    for _ in range(5):
-        tmp = augment_image(image, np.array([[0, 0, image.shape[1], image.shape[0]]]))
-        cv2.imshow('image', tmp[0])
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
+
+    # test guassian noise
+    image = _guassian_noise(image)
+    cv2.imshow('guassian noise', image)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+    # for _ in range(5):
+    #     tmp = augment_image(image, np.array([[0, 0, image.shape[1], image.shape[0]]]))
+    #     cv2.imshow('image', tmp[0])
+    #     cv2.waitKey(0)
+    #     cv2.destroyAllWindows()
     

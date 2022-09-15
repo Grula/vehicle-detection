@@ -85,7 +85,7 @@ def _main():
     with open(annotation_train_path) as f:
         lines_train = f.readlines()
 
-    lines_train = lines_train
+    lines_train = lines_train[:100]
 
     np.random.seed(42)
     np.random.shuffle(lines_train)
@@ -188,12 +188,13 @@ def create_model(input_shape, anchors_stride_base, num_classes, load_pretrained=
 
     # model_body = yolo4_body(image_input, num_anchors, num_classes)
     # model_body = load_model(weights_path, custom_objects={'Mish':Mish})
+    print(weights_path)
     model_body = load_model('model_data/512_yolo4.h5', custom_objects={'Mish':Mish})
 
     print('Create YOLOv4 model with {} anchors and {} classes.'.format(num_anchors*3, num_classes))
 
     if load_pretrained:
-        # model_body.load_weights(weights_path, by_name=True, skip_mismatch=True)
+        model_body.load_weights(weights_path, by_name=True, skip_mismatch=True)
         print('Load weights {}.'.format(weights_path))
         if freeze_body in [1, 2]:   
             # Freeze darknet53 body or freeze all but 3 output layers.

@@ -142,14 +142,14 @@ def _main():
     if True:
         epoch = 200
         lr_schedule = keras.optimizers.schedules.ExponentialDecay(
-            initial_learning_rate=0.20,
+            initial_learning_rate=0.1,
             decay_steps=1000,
             decay_rate=0.9
             )
         # model.compile(optimizer=adam_v2.Adam(learning_rate=1e-4), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
         # model.compile(optimizer=tf.keras.optimizers.SGD(learning_rate=lr_schedule), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
-        model.compile(optimizer=tf.keras.optimizers.Nadam(learning_rate=1e-2), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
-        # model.compile(optimizer=tf.keras.optimizers.RMSprop(learning_rate=lr_schedule), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
+        # model.compile(optimizer=tf.keras.optimizers.Nadam(learning_rate=1e-2), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
+        model.compile(optimizer=tf.keras.optimizers.Adagrad(learning_rate=1e-1), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
         batch_size = 8 
         print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
         model.fit(data_generator_wrapper(lines_train, batch_size, anchors_stride_base, num_classes, max_bbox_per_scale, 'train'),
@@ -161,7 +161,7 @@ def _main():
 
     # Unfreeze and continue training, to fine-tune.
     # Train longer if the result is not good.
-    if True:
+    if False:
         epoch = 200
         for i in range(len(model.layers)):
             model.layers[i].trainable = True

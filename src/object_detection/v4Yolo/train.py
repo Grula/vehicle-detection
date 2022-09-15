@@ -364,9 +364,10 @@ def parse_annotation(annotation, train_input_size, annotation_type):
         bboxes = np.array([list(map(lambda x: int(float(x)), box.split(','))) for box in line[1:]])
     if annotation_type == 'train':
         # image, bboxes = random_fill(np.copy(image), np.copy(bboxes))    # Open when dataset lacks small objects
-        image, bboxes = random_horizontal_flip(np.copy(image), np.copy(bboxes))
-        image, bboxes = random_crop(np.copy(image), np.copy(bboxes))
-        image, bboxes = random_translate(np.copy(image), np.copy(bboxes))
+        # image, bboxes = random_horizontal_flip(np.copy(image), np.copy(bboxes))
+        # image, bboxes = random_crop(np.copy(image), np.copy(bboxes))
+        # image, bboxes = random_translate(np.copy(image), np.copy(bboxes))
+        pass
     image, bboxes = image_preprocess(np.copy(image), [train_input_size, train_input_size], np.copy(bboxes))
     return image, bboxes, exist_boxes
 
@@ -403,11 +404,6 @@ def data_generator(annotation_lines, batch_size, anchors, num_classes, max_bbox_
             tf.print(annotation_lines[i] + '\n')
             image, bboxes, exist_boxes = parse_annotation(annotation_lines[i], train_input_size, annotation_type)
             label_sbbox, label_mbbox, label_lbbox, sbboxes, mbboxes, lbboxes = preprocess_true_boxes(bboxes, train_output_sizes, strides, num_classes, max_bbox_per_scale, anchors)
-            # tf.print("###################################")
-            # tf.print("sbboxes:", sbboxes[0])
-            # tf.print("mbboxes:", mbboxes[0])
-            # tf.print("lbboxes:", lbboxes[0] )
-            # tf.print("###################################\n")
             batch_image[num, :, :, :] = image
             if exist_boxes:
                 batch_label_sbbox[num, :, :, :, :] = label_sbbox

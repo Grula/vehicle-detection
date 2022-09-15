@@ -40,7 +40,7 @@ def _main():
 
     parser.add_argument('--model_data', type=str , default='model_data/', help='path to model data')
     parser.add_argument('--weights_name', type=str , default='yolo4_weights.h5', help='name of model weights')
-    parser.add_argument('--model_name', type=str , default='yolo4_model.h5', help='name of model')
+    parser.add_argument('--model_name', type=str , default='512_yolo4.h5', help='name of model')
     parser.add_argument('--log_dir', type=str , default='logs/')
 
 
@@ -105,7 +105,8 @@ def _main():
 
 
     model, model_body = create_model(input_shape, anchors_stride_base, num_classes,
-                                    load_pretrained=True, freeze_body=0, weights_path=weights_path)
+                                    load_pretrained=True, freeze_body=0, weights_path=weights_path,
+                                    model_path = model_path)
 
     logging = TensorBoard(log_dir=log_dir)
     checkpoint = ModelCheckpoint(os.path.join(args['log_dir'], 'best_weights.h5'),
@@ -173,7 +174,7 @@ def get_anchors(anchors_path):
 
 
 def create_model(input_shape, anchors_stride_base, num_classes, load_pretrained=True, freeze_body=2,
-            weights_path=None):
+            weights_path=None, model_path=None):
     '''create the training model'''
     K.clear_session() # get a new session
     image_input = Input(shape=(None, None, 3))
@@ -189,7 +190,8 @@ def create_model(input_shape, anchors_stride_base, num_classes, load_pretrained=
     # model_body = yolo4_body(image_input, num_anchors, num_classes)
     # model_body = load_model(weights_path, custom_objects={'Mish':Mish})
     print(weights_path)
-    model_body = load_model('model_data/512_yolo4.h5', custom_objects={'Mish':Mish})
+    print(model_path)
+    model_body = load_model(model_path, custom_objects={'Mish':Mish})
 
     print('Create YOLOv4 model with {} anchors and {} classes.'.format(num_anchors*3, num_classes))
 

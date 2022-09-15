@@ -95,8 +95,8 @@ def _main():
 
 
     # We have to be carefull here, what if all instances of class go to one set
-    lines_val = lines_train[:int(len(lines_train)*0.2)]
-    lines_train = lines_train[int(len(lines_train)*0.2):]
+    lines_val = lines_train[:int(len(lines_train)*0.1)]
+    lines_train = lines_train[int(len(lines_train)*0.1):]
     # get all unique classes in lines_val ( last number in each line )
     val_classes = set([line.split(',')[-1].strip() for line in lines_val])
     print("In validation set we have classes: ", val_classes)

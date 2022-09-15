@@ -91,8 +91,8 @@ def _main():
     np.random.shuffle(lines_train)
     np.random.seed(None)
 
-    lines_val = lines_train[:int(len(lines_train)*0.3)]
-    lines_train = lines_train[int(len(lines_train)*0.3):]
+    lines_val = lines_train[:int(len(lines_train)*0.2)]
+    lines_train = lines_train[int(len(lines_train)*0.2):]
     num_train = len(lines_train)
 
 

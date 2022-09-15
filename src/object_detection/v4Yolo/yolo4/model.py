@@ -545,6 +545,22 @@ def yolo_loss(args, num_classes, iou_loss_thresh, anchors):
     pred_mbbox = decode(conv_mbbox, anchors[1], 16, num_classes)
     pred_lbbox = decode(conv_lbbox, anchors[2], 32, num_classes)
 
+
+    tf.print("##############################################################")
+    # Check if any values are NaN and if so print them
+    tf.print("conv_sbbox", tf.math.is_nan(conv_sbbox))
+    tf.print("conv_mbbox", tf.math.is_nan(conv_mbbox))
+    tf.print("conv_lbbox", tf.math.is_nan(conv_lbbox))
+    tf.print("label_sbbox", tf.math.is_nan(label_sbbox))
+    tf.print("label_mbbox", tf.math.is_nan(label_mbbox))
+    tf.print("label_lbbox", tf.math.is_nan(label_lbbox))
+    tf.print("true_sbboxes", tf.math.is_nan(true_sbboxes))
+    tf.print("true_mbboxes", tf.math.is_nan(true_mbboxes))
+    tf.print("true_lbboxes", tf.math.is_nan(true_lbboxes))
+    tf.print("pred_sbbox", tf.math.is_nan(pred_sbbox))
+    tf.print("pred_mbbox", tf.math.is_nan(pred_mbbox))
+    tf.print("pred_lbbox", tf.math.is_nan(pred_lbbox))
+    tf.print("##############################################################")
     
     sbbox_ciou_loss, sbbox_conf_loss, sbbox_prob_loss = \
         loss_layer(conv_sbbox, pred_sbbox, label_sbbox, true_sbboxes, 8, num_classes, iou_loss_thresh)
@@ -554,18 +570,6 @@ def yolo_loss(args, num_classes, iou_loss_thresh, anchors):
         loss_layer(conv_lbbox, pred_lbbox, label_lbbox, true_lbboxes, 32, num_classes, iou_loss_thresh)
     
 
-    tf.print("##############################################################")
-    # Check if any values are NaN and if so print them
-    tf.print("sbbox_ciou_loss", sbbox_ciou_loss)
-    tf.print("sbbox_conf_loss", sbbox_conf_loss)
-    tf.print("sbbox_prob_loss", sbbox_prob_loss)
-    tf.print("mbbox_ciou_loss", mbbox_ciou_loss)
-    tf.print("mbbox_conf_loss", mbbox_conf_loss)
-    tf.print("mbbox_prob_loss", mbbox_prob_loss)
-    tf.print("lbbox_ciou_loss", lbbox_ciou_loss)
-    tf.print("lbbox_conf_loss", lbbox_conf_loss)
-    tf.print("lbbox_prob_loss", lbbox_prob_loss)
-    tf.print("##############################################################")
 
 
 

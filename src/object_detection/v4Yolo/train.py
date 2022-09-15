@@ -122,7 +122,7 @@ def _main():
     reduce_lr_1 = ReduceLROnPlateau(monitor='loss', factor=0.1, patience=2, verbose=1)
     reduce_lr_2 = ReduceLROnPlateau(monitor='loss', factor=0.5, patience=3, verbose=1)
     
-    early_stopping = EarlyStopping(monitor='loss', min_delta=0, patience=10, verbose=1)
+    early_stopping = EarlyStopping(monitor='loss', min_delta=0, patience=7, verbose=1)
 
     evaluation = Evaluate(model_body=model_body, anchors=anchors, class_names=class_index,
          score_threshold=0.05, tensorboard=logging, weighted_average=True, eval_lines=lines_val, log_dir=log_dir,
@@ -138,7 +138,7 @@ def _main():
         print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
         model.fit(data_generator_wrapper(lines_train, batch_size, anchors_stride_base, num_classes, max_bbox_per_scale, 'train'),
                 steps_per_epoch=max(1, num_train//batch_size),
-                epochs=10,
+                epochs=50,
                 initial_epoch=0,
                 callbacks=[logging, checkpoint, early_stopping, reduce_lr_1])
     
@@ -154,7 +154,7 @@ def _main():
         print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
         model.fit(data_generator_wrapper(lines_train, batch_size, anchors_stride_base, num_classes, max_bbox_per_scale, 'train'),
             steps_per_epoch=max(1, num_train//batch_size),
-            epochs=100,
+            epochs=200,
             initial_epoch=0,
             # callbacks=[logging, checkpoint, reduce_lr, early_stopping])
             callbacks=[logging, checkpoint, reduce_lr_2, early_stopping, evaluation])

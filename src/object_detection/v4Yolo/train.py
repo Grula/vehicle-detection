@@ -188,6 +188,7 @@ def create_model(input_shape, anchors_stride_base, num_classes, load_pretrained=
 
     # model_body = yolo4_body(image_input, num_anchors, num_classes)
     model_body = load_model(weights_path, custom_objects={'Mish':Mish})
+    model_body = load_model('model_data/512_yolo4.h5', custom_objects={'Mish':Mish})
 
     print('Create YOLOv4 model with {} anchors and {} classes.'.format(num_anchors*3, num_classes))
 

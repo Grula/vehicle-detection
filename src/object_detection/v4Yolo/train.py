@@ -118,7 +118,7 @@ def _main():
 
     evaluation = Evaluate(model_body=model_body, anchors=anchors, class_names=class_index,
          score_threshold=0.05, tensorboard=logging, weighted_average=True, eval_lines=lines_val, log_dir=log_dir,
-         image_shape = input_shape, eval_path = args['log_dir'])
+         image_shape = input_shape)
     
 
 

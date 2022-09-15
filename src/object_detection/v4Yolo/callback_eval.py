@@ -28,11 +28,11 @@ class Evaluate(keras.callbacks.Callback):
         max_boxes=450,
         tensorboard=None,
         weighted_average=False,
-        eval_file='2007_val.txt',
+        eval_lines=None,
         log_dir='logs/000/',
         verbose=1,
         image_shape = (608, 608),
-        eval_lines  = []
+        # eval_path  = '.'
     ):
         """ Evaluate a given dataset using a given model at the end of every epoch during training.
 

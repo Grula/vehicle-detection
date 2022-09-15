@@ -152,7 +152,8 @@ def _main():
     if True:
         for i in range(len(model.layers)):
             model.layers[i].trainable = True
-        model.compile(optimizer=tf.keras.optimizers.adam_v2(learning_rate=1e-3), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
+        adam = tf.keras.optimizers.Adam(learning_rate=1e-3)
+        model.compile(optimizer=adam, loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
         print('Unfreeze all of the layers.')
 
         batch_size = 16 # note that more GPU memory is required after unfreezing the body

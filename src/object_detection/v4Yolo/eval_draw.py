@@ -40,18 +40,18 @@ if __name__ == '__main__':
     parser.add_argument('--model_data', type=str , default='model_data/', help='path to model data')
     parser.add_argument('--weights_name', type=str , default='512_yolo4_weights.h5', help='name of model weights')
     parser.add_argument('--image_dim', default=512, type=int)
-    parser.add_argument('--images', default='', type=str, required=True)
+    parser.add_argument('--valid', default='', type=str, required=True)
     
     # parser.add_argument('--model_dir', default='model_data/', type=str)
     # parser.add_argument('--weights_path', default='', type=str)
     # parser.add_argument('--classes_path', default='', type=str)
-    parser.add_argument('--save', default=0, type=bool)
+    parser.add_argument('--save', default=1, type=bool)
 
     args = vars(parser.parse_args())
 
     model_dir = args['model_data']
     print(model_dir)
-    images_path = args['images']
+    images_path = args['valid']
 
     weights_path = os.path.join(args['model_data'],args['weights_name'])
     classes_path = os.path.join(args['model_data'], 'custom_classes.txt')
@@ -82,12 +82,6 @@ if __name__ == '__main__':
     yolo4_model.load_weights(model_path)
     _decode = Decode(conf_thresh, nms_thresh, model_image_size, yolo4_model, class_names)
 
-    # create csv file
-    f = open('data_prediction.csv', 'w')
-    # im_path, label, x, y, w, h
-    # f.write('im_path,label,x,y,w,h\n')
-    f.write('detected_label, score\n')
-
 
 
     # detect images in test floder
@@ -112,7 +106,6 @@ if __name__ == '__main__':
             image = cv2.imread(image_path)
             image, boxes, scores, classes = _decode.detect_image(image, True)
             if boxes is  None:
-                f.write(f'{current_label}:{False},{0}\n')
                 continue
             predicted_data = list(zip(boxes, scores, classes))
             predicted_data.sort(key=lambda x: x[1], reverse=True)
@@ -127,11 +120,6 @@ if __name__ == '__main__':
                 detected = True
                 if max_score < score:
                     max_score = score
-                # max_idx = 0
-                # for i, box in enumerate(boxes):
-                #     if scores[i] > max_score:
-                #         max_score = scores[i]
-                #         max_idx = i
 
                 # x0, y0, x1, y1 = boxes[max_idx]
                 x0, y0, x1, y1 = box
@@ -144,12 +132,9 @@ if __name__ == '__main__':
                 # saving info to csv file 
 
                 # f.write(f'{image_path},{current_label},{class_names[classes[i]]},{max_score},{x},{y},{w},{h}\n')
-            
-            f.write(f'{current_label}:{detected},{max_score}\n')
 
             if args['save']:
                 cv2.imwrite(f'{destination_folder}/{image_file}', image)
                 print(f'Saved {image_file}')
     
     
-    f.close()

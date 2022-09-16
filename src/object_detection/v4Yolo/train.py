@@ -126,7 +126,7 @@ def _main():
 
     reduce_lr = ReduceLROnPlateau(monitor='loss', factor=0.5, patience=3, verbose=1)
     
-    early_stopping_1 = EarlyStopping(monitor='loss', min_delta=0, patience=5, verbose=1)
+    early_stopping_1 = EarlyStopping(monitor='loss', min_delta=0, patience=7, verbose=1)
     early_stopping_2 = EarlyStopping(monitor='loss', min_delta=0, patience=12, verbose=1)
 
     csv = tf.keras.callbacks.CSVLogger(args['log_dir'] + "history.csv", append=True)
@@ -144,12 +144,12 @@ def _main():
     n_epochs = 0 
     if True:
         epoch = 200
-        lr_schedule = keras.optimizers.schedules.ExponentialDecay(
-            initial_learning_rate=1e-3,
-            decay_steps=1000,
-            decay_rate=0.9
-            )
-        model.compile(optimizer=adam_v2.Adam(learning_rate=lr_schedule), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
+        # lr_schedule = keras.optimizers.schedules.ExponentialDecay(
+        #     initial_learning_rate=1e-3,
+        #     decay_steps=1000,
+        #     decay_rate=0.9
+        #     )
+        model.compile(optimizer=adam_v2.Adam(learning_rate=1e-3), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
         # model.compile(optimizer=tf.keras.optimizers.SGD(learning_rate=lr_schedule), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
         # model.compile(optimizer=tf.keras.optimizers.Nadam(learning_rate=1e-2), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
         # model.compile(optimizer=tf.keras.optimizers.Adagrad(learning_rate=1e-1), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
@@ -159,12 +159,12 @@ def _main():
                 steps_per_epoch=max(1, num_train//batch_size),
                 epochs=epoch,
                 initial_epoch=0,
-                callbacks=[logging, checkpoint, early_stopping_1, stop_on_nan, csv])
+                callbacks=[logging, checkpoint, early_stopping_1, stop_on_nan, csv, reduce_lr])
         n_epochs = len(h.history['loss'])
 
     # Unfreeze and continue training, to fine-tune.
     # Train longer if the result is not good.
-    if True:
+    if False:
         epoch = 200 + n_epochs
         for i in range(len(model.layers)):
             model.layers[i].trainable = True

@@ -93,7 +93,7 @@ def _main():
     np.random.shuffle(lines_train)
     np.random.seed(None)   
 
-    # lines_train = lines_train[:10]
+    lines_train = lines_train[:10]
 
 
 
@@ -129,7 +129,7 @@ def _main():
     early_stopping_1 = EarlyStopping(monitor='loss', min_delta=0, patience=5, verbose=1)
     early_stopping_2 = EarlyStopping(monitor='loss', min_delta=0, patience=10, verbose=1)
 
-    csv = tf.keras.callbacks.CSVLogger(args['log_dir'] / "history.csv", append=True)
+    csv = tf.keras.callbacks.CSVLogger(args['log_dir'] + "history.csv", append=True)
 
     evaluation = Evaluate(model_body=model_body, anchors=anchors, class_names=class_index,
          score_threshold=0.05, tensorboard=logging, weighted_average=True, eval_lines=lines_val, log_dir=log_dir,
@@ -153,14 +153,14 @@ def _main():
         # model.compile(optimizer=tf.keras.optimizers.SGD(learning_rate=lr_schedule), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
         # model.compile(optimizer=tf.keras.optimizers.Nadam(learning_rate=1e-2), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
         # model.compile(optimizer=tf.keras.optimizers.Adagrad(learning_rate=1e-1), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
-        batch_size = 4
+        batch_size = 1
         print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
-        model.fit(data_generator_wrapper(lines_train, batch_size, anchors_stride_base, num_classes, max_bbox_per_scale, 'train'),
+        h = model.fit(data_generator_wrapper(lines_train, batch_size, anchors_stride_base, num_classes, max_bbox_per_scale, 'train'),
                 steps_per_epoch=max(1, num_train//batch_size),
                 epochs=epoch,
                 initial_epoch=0,
                 callbacks=[logging, checkpoint, early_stopping_1, stop_on_nan, csv])
-        n_epochs = len(model.history['loss'])
+        n_epochs = len(h.history['loss'])
 
     # Unfreeze and continue training, to fine-tune.
     # Train longer if the result is not good.
@@ -215,7 +215,7 @@ def create_model(input_shape, anchors_stride_base, num_classes, load_pretrained=
 
 
 
-    # model_body = yolo4_body(image_input, num_anchors, num_classes)
+    model_body = yolo4_body(image_input, num_anchors, num_classes)
     # model_body = load_model(weights_path, custom_objects={'Mish':Mish})
     model_body = load_model(model_path, custom_objects={'Mish':Mish})
     
@@ -366,10 +366,10 @@ def parse_annotation(annotation, train_input_size, annotation_type):
     else:
         bboxes = np.array([list(map(lambda x: int(float(x)), box.split(','))) for box in line[1:]])
     if annotation_type == 'train':
-        # image, bboxes = random_fill(np.copy(image), np.copy(bboxes))    # Open when dataset lacks small objects
-        # image, bboxes = random_horizontal_flip(np.copy(image), np.copy(bboxes))
-        # image, bboxes = random_crop(np.copy(image), np.copy(bboxes))
-        # image, bboxes = random_translate(np.copy(image), np.copy(bboxes))
+        image, bboxes = random_fill(np.copy(image), np.copy(bboxes))    # Open when dataset lacks small objects
+        image, bboxes = random_horizontal_flip(np.copy(image), np.copy(bboxes))
+        image, bboxes = random_crop(np.copy(image), np.copy(bboxes))
+        image, bboxes = random_translate(np.copy(image), np.copy(bboxes))
         pass
     image, bboxes = image_preprocess(np.copy(image), [train_input_size, train_input_size], np.copy(bboxes))
     return image, bboxes, exist_boxes

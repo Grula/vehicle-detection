@@ -13,7 +13,8 @@ from yolo4.utils import letterbox_image
 from PIL import Image, ImageFont, ImageDraw
 from timeit import default_timer as timer
 import cv2
-
+import colorsys
+import random
 from decode_np import Decode
 
 
@@ -104,32 +105,53 @@ if __name__ == '__main__':
 
             print("Detecing image: {}".format(image_path))
             image = cv2.imread(image_path)
-            image, boxes, scores, classes = _decode.detect_image(image, True)
+            image, boxes, scores, classes = _decode.detect_image(image, False)
             if boxes is  None:
                 continue
             predicted_data = list(zip(boxes, scores, classes))
             predicted_data.sort(key=lambda x: x[1], reverse=True)
             
-            # find image with highest score if exists
-            detected = False
-            max_score = 0
-            for box, score, cl in predicted_data:
-                # Check if class is in the list of classes to detect
-                if class_names[cl] != current_label:
-                    continue
-                detected = True
-                if max_score < score:
-                    max_score = score
+            
+            box, score, cl = predicted_data[0]
+            print(score)
+            # for box, score, cl in predicted_data[:1]:
+            # Check if class is in the list of classes to detect
+            if class_names[cl] != current_label:
+                continue
 
-                # x0, y0, x1, y1 = boxes[max_idx]
-                x0, y0, x1, y1 = box
-                x = max(0, np.floor(x0 + 0.5).astype(int))
-                y = max(0, np.floor(y0 + 0.5).astype(int))
-                right = min(image.shape[1], np.floor(x1 + 0.5).astype(int))
-                bottom = min(image.shape[0], np.floor(y1 + 0.5).astype(int))
-                w = right - x
-                h = bottom - y
-                # saving info to csv file 
+            # x0, y0, x1, y1 = boxes[max_idx]
+            x0, y0, x1, y1 = box
+            x = max(0, np.floor(x0 + 0.5).astype(int))
+            y = max(0, np.floor(y0 + 0.5).astype(int))
+            right = min(image.shape[1], np.floor(x1 + 0.5).astype(int))
+            bottom = min(image.shape[0], np.floor(y1 + 0.5).astype(int))
+            w = right - x
+            h = bottom - y
+            # saving info to csv file 
+
+
+            hsv_tuples = [(1.0 * x / 4, 1., 1.) for x in range(4)]
+            colors = list(map(lambda x: colorsys.hsv_to_rgb(*x), hsv_tuples))
+            colors = list(map(lambda x: (int(x[0] * 255), int(x[1] * 255), int(x[2] * 255)), colors))
+
+            random.seed(0)
+            random.shuffle(colors)
+            random.seed(None)
+
+            x0, y0, x1, y1 = box
+            left = max(0, np.floor(x0 + 0.5).astype(int))
+            top = max(0, np.floor(y0 + 0.5).astype(int))
+            right = min(image.shape[1], np.floor(x1 + 0.5).astype(int))
+            bottom = min(image.shape[0], np.floor(y1 + 0.5).astype(int))
+            bbox_color = colors[cl]
+            # bbox_thick = 1 if min(image_h, image_w) < 400 else 2
+            bbox_thick = 1
+            cv2.rectangle(image, (left, top), (right, bottom), bbox_color, bbox_thick)
+            bbox_mess = '%s: %.2f' % (class_names[cl], score)
+            t_size = cv2.getTextSize(bbox_mess, 0, 0.5, thickness=1)[0]
+            cv2.rectangle(image, (left, top), (left + t_size[0], top + t_size[1] + 3), bbox_color, -1)
+            cv2.putText(image, bbox_mess, (left, top + 15), cv2.FONT_HERSHEY_SIMPLEX,
+                        0.5, (0, 0, 0), 1, lineType=cv2.LINE_AA)
 
                 # f.write(f'{image_path},{current_label},{class_names[classes[i]]},{max_score},{x},{y},{w},{h}\n')
 

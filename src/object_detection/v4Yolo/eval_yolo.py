@@ -89,8 +89,9 @@ if __name__ == '__main__':
     with open(valid_paths) as f:
         lines = f.readlines()
 
+    weights_name = args["weights_name"].split("_")[-1].split(".")[0]
     # create csv file
-    f = open(f'{"-".join(args["weights_name"].split("_")[:2])}-data_prediction.csv', 'w')
+    f = open(f'{weights_name}_512_data_prediction.csv', 'w')
     # write header
     # file_path,true_label, predicted_label, confidence, [true_bboxes], [predicted_bboxes] 
     f.write('file_path, true_label, predicted_label, confidence, true_bboxes, predicted_bboxes\n')
@@ -123,31 +124,58 @@ if __name__ == '__main__':
             f.write('{}, {}, {}, {}, {}, {}\n'.format(path_to_image, label_ids[_id], 'None', 0, " ".join(true_bbox), 'None'))
             continue
 
-        # Save all predictions
-        for bbox, score, cl in zip(bboxes, confidences, classes):
+        _predictions = list(zip(bboxes, confidences, classes))
+        # sort by confidence
+        _predictions.sort(key=lambda x: x[1], reverse=True)
+        # get the highest confidence prediction
+        _bbox, _conf, _class = _predictions[0]
 
-            predicted_label = class_names[cl]
-            if predicted_label not in intersected_labels:
-                continue
+        predicted_label = class_names[_class]
+        if predicted_label not in intersected_labels:
+            continue
 
-            true_label = label_ids[_id]
-            confidence = score
+        true_label = label_ids[_id]
 
-            x0, y0, x1, y1 = bbox
-            x0 = max(0, np.floor(x0 + 0.5).astype(int))
-            y0 = max(0, np.floor(y0 + 0.5).astype(int))
-            x1 = min(image.shape[1], np.floor(x1 + 0.5).astype(int))
-            y1 = min(image.shape[0], np.floor(y1 + 0.5).astype(int))
+        x0, y0, x1, y1 = _bbox
+        x0 = max(0, np.floor(x0 + 0.5).astype(int))
+        y0 = max(0, np.floor(y0 + 0.5).astype(int))
+        x1 = min(image.shape[1], np.floor(x1 + 0.5).astype(int))
+        y1 = min(image.shape[0], np.floor(y1 + 0.5).astype(int))
+        
+        predicted_bbox = [str(x0), str(y0), str(x1), str(y1)] 
+
+        true_label = label_ids[_id]
+        predicted_label = class_names[_class]
+        
+        f.write('{}, {}, {}, {}, {}, {}\n'.format(path_to_image, true_label, predicted_label, \
+                _conf, ' '.join(true_bbox), ' '.join(predicted_bbox))
+            )
+
+        # # Save all predictions
+        # for bbox, score, cl in zip(bboxes, confidences, classes):
+
+        #     predicted_label = class_names[cl]
+        #     if predicted_label not in intersected_labels:
+        #         continue
+
+        #     true_label = label_ids[_id]
+        #     confidence = score
+
+        #     x0, y0, x1, y1 = bbox
+        #     x0 = max(0, np.floor(x0 + 0.5).astype(int))
+        #     y0 = max(0, np.floor(y0 + 0.5).astype(int))
+        #     x1 = min(image.shape[1], np.floor(x1 + 0.5).astype(int))
+        #     y1 = min(image.shape[0], np.floor(y1 + 0.5).astype(int))
             
-            predicted_bbox = [str(x0), str(y0), str(x1), str(y1)] 
+        #     predicted_bbox = [str(x0), str(y0), str(x1), str(y1)] 
 
-            true_label = label_ids[_id]
-            predicted_label = class_names[cl]
-            confidence = score
+        #     true_label = label_ids[_id]
+        #     predicted_label = class_names[cl]
+        #     confidence = score
             
-            f.write('{}, {}, {}, {}, {}, {}\n'.format(path_to_image, true_label, predicted_label, \
-                 confidence, ' '.join(true_bbox), ' '.join(predicted_bbox))
-                )
+        #     f.write('{}, {}, {}, {}, {}, {}\n'.format(path_to_image, true_label, predicted_label, \
+        #          confidence, ' '.join(true_bbox), ' '.join(predicted_bbox))
+        #         )
     f.close()
 
             

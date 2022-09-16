@@ -93,7 +93,7 @@ def _main():
     np.random.shuffle(lines_train)
     np.random.seed(None)   
 
-    lines_train = lines_train[:10]
+    # lines_train = lines_train[:10]
 
 
 
@@ -143,23 +143,23 @@ def _main():
     # Adjust num epochs to your dataset. This step is enough to obtain a not bad model.
     n_epochs = 0 
     if True:
-        epoch = 200
-        # lr_schedule = keras.optimizers.schedules.ExponentialDecay(
-        #     initial_learning_rate=1e-3,
-        #     decay_steps=1000,
-        #     decay_rate=0.9
-        #     )
-        model.compile(optimizer=adam_v2.Adam(learning_rate=1e-3), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
+        epoch = 100
+        lr_schedule = keras.optimizers.schedules.ExponentialDecay(
+            initial_learning_rate=1e-3,
+            decay_steps=1000,
+            decay_rate=0.9
+            )
+        model.compile(optimizer=adam_v2.Adam(learning_rate=lr_schedule), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
         # model.compile(optimizer=tf.keras.optimizers.SGD(learning_rate=lr_schedule), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
         # model.compile(optimizer=tf.keras.optimizers.Nadam(learning_rate=1e-2), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
         # model.compile(optimizer=tf.keras.optimizers.Adagrad(learning_rate=1e-1), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
-        batch_size = 1
+        batch_size = 8
         print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
         h = model.fit(data_generator_wrapper(lines_train, batch_size, anchors_stride_base, num_classes, max_bbox_per_scale, 'train'),
                 steps_per_epoch=max(1, num_train//batch_size),
                 epochs=epoch,
                 initial_epoch=0,
-                callbacks=[logging, checkpoint, early_stopping_1, stop_on_nan, csv, reduce_lr])
+                callbacks=[logging, checkpoint, early_stopping_1, stop_on_nan, csv])
         n_epochs = len(h.history['loss'])
 
     # Unfreeze and continue training, to fine-tune.

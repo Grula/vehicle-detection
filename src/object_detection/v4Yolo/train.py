@@ -98,8 +98,8 @@ def _main():
 
 
     # We have to be carefull here, what if all instances of class go to one set
-    lines_val = lines_train[:int(len(lines_train)*0.2)]
-    lines_train = lines_train[int(len(lines_train)*0.2):]
+    lines_val = lines_train[:int(len(lines_train)*0.1)]
+    lines_train = lines_train[int(len(lines_train)*0.1):]
     # get all unique classes in lines_val ( last number in each line )
     val_classes = set([line.split(',')[-1].strip() for line in lines_val])
     print("In validation set we have classes: ", val_classes)
@@ -124,10 +124,10 @@ def _main():
     checkpoint = ModelCheckpoint(os.path.join(args['log_dir'], 'best_weights.h5'),
         monitor='loss', save_weights_only=True, save_best_only=True, save_freq='epoch')
 
-    reduce_lr = ReduceLROnPlateau(monitor='loss', factor=0.7, patience=3, verbose=1)
+    reduce_lr = ReduceLROnPlateau(monitor='loss', factor=0.5, patience=3, verbose=1)
     
     early_stopping_1 = EarlyStopping(monitor='loss', min_delta=0, patience=5, verbose=1)
-    early_stopping_2 = EarlyStopping(monitor='loss', min_delta=0, patience=10, verbose=1)
+    early_stopping_2 = EarlyStopping(monitor='loss', min_delta=0, patience=12, verbose=1)
 
     csv = tf.keras.callbacks.CSVLogger(args['log_dir'] + "history.csv", append=True)
 
@@ -164,7 +164,7 @@ def _main():
 
     # Unfreeze and continue training, to fine-tune.
     # Train longer if the result is not good.
-    if False:
+    if True:
         epoch = 200 + n_epochs
         for i in range(len(model.layers)):
             model.layers[i].trainable = True

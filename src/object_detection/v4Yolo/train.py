@@ -129,6 +129,8 @@ def _main():
     early_stopping_1 = EarlyStopping(monitor='loss', min_delta=0, patience=5, verbose=1)
     early_stopping_2 = EarlyStopping(monitor='loss', min_delta=0, patience=10, verbose=1)
 
+    csv = tf.keras.callbacks.CSVLogger(args['log_dir'] / "history.csv", append=True)
+
     evaluation = Evaluate(model_body=model_body, anchors=anchors, class_names=class_index,
          score_threshold=0.05, tensorboard=logging, weighted_average=True, eval_lines=lines_val, log_dir=log_dir,
          image_shape = input_shape)
@@ -139,6 +141,7 @@ def _main():
 
     # Train with frozen layers first, to get a stable loss.
     # Adjust num epochs to your dataset. This step is enough to obtain a not bad model.
+    n_epochs = 0 
     if True:
         epoch = 200
         lr_schedule = keras.optimizers.schedules.ExponentialDecay(
@@ -156,13 +159,13 @@ def _main():
                 steps_per_epoch=max(1, num_train//batch_size),
                 epochs=epoch,
                 initial_epoch=0,
-                callbacks=[logging, checkpoint, early_stopping_1, stop_on_nan])
-
+                callbacks=[logging, checkpoint, early_stopping_1, stop_on_nan, csv])
+        n_epochs = len(model.history['loss'])
 
     # Unfreeze and continue training, to fine-tune.
     # Train longer if the result is not good.
     if False:
-        epoch = 200
+        epoch = 200 + n_epochs
         for i in range(len(model.layers)):
             model.layers[i].trainable = True
         model.compile(optimizer=adam_v2.Adam(learning_rate=1e-5), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
@@ -173,9 +176,9 @@ def _main():
         model.fit(data_generator_wrapper(lines_train, batch_size, anchors_stride_base, num_classes, max_bbox_per_scale, 'train'),
             steps_per_epoch=max(1, num_train//batch_size),
             epochs=epoch,
-            initial_epoch=0,
+            initial_epoch=n_epochs,
             # callbacks=[logging, checkpoint, reduce_lr, early_stopping])
-            callbacks=[logging, checkpoint, reduce_lr, early_stopping_2, evaluation, stop_on_nan])
+            callbacks=[logging, checkpoint, reduce_lr, early_stopping_2, evaluation, stop_on_nan, csv])
 
     # Further training if needed.
 
@@ -330,10 +333,10 @@ def image_preprocess(image, target_size, gt_boxes):
     h, w = image.shape[:2]
     interps = [   # 随机选一种插值方式
         cv2.INTER_NEAREST,
-        cv2.INTER_LINEAR,
-        cv2.INTER_AREA,
-        cv2.INTER_CUBIC,
-        cv2.INTER_LANCZOS4,
+        # cv2.INTER_LINEAR,
+        # cv2.INTER_AREA,
+        # cv2.INTER_CUBIC,
+        # cv2.INTER_LANCZOS4,
     ]
     method = np.random.choice(interps)   # 随机选一种插值方式
     scale_x = float(iw) / w

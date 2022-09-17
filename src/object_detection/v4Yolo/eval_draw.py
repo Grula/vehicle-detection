@@ -101,13 +101,19 @@ if __name__ == '__main__':
             os.makedirs(destination_folder)
         
         for image_file in images:
+
+            
+
             image_path = os.path.join(subfolder, image_file)
 
             print("Detecing image: {}".format(image_path))
             image = cv2.imread(image_path)
             image, boxes, scores, classes = _decode.detect_image(image, False)
             if boxes is  None:
+                cv2.imwrite(f'{destination_folder}/{image_file}', image)
+                print(f'Saved {image_file}')
                 continue
+
             predicted_data = list(zip(boxes, scores, classes))
             predicted_data.sort(key=lambda x: x[1], reverse=True)
             
@@ -116,8 +122,8 @@ if __name__ == '__main__':
             print(score)
             # for box, score, cl in predicted_data[:1]:
             # Check if class is in the list of classes to detect
-            if class_names[cl] != current_label:
-                continue
+            # if class_names[cl] != current_label:
+            #     continue
 
             # x0, y0, x1, y1 = boxes[max_idx]
             x0, y0, x1, y1 = box
@@ -129,34 +135,34 @@ if __name__ == '__main__':
             h = bottom - y
             # saving info to csv file 
 
+            if score > 0.5:
+                hsv_tuples = [(1.0 * x / 4, 1., 1.) for x in range(4)]
+                colors = list(map(lambda x: colorsys.hsv_to_rgb(*x), hsv_tuples))
+                colors = list(map(lambda x: (int(x[0] * 255), int(x[1] * 255), int(x[2] * 255)), colors))
 
-            hsv_tuples = [(1.0 * x / 4, 1., 1.) for x in range(4)]
-            colors = list(map(lambda x: colorsys.hsv_to_rgb(*x), hsv_tuples))
-            colors = list(map(lambda x: (int(x[0] * 255), int(x[1] * 255), int(x[2] * 255)), colors))
+                random.seed(0)
+                random.shuffle(colors)
+                random.seed(None)
 
-            random.seed(0)
-            random.shuffle(colors)
-            random.seed(None)
-
-            x0, y0, x1, y1 = box
-            left = max(0, np.floor(x0 + 0.5).astype(int))
-            top = max(0, np.floor(y0 + 0.5).astype(int))
-            right = min(image.shape[1], np.floor(x1 + 0.5).astype(int))
-            bottom = min(image.shape[0], np.floor(y1 + 0.5).astype(int))
-            bbox_color = colors[cl]
-            # bbox_thick = 1 if min(image_h, image_w) < 400 else 2
-            bbox_thick = 1
-            cv2.rectangle(image, (left, top), (right, bottom), bbox_color, bbox_thick)
-            bbox_mess = '%s: %.2f' % (class_names[cl], score)
-            t_size = cv2.getTextSize(bbox_mess, 0, 0.5, thickness=1)[0]
-            cv2.rectangle(image, (left, top), (left + t_size[0], top + t_size[1] + 3), bbox_color, -1)
-            cv2.putText(image, bbox_mess, (left, top + 15), cv2.FONT_HERSHEY_SIMPLEX,
-                        0.5, (0, 0, 0), 1, lineType=cv2.LINE_AA)
+                x0, y0, x1, y1 = box
+                left = max(0, np.floor(x0 + 0.5).astype(int))
+                top = max(0, np.floor(y0 + 0.5).astype(int))
+                right = min(image.shape[1], np.floor(x1 + 0.5).astype(int))
+                bottom = min(image.shape[0], np.floor(y1 + 0.5).astype(int))
+                bbox_color = colors[cl]
+                # bbox_thick = 1 if min(image_h, image_w) < 400 else 2
+                bbox_thick = 1
+                cv2.rectangle(image, (left, top), (right, bottom), bbox_color, bbox_thick)
+                bbox_mess = '%s: %.2f' % (class_names[cl], score)
+                t_size = cv2.getTextSize(bbox_mess, 0, 0.5, thickness=1)[0]
+                cv2.rectangle(image, (left, top), (left + t_size[0], top + t_size[1] + 3), bbox_color, -1)
+                cv2.putText(image, bbox_mess, (left, top + 15), cv2.FONT_HERSHEY_SIMPLEX,
+                            0.5, (0, 0, 0), 1, lineType=cv2.LINE_AA)
 
                 # f.write(f'{image_path},{current_label},{class_names[classes[i]]},{max_score},{x},{y},{w},{h}\n')
 
-            if args['save']:
-                cv2.imwrite(f'{destination_folder}/{image_file}', image)
-                print(f'Saved {image_file}')
+            # if args['save']:
+            sav = cv2.imwrite(f'{destination_folder}/{image_file}', image)
+            print(f'Saved {image_file} : {sav}')
     
     

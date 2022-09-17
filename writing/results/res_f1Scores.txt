@@ -1,0 +1,23 @@
+
+
+
+###################################################
+Current file:  base_512_data_prediction.csv
+Average f1-score for class:  car  is:  0.9957760548968485
+Average f1-score for class:  motorbike  is:  0.9900310861345899
+Average f1-score for class:  bus  is:  0.0
+Average f1-score for class:  truck  is:  0.0
+
+###################################################
+Current file:  style_512_data_prediction.csv
+Average f1-score for class:  car  is:  0.991501794948881
+Average f1-score for class:  motorbike  is:  0.9812192433796648
+Average f1-score for class:  bus  is:  1.0
+Average f1-score for class:  truck  is:  0.0
+
+###################################################
+Current file:  standard_512_data_prediction.csv
+Average f1-score for class:  car  is:  0.9884542001516534
+Average f1-score for class:  motorbike  is:  0.9878125953555295
+Average f1-score for class:  bus  is:  0.0
+Average f1-score for class:  truck  is:  0.0

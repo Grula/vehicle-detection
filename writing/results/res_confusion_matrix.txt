@@ -1,0 +1,46 @@
+Current Object Detection folder:  yolo
+###################################################
+Current file:  base_512_data_prediction.csv
+Number of total images:  188
+Number of detected images:  188
+Number of undetected images:  0
+Number of images after iou filter:  188
+Confusion Matrix:
+           car        motorbike  bus        truck      none      
+car        89         0          0          1          0         
+motorbike  0          97         1          0          0         
+bus        0          0          0          0          0         
+truck      0          0          0          0          0         
+none       0          0          0          0          0         
+###################################################
+
+###################################################
+Current file:  standard_512_data_prediction.csv
+Number of total images:  188
+Number of detected images:  187
+Number of undetected images:  1
+Number of images after iou filter:  187
+Confusion Matrix:
+           car        motorbike  bus        truck      none      
+car        89         0          0          1          0         
+motorbike  0          97         0          0          0         
+bus        0          0          0          0          0         
+truck      0          0          0          0          0         
+none       0          0          1          0          0         
+###################################################
+
+###################################################
+Current file:  style_512_data_prediction.csv
+Number of total images:  188
+Number of detected images:  188
+Number of undetected images:  0
+Number of images after iou filter:  188
+Confusion Matrix:
+           car        motorbike  bus        truck      none      
+car        89         0          0          1          0         
+motorbike  0          97         0          0          0         
+bus        0          0          1          0          0         
+truck      0          0          0          0          0         
+none       0          0          0          0          0         
+###################################################
+

@@ -1,0 +1,21 @@
+###################################################
+Current file:  base_512_data_prediction.csv
+AP for car: 1.0
+AP for motorbike: 1.0
+AP for bus: 0.0
+AP for truck: 0.0
+mAP:  0.5
+###################################################
+Current file:  style_512_data_prediction.csv
+AP for car: 1.0
+AP for motorbike: 1.0
+AP for bus: 1.0
+AP for truck: 0.0
+mAP:  0.75
+###################################################
+Current file:  standard_512_data_prediction.csv
+AP for car: 1.0
+AP for motorbike: 1.0
+AP for bus: 0.0
+AP for truck: 0.0
+mAP:  0.5

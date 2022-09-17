@@ -86,7 +86,7 @@ for folder in folders:
             aps = {'precision': [], 'recall': [], 'f1': []}
             # we will get mAP for each class here
             
-            for iou_threshold in np.arange(0.5, 1.0, 0.01):
+            for iou_threshold in np.arange(0.5, 1.0, 0.05):
                 # print("Current IoU threshold: ", iou_threshold)
                 for line in lines_class:
                     line = list(map(lambda x: x.strip(), line))
@@ -149,16 +149,15 @@ for folder in folders:
         
 
             # plot precision with iou threshold
-            plt.plot(np.arange(0.5, 1.0, 0.01), aps['precision'], label=class_name)
+            plt.plot(np.arange(0.5, 1.0, 0.05), aps['precision'], label=class_name)
 
 
         # plot precision with iou threshold
-        file_name = file.split('.')[0]
         plt.legend()
         plt.ylim(-0.05, 1.05)
         plt.xlabel('IoU prag')
         plt.ylabel('Preciznost')
-        plt.title('Preciznost za ' + file_name.split('-')[0] + ' sa IoU pragom')
+        plt.title('Preciznost u odnosu na IoU prag za model ')
         plt.savefig(file.split('.')[0] + '.png')
         plt.close()
 

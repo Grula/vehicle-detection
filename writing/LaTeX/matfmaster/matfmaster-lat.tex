@@ -20,6 +20,7 @@
 \usepackage{multirow}
 
 \usepackage{textcomp}
+\usepackage{pbox}
 
 
 \usepackage{amsfonts}
@@ -69,14 +70,6 @@
 \mentor{dr Milena \textsc{Vujošević Janičić}, vandredni profesor\\ Univerzitet u Beogradu, Matematički fakultet}
 \komisijaA{dr Mladen \textsc{Nikolić}, vandredni profesor\\ Univerzitet u Beogradu, Matematički fakultet}
 \komisijaB{Lester de \textsc{Abreu Faria}, Professor at ITA \& PHD in Microelectronics\\ IPFacens, Sorocaba, São Paulo, Brazil}
-% Ime i afilijacija prvog člana komisije (u odabranom pismu)
-% \komisijaA{------ \textsc{------}, profesor\\ Univerzitet u Beogradu, Matematički fakultet}
-% Ime i afilijacija drugog člana komisije (u odabranom pismu)
-% Ime i afilijacija trećeg člana komisije (opciono)
-% \komisijaC{}
-% Ime i afilijacija četvrtog člana komisije (opciono)
-% \komisijaD{}
-
 % Datum odbrane (odkomentarisati narednu liniju i upisati datum odbrane ako je poznat)
 \datumodbrane{Septembar, 2022.}
 
@@ -86,13 +79,11 @@ Jedan od najznačajnijih primera korišćenja detekcije i prepoznavanja objekata
 Da bi se omogućilo efikasno prepoznavanje objekata, koriste se metode mašinskog učenja, na primer neuronske mreže, duboko učenje i metode računarskog vida.
 Međutim, da bi se dobili rezultati u skladu sa željenim kvalitetom, obično je neophodna velika količina podataka, velika procesorska snaga i obeležavanje podataka koje može da bude veoma skupo ili u velikoj meri nedostupno. 
 Ovaj rad se bavi metodama za proširivanje skupa podataka, kao i metodama za smanjenje vremena potrebnog za obučavanje modela, u slučaju da velika količina podataka ili velika procesorska snaga nisu na raspolaganju.
-% U radu se podaci proširuju standardnim augmentacijama i metodama kreiranja novih sintetičkih podataka. IZMENA std aug (3.2-1)
 U radu se podaci proširuju standardnim transformacijama za slike i metodama kreiranja novih sintetičkih podataka.
 Korišćenjem obuke sa prenosom znanja smanjuje se vreme koje je potrebno neuronskim mrežama da nauče glavne karakteristike raspoloživih podataka.
 Korišćenjem navedenih metoda dobijaju se poboljšani rezultati u odnosu na trenutno najbolji model za detekciju objekata. Poboljšanja modela se ogledaju u boljoj detekciji i u boljem prepoznavanju objekata.
 }
 
-% Ključne reči na srpskom jeziku (u odabranom pismu) IZMENA vizija u vid
 \kljucnereci{veštačka inteligencija, mašinsko učenje, računarski vid, duboko učenje, digitalna slika, VGG16, YOLO, StyleGAN}
 
 \begin{document}
@@ -124,19 +115,17 @@ Korišćenjem navedenih metoda dobijaju se poboljšani rezultati u odnosu na tre
 Mašinsko učenje (eng.~\textit{machine learning}) se odnosi na sposobnost mašine da donosi zaključke koristeći dostupne podatke umesto strogo definisanih i kodiranih pravila. Zapravo, mašinsko učenje omogućava računarima da sami uče. 
 Rezultati mašinskog učenja posredno se javljaju u svakodnevnom životu, od predviđanja vremenske prognoze do autonomne vožnje.
 
-Tehnike nadgledanog mašinskog učenja podrazumevaju korišćenje velike količine označenih podataka. 
-Međutim, postoji više razloga zbog kojih velika količina označenih podataka nije uvek dostupna. Prikupljanje i obeležavanje podataka je proces koji može biti izuzetno skup ili čak i nemoguć \cite{bengio2007scaling}. Na primer, u oblasti medicine, obeležavanje podataka od strane stručnjaka radiologije je skupo i nije izvodljivo u velikim razmerama \cite{litjens2017survey}. U takvim situacijama, mašinsko učenje ima na raspolaganju samo malu količinu podataka i potrebno je primeniti posebne tehnike i pristupe kako bi se problem dostupnosti male količine podataka, ukoliko je to moguće, prevazišao. 
+Tehnike nadgledanog mašinskog učenja podrazumevaju korišćenje velike količine označenih podataka. Međutim, postoji više razloga zbog kojih velika količina označenih podataka nije uvek dostupna. Prikupljanje i obeležavanje podataka je proces koji može biti izuzetno skup ili čak i nemoguć \cite{bengio2007scaling}. Na primer, u oblasti medicine, obeležavanje podataka od strane stručnjaka radiologije je skupo i nije izvodljivo u velikim razmerama \cite{litjens2017survey}. U takvim situacijama, mašinsko učenje ima na raspolaganju samo malu količinu podataka i potrebno je primeniti posebne tehnike i pristupe kako bi se problem dostupnosti male količine podataka, ukoliko je to moguće, prevazišao. 
 
 U ovom radu se rešava problem dostupnosti male količine podataka, pri čemu su podaci slike sa obeleženim okvirima objekata. Za rešavanje problema male količine podataka koriste se dva pristupa: proširivanje skupa podataka i učenje sa prenosom znanja (eng.~\textit{transfer learning}).
-% U radu je opisan postupak proširivanja skupa podataka, pri čemu se podaci proširuju standardnim tehnikama za augmentaciju slika i podacima dobijenim pomoću modela za generisanje sintetičkih slika. IZMENA std aug (3.2-1)
 U radu je opisan postupak proširivanja skupa podataka, pri čemu se podaci proširuju standardnim transformacijama za augmentaciju slika i podacima dobijenim pomoću modela za generisanje sintetičkih slika.
-Proširivanje skupa podataka navedenim metodama i dalje ne rešava dovoljno dobro problem male količine podataka. 
-U radu je opisana i tehnika učenja sa prenosom znanja \cite{zhuang2020comprehensive} na već obučenom modelu za detekciju objekta \cite{bochkovskiy2020yolov4}. 
-% Korišćenje učenja sa prenosom znanja ima za cilj da se nauče reprezentacije iz jednog domena i prenesu naučene karakteristike u blisko povezan ciljni domen \cite{brigato2021close, bengio2012deep}. IZMENA (1.0-2)
-Korišćenje učenja sa prenosom znanja za cilj ima da se upotrebi naučeno znanje iz jednog domena kako bi se bolje učilo u drugom \cite{brigato2021close, bengio2012deep}.
-
-Indirektan doprinos korišćenja učenja sa prenosom znanja je i smanjivanje procesorkse snage potrebne za obuku modela.
+Proširivanje skupa podataka navedenim metodama i dalje ne rešava dovoljno dobro problem male količine podataka.
+U radu je opisana i tehnika učenja sa prenosom znanja \cite{zhuang2020comprehensive} na već obučenom modelu za detekciju objekta \cite{bochkovskiy2020yolov4}. Korišćenje učenja sa prenosom znanja za cilj ima da se upotrebi naučeno znanje iz jednog domena kako bi se bolje učilo u drugom \cite{bengio2012deep}. Indirektan doprinos korišćenja učenja sa prenosom znanja je i smanjivanje procesorkse snage potrebne za obuku modela.
 Korišćenjem navedenih metoda proširivanja skupa podataka i učenja sa prenosom znanja, dobija se model sa boljim karakteristikama.
+
+Ideje koje su ovde predstavljene zasnivaju se na prethodnim istraživanjima. Kod nekih istraživanja gde su na raspolaganju bile male količine podataka, pomoću standardnih transformacija slika, generisane su nove slike koje su korišćene u obuci modela i koje su pozitivno uticale na krajnje rezultate  \cite{brigato2021close}. Pored toga, predloženo je i generisanje novih slika generativnim suparničkim mrežama za proširenje skupa podataka radi povećanja performansi \cite{brigato2021close,liu2019generative}. Obuka generativnih suparničkih mreža sa malom količinom podataka ne daje zadovoljavajuće rezultate \cite{brigato2021close}, pa se pojavom metode diferencijabilne augmentacije za generativne suparničke mreže \cite{zhao2020differentiable} stvara mogućnost generisanja novih podataka pomoću malog skupa podataka. 
+Cilj ovog rada je proširivanje skupa podataka standarnim transformacijama slika i generisanje sintetičkih podataka generativnim suparničkim mrežama sa malom količinom podataka, koje ranije nisu bile u fokusu i koje su postale dostupne metodom diferencijabilne augmentacije.
+
 U glavi \ref{section2} je dat kratak pregled modela za detekciju objekata koji se koriste u ovom radu. U glavi \ref{section3} je dat pregled tehnika i generativne suparničke mreže koje se koriste u rešavanju problema male količine podataka, dok u glavi \ref{section4} se opisuju tehnike evaluacije tih modela. U glavi \ref{section5} su predstavljeni eksperimenti i rezultati dobijenih modela. U glavi \ref{section6} su ukratko prikazani problemi sa kojima se ovaj rad susreće, metode njihovog prevazilaženja i moguća dalja unapređenja rešenja.
 
 
@@ -144,7 +133,6 @@ U glavi \ref{section2} je dat kratak pregled modela za detekciju objekata koji s
 \chapter{Detekcija objekata}
 \label{section2}
 % ------------------------------------------------------------------------------
-% IZMENA vizija u vid
 Računarski vid (eng.~\textit{computer vision}) je oblast mašinskog učenja, koja se bavi izgradnjom i korišćenjem  sistema za obradu, analizu i interpretaciju digitalnih slika ili video zapisa \cite{ballard1982computer, huang1996computer}.
 Detekcija objekata je tehnika računarskog vida, koja za zadatak ima 
 da otkrije objekte na slici. Za uspešnu detekciju objekta potrebno je obučiti model na velikoj količini podataka. 
@@ -172,7 +160,6 @@ Modeli jednostepene detekcije objekata odnose se na klasu modela koji preskaču 
 
 
 % #######################################
-% \section{Model za detekciju objekata VGG16} IZMENA (2.2-2)
 \section{Model za klasifikaciju objekata VGG16}
 % #######################################
 
@@ -187,8 +174,7 @@ Model VGG16 spada u model jednostepene detekcije i dobio je svoj naziv po šesna
     \label{fig:section2_vgg16}
 \end{figure}
 
-% Model je bio u mogućnosti da predvidi objekte na datim slikama za validaciju sa 6.8\% greške nadmašujući prvi naredni model za 0,9\%. \cite{simonyan2014very}. IZMENA (2.2-1), validacioni skup -> test
-Model je bio u mogućnosti da predvidi objekte na datim slikama sa greškom klasifikacije koja je iznosila 6.8\% na skupu za test i time je nadmašio prvi naredni model za 0,9\% \cite{simonyan2014very}.
+U skupu podataka za ILSVR, test skup je sadržao oko četrdeset hiljada slika, što je bilo oko 10\% celokupnog skupa podataka \cite{LSVRC2013}.  Model je bio u mogućnosti da predvidi objekte na datim slikama sa greškom klasifikacije koja je iznosila 6.8\% na skupu za test i time je nadmašio prvi naredni model za 0,9\% \cite{simonyan2014very}.
 Nedostatak modela VGG16 je da nije u mogućnosti da odredi okvire detektovanog objekta na slici.
 
 
@@ -208,7 +194,6 @@ Model R-CNN je prvi model dvostepene detekcije i sastoji se od tri modula koji o
 
 Problemi koji se javljaju kod R-CNN-a su \cite{gandhi_2018}:
 \begin{itemize}
-    % \item Zbog moguće klasifikacije velikog broja predloga regiona po slici, obučavanje modela nije moguće koristiti u realnom vremenu. IZMENA (2.3-1)
     \item Zbog moguće klasifikacije velikog broja predloga regiona po slici, predviđanja modela nije moguće koristiti u realnom vremenu.
     \item Algoritam selektivne pretrage je fiksiran i kao takav se ne prilagođava podacima. To može da ima za posledicu da se u nekim situacijama dobijaju loši predlozi regiona.
 \end{itemize}
@@ -220,10 +205,16 @@ Tokom nekoliko iteracija razvoja R-CNN-a dolazi do znatnog ubrzavanje modela i t
 \section{Model za detekciju objekata YOLO}
 % #######################################
 %YOLO
-Model za detekciju objekata R-CNN koristi regione da otkrije objekte unutar slike. Model ne gleda na kompletnu sliku, već umesto toga, gleda delove slike koji imaju visoku verovatnoću da sadrže objekte. YOLO (eng.~\textit{you only look once}) je model za otkrivanje objekata koji se razlikuje od modela zasnovanih na regionima. Model YOLO spada u model zasnovan na jednostepenoj detekciji i nastao je 2015.~godine \cite{redmon2016you}. Kod modela YOLO jedna konvolutivna mreža predviđa granične okvire i otkriva objekte.% IZMENA obrisao regioni (2.4-1)
+Model za detekciju objekata R-CNN koristi regione da otkrije objekte unutar slike. Model ne gleda na kompletnu sliku, već umesto toga, gleda delove slike koji imaju visoku verovatnoću da sadrže objekte. YOLO (eng.~\textit{you only look once}) je model za otkrivanje objekata koji se razlikuje od modela zasnovanih na regionima. Model YOLO spada u model zasnovan na jednostepenoj detekciji i nastao je 2015.~godine \cite{redmon2016you}. Kod modela YOLO jedna konvolutivna mreža predviđa granične okvire i otkriva objekte.
 
-Odvojene komponente detekcije objekata objedinjuju se u jednu neuronsku mrežu. Model koristi pronađene karakteristike iz cele slike da predvidi svaki granični okvir. Takođe, predviđaju se svi granični okviri za sve objekte na slici istovremeno. To znači da model globalno razmišlja o celokupnoj slici i svim objektima na njoj \cite{redmon2016you}.
+Odvojene komponente detekcije objekata objedinjuju se u jednu neuronsku mrežu. Model koristi pronađene karakteristike iz cele slike da predvidi svaki granični okvir. Takođe, predviđaju se svi granični okviri za sve objekte na slici istovremeno. To znači da model globalno razmišlja o celokupnoj slici i svim objektima na njoj \cite{redmon2016you}. Model YOLO je duplo brži od modela brži R-CNN, i ima 5\% bolju preciznost pri detekciji objekata. Modelu YOLO je potrebno 12 milisekundi da uspešno predvidi objekte na slici, dok modelu brži R-CNN je potrebno 25 milisekundi da predvidi objekte. Poređenje modela je prikazano na slici \ref{fig:section2_YOLOvsRCNN} \cite{bdcc6030072}.
 
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.8\textwidth]{matfmaster/glava2/yolo4_rcnn.png}
+    \caption{ Poređenje modela YOLO sa modelom brži R-CNN \cite{bdcc6030072}. Na $y$ osi je prikazana metrika srednje prosečne preciznosti koju modeli ostvaruju, dok $x$ osa predstavlja broj slika koji modeli mogu da obrade u sekundi.}
+    \label{fig:section2_YOLOvsRCNN}
+\end{figure}
 
 % ------------------------------------------------------------------------------
 \chapter{Tehnike proširivanja skupa podataka}
@@ -232,25 +223,24 @@ Odvojene komponente detekcije objekata objedinjuju se u jednu neuronsku mrežu. 
 
 Skup podataka je moguće proširiti kreiranjem novih podataka. U tehnike za kreiranje podataka spadaju augmentacija podataka i generativne suparničke mreže. U nekim slučajevima i nakon proširenja skupa za obuku, količina podataka koja je na raspolaganju može da bude nedovoljna za obuku modela. Takav problem se može ublažiti korišćenjem učenja sa prenosom znanja. 
 
+% Detaljno poređenje modela koji je koristio tehnike proširivanja skupa podataka CIFAR-10 može se naći u radu \cite{brigato2021close}.
+
+
 % #######################################
 \section{Problem malog skupa podataka}
 % #######################################
 
-% Modeli obučeni na malom skupu podataka teže ka tome da pronađu karakteristike koje ne postoje, što rezultira velikom varijansom i velikom greškom na skupu za validaciju. IZMENA (3.1-1)
 Modeli obučeni na malom skupu podataka obično uočavaju karakteristike koje su svojstvene tom malom skupu, ali ne i celoj populaciji podataka. To rezultira velikom varijansom i velikom greškom na skupu za test. U ovom radu koriste se dve metode kako bi se izbeglo ovakvo ponašanje. Prvi metod je proširivanje skupa podataka.
-% Podaci se proširuju slikama koje su izmenjene pomoću standardnih metoda augmentacije i slikama koje su sintetički generisane pomoću generativnih suparničkih mreža. IZMENA std aug (3.2-1)
 Podaci se proširuju slikama koje su izmenjene standardnim transformacijama i slikama koje su sintetički generisane pomoću generativnih suparničkih mreža.
 Drugi metod predstavlja korišćenje učenja sa prenosom znanja.
 
 
 % #######################################
-% \section{Standardne metode augmentacije} IZMENA
 \section{Standardne transformacije slika koje se koriste za augmentaciju}
 \label{section3_increasedata_bas}
 % #######################################
-% U standardne metode augmentacija spadaju IZMENA  std aug (3.2-1)
 U standardne transformacije spadaju rotacija (eng.~\textit{rotation}), refleksija (eng.~\textit{flip}), skaliranje (eng.~\textit{scale}), seckanje (eng.~\textit{crop}), zamućenje (eng.~\textit{blur}) i augmentacija boja (eng.~\textit{color augmentation}).
-Nasumičnim kombinovanjem navedenih metoda se kreiraju novi podaci koji služe kao proširenje skupa podataka za obučavanje.
+Nasumičnim kombinovanjem navedenih metoda se kreiraju novi podaci koji služe kao proširenje skupa podataka za obučavanje. 
 
 \subsection{Refleksija}
 Refleksija slike se odnosi na kreiranje nove slike koja odgovara slici u ogledalu, u odnosu na vertikalnu ili horizontalnu osu. Operaciju refleksije nije moguće primeniti u svakom domenu. Na primer, vertikalna refleksija neće imati mnogo smisla u slučaju saobraćajnih vozila. Primeri refleksije su prikazani na slici \ref{fig:section3_flip}. 
@@ -374,7 +364,7 @@ Tehnika menjanja nijanse (eng.~\textit{HUE}) pomera piksele na slici u drugu ta�
 \label{section3_increasedata_gan}
 % #######################################
 
-Tokom razvoja mašinskog učenja, razvijen je koncept generativnih suparničkih mreža (eng.~\textit{generative adversarial network, GAN}). Kod generativnih suparničkih mreža postoje dva modela: \textit{generator} i \textit{diskriminator}. Generator za zadatak ima da generiše slike, a diskriminator da razlikuje slike generisane generatorom od pravih slika \cite{goodfellow2014generative}. % IZMENA (4.6-1) prebacio fju greske
+Tokom razvoja mašinskog učenja, razvijen je koncept generativnih suparničkih mreža (eng.~\textit{generative adversarial network, GAN}). Kod generativnih suparničkih mreža postoje dva modela: \textit{generator} i \textit{diskriminator}. Generator za zadatak ima da generiše slike, a diskriminator da razlikuje slike generisane generatorom od pravih slika \cite{goodfellow2014generative}.
 Osnovna arhitektura generativnih suparničkih mreža je prikazana na slici \ref{fig:section2_gans}.
 
 \begin{figure}[ht]
@@ -385,9 +375,7 @@ Osnovna arhitektura generativnih suparničkih mreža je prikazana na slici \ref{
 \end{figure}
 
 Generativne suparničke mreže se u velikoj meri oslanjaju na velike količine raznovrsnih i visokokvalitetnih podataka za obučavanje, kako bi generisali fotorealistične slike \cite{zhao2020differentiable}. 
-% Generator i diskriminator naizmenično uče i može se reći da je rezultat dobar kada diskriminator ima približnu preciznost od 50\%, tačnije kada počne da nagađa da li je slika prava ili ne. IZMENA (3.3-1,2)
 Generator se obučava da što bolje generiše slike koje diskriminator neće razlikovati od stvarnih, dok diskriminator se obučava da što bolje razlikuje lažne slike od stvarnih. Kako se generator menja, mora i diskriminator i obratno. Tako se generator i diskriminator obučavaju naizmenično \cite{ml2019}. 
-% IZMENA (4.6-1) prebacio fju greske
 Funkcije grešaka za generativne suparničke mreže mogu se formulisati preko igre nulte sume \cite{goodfellow2020generative, hodgson2006microeconomics}. Generator pokušava da minimizuje funkciju dok diskriminator pokušava da maksimizuje. Za dati generator $G$ i diskriminator $D$ problem igre nulte sume se definiše kao \cite{goodfellow2020generative, ml2019}:
 
 \begin{equation}
@@ -401,49 +389,36 @@ U datoj formuli:
     \item $D(G(z))$ predstavlja procenu diskriminatora da je lažni podatak stvaran,
     \item $\mathbb{E}_{z}$ je očekivanje po raspodeli podataka u latentnom prostoru.
 \end{itemize}
-% IZMENA (4.6-2) 
-% \noindent Funkcija greške za generator se definiše sa:
-% \begin{equation}
-% \label{eq:generator}
-%     \min\log{(1-D(G(z)))}
-% \end{equation}
-% i za diskriminator sa:
-% \begin{equation}
-% \label{eq:discriminator}
-%     \max\log{D(x)}+\log{(1-D(G(z)))}
-% \end{equation}
 
 
 Progresivne generativne suparničke mreže (eng.~\textit{progressive generative adversarial network}) modifikuju arhitekturu na taj način da obučavanje generativnih suparničkih mreža počinje sa niskom rezolucijom slike, a zatim progresivno povećava rezoluciju dodavanjem slojeva u mrežu. Proces obuke je prikazan na slici \ref{fig:section2_augmentation_progressivegans}.
-% IZMENA od standardnih osobina pa do -> od grubih crta pa do (3.3-4)
 Ovakva inkrementalna priroda omogućava da model tokom obuke prvo otkrije vizuelne karakteristike koje se manifestuju na početnim slojevima, od grubih crta pa do sitnih detalja \cite{karras2017progressive}.
 
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=1\textwidth]{matfmaster/glava2/progressive_gan.png}
+    \includegraphics[width=0.85\textwidth]{matfmaster/glava2/progressive_gan.png}
     \caption{Proces obuke progresivnih generativnih suparničkih mreža počinje od slika niske rezolucije (4\(\times\)4) i progresivno se dodaju slojevi u mrežu i rezolucija povećava do (1024\(\times\)1024). Prva slika (slika a) predstavlja prvu iteraciju obuke modela, druga slika (slika b) predstavlja drugu iteraciju obuke, dok treća slika (slika c) predstavlja poslednju iteraciju. Slike automobila (slika d) predstavljaju generisane slike sa najvećom rezolucijom \cite{karras2017progressive}. }
     \label{fig:section2_augmentation_progressivegans}
 \end{figure}
 
+\clearpage
 Tokom razvijanja generativnih suparničkih mreža najviše se radilo na poboljšanju diskriminatora, što je vodilo ka boljim rezultatima. S druge strane, \textit{StyleGAN} (eng.~\textit{style generative adversarial network}) je dodatak arhitekturi generativnih suparničkih mreža, koji uvodi značajne modifikacije u model generatora \cite{karras2019style}. 
 
-
 Generator modela zasnovan na stilu se sastoji iz dva dela i prikazan je na slici \ref{fig:section2_augmentation_stylegan}. 
-% IZMENA naziva se mreža mapiranja -> naziva se mreža preslikavanja (3.3-6)
 Prvi deo čini duboko povezanu mrežu sa osam slojeva. Mreža je predstavljena kao funkcija \(f: Z\to W\) i naziva se mreža preslikavanja (eng.~\textit{mapping network}). Ulaz mreže predstavlja normalizovani latentni kod \(z \in Z\). Latentni kod (eng.~\textit{latent code}) ili z-vektor \(z\), je vektor koji sadrži slučajne vrednosti iz Gausove raspodele. Prostor u kome se nalaze svi z-vektori se naziva Z-prostor (eng.~\textit{Z-space}) i obeležava se sa \(Z\). Kao izlaz mreže se dobija vektor \(w\) koji pripada latentnom prostoru \(W\). Latentni prostor (eng.~\textit{latent space}) je apstraktni višedimenzionalni prostor koji sadrži vrednosti karakteristika koje se ne mogu direktno interpretirati.
-% IZMENA uz pomoć konstantnog vektora, ... -> uz pomoć konstantnog vektora sa nasumičnim vrednostima iz Gausove raspodele, ... (3.3-7), 2(1) 
 Drugi deo generatora predstavlja mrežu koja uz pomoć vektora sa nasumičnim vrednostima iz Gausove raspodele, slučajnog šuma i vektora \(w\) transformisanog afinim transformacijama generiše sliku. 
-
-Vektor \(w\) transformisan afinim transformacijama služi za prilagođavanje stila sintetički generisanim slikama pomoću adaptivne normalizacije instance (eng.~\textit{adaptive instance normalization, AdaIN}). Stil slike predstavlja vektor u latentnom prostoru koji je razdvojen od vektora semantičkog sadržaja slike \cite{huang2017arbitrary}. Primer prenosa stila sa jedne slike na drugu je dat na slici \ref{fig:section2_augmentation_adain}.
-
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=0.8\textwidth]{matfmaster/glava2/stylegan_cus3.png}
+    \includegraphics[width=0.5\textwidth]{matfmaster/glava2/stylegan_cus3.png}
     \caption{Model generatora zasnovanog na stilu, "A" predstavlja afine transformacije dok "B" predstavlja faktor skaliranja za šum \cite{karras2019style}. }
     \label{fig:section2_augmentation_stylegan}
 \end{figure}
+
+
+\clearpage
+Vektor \(w\) transformisan afinim transformacijama služi za prilagođavanje stila sintetički generisanim slikama pomoću adaptivne normalizacije instance (eng.~\textit{adaptive instance normalization, AdaIN}). Stil slike predstavlja vektor u latentnom prostoru koji je razdvojen od vektora semantičkog sadržaja slike \cite{huang2017arbitrary}. Primer prenosa stila sa jedne slike na drugu je dat na slici \ref{fig:section2_augmentation_adain}.
 
 
 \begin{figure}[ht]
@@ -457,25 +432,16 @@ Vektor \(w\) transformisan afinim transformacijama služi za prilagođavanje sti
 Model \textit{StyleGAN} generiše fotorealistične slike. Tokom razvoja, model \textit{StyleGAN} je prošao kroz fazu optimizacije i manje izmene mreže sinteze. Nova verzija \textit{StyleGAN}-a, \textit{StyleGAN2} donosi i do 60\% brže obučavanje modela u odnosu na prvu verziju \cite{karras2020analyzing}. Zbog ovakvih ubrzanja, direktno se smanjuje procesorska snaga potrebna za obučavanje. U radu se koristi ova poboljšana verzija, tačnije arhitektura \textit{StyleGAN2}.
 
 Ukoliko ne postoji na raspolaganju velika količina podataka, rad sa generativnim suparničkim mrežama može da rezultira nekvalitetnim modelima.
-Da bi se takav problem ublažio, uvedena je metoda diferencijabilne augmentacije (eng.~\textit{differentiable augmentation}) za model \textit{StyleGAN2}. Metoda koristi različite tipove augmentacija nad stvarnim i lažnim podacima. Metoda omogućava stabilnije obučavanje i dovodi do bolje konvergencije u odnosu na obučavanje modela bez metode diferencijabilne augmentacije nad istim skupom podataka. Model \textit{StyleGAN2} sa metodom diferencijabilne augmentacija je u stanju da proizvede realistične slike, čak i nad skupom podataka koji sadrži samo sto slika \cite{zhao2020differentiable}..
+Da bi se takav problem ublažio, uvedena je metoda diferencijabilne augmentacije (eng.~\textit{differentiable augmentation}) za model \textit{StyleGAN2}. Metoda koristi različite tipove augmentacija nad stvarnim i lažnim podacima. Metoda omogućava stabilnije obučavanje i dovodi do bolje konvergencije u odnosu na obučavanje modela bez metode diferencijabilne augmentacije nad istim skupom podataka. Model \textit{StyleGAN2} sa metodom diferencijabilne augmentacija je u stanju da proizvede realistične slike, čak i nad skupom podataka koji sadrži samo sto slika \cite{zhao2020differentiable}.
 
 
 % #######################################
-% \section{Tehnika transfernog učenja} IZMENA (0.0-3)
 \section{Učenje sa prenosom znanja}
 \label{section3_trasnferucenje}
 % #######################################
-% IZMENA Modeli razvijeni na ovaj nacin davace bolje -> Modeli ce na ovaj nacin davati dobre 2(.2) 
 U nadgledanom učenju, modeli se obučavaju da nauče odnose koji važe između datih ulaza i izlaza. Modeli zatim mogu da vrše predviđanja izlaza nad novim podacima. Modeli će na ovaj način davati dobre rezultate kada rešavaju problem koji se nalazi u istom domenu kao i podaci za obučavanje. Rezultat će se pogoršati ako se domen problema promeni. U najgorem slučaju, može da bude potrebno obučavati novi model čak i kada su domeni problema slični \cite{zhuang2020comprehensive}.
 
-% IZMENA (3.4-sve) 
-% Ucenje sa prenosom znanja predstavlja tehniku mašinskog ucenja... -> Ucenje sa prenosom znanja predstavlja oblast mašinskog ucenja koja se bavi iskoriscavanjem znanja iz postojeceg obucenog modela pri obucavanju novog modela koji treba da resava slican zadatak. 2(3)
 Učenje sa prenosom znanja predstavlja oblast mašinskog učenja koja se bavi iskorišćavanjem znanja iz postojećeg obučenog modela pri obučavanju novog modela koji treba da rešava sličan zadatak. Tehnika se najčešće koristi kada za obuku novog modela nije na raspolaganju dovoljna količina podataka ili resursa. Korišćenje učenja sa prenosom znanja donosi niz prednosti od kojih su glavne ušteda resursa, smanjivanje greške tokom obuke i generalizacija modela \cite{zhuang2020comprehensive}.
-
-
-% Obuka sa prenosom znanja se često koristi kada obuka modela za rešavanje novog problema zahteva veliku količinu resursa. Korišćenje tehnike transfernog učenja donosi niz prednosti od kojih su glavne ušteda resursa i smanjivanje greške tokom obuke modela \cite{zhuang2020comprehensive}. 
-
-% Tehnika transfernog učenja je jedna od tehnika koja se koristi kako bi se premostio problem nepostojanja dovoljne količine podataka. Transfernim učenjem se prenosi znanje iz postojećeg modela u novi model koji treba da rešava sličan zadatak. Ključni deo transfernog učenja je generalizacija. To znači da se prenosi samo ono znanje koje se može koristiti u drugim  domenima. Umesto da modeli budu čvrsto vezani za skup podataka za obučavanje, modeli koji se koriste u transfernom učenju su opštiji \cite{zhuang2020comprehensive}.
 
 
 
@@ -484,15 +450,13 @@ Učenje sa prenosom znanja predstavlja oblast mašinskog učenja koja se bavi is
 \chapter{Tehnike evaluacije modela}
 \label{section4}
 % #######################################
-% IZMENA objekta u objekata
 Za evaluaciju modela kod detekcije objekata koristi se mera srednje prosečne preciznosti (eng.~\textit{mean average precission, mAP}), koja uzima u obzir preciznost (eng.~\textit{precision}) i odziv (eng.~\textit{recall}). Takođe, koristi se i matrica konfuzije, kod koje računanje ispravno i pogrešno klasifikovanih objekta zavisi od zadatog praga metrike preseka po uniji (eng.~\textit{intersection over union, IoU}) i ocene pouzdanosti (eng.~\textit{confidence score}) klasifikovanih objekata. Ocena pouzdanosti predstavlja vrednost verovatnoće objekta koju joj je model dodelio prilikom klasifikacije.
 
 
 % +++++++++++++++++++++++++++++++
 \section{Presek po uniji}
 % +++++++++++++++++++++++++++++++
-% Za zadatke otkrivanja objekata, preciznost se izračunava pomoću metrike preseka po uniji. IoU je metrika evaluacije koja se koristi za merenje tačnosti detektora objekata na određenom skupu podataka. IZMENA (4.1-1)
-Presek po uniji predstavlja metriku evaluacije koja se koristi za merenje tačnosti detektora objekata. Na slici \ref{fig:section3_iou} dat je primer okvira, gde je predviđen okvir nacrtan crvenom bojom, dok je pravi okvir nacrtan žutom bojom. Metrika se računa tako što se presek dva okvira podeli njihovom unijom (slika \ref{fig:section3_iou_calc}).
+Presek po uniji predstavlja metriku evaluacije koja se koristi za merenje tačnosti detektora objekata. Na slici \ref{fig:section3_iou} dat je primer okvira, gde je predviđen okvir nacrtan crvenom bojom, dok je pravi okvir nacrtan žutom bojom. Metrika se računa tako što se presek dva okvira podeli njihovom unijom (slika \ref{fig:section3_iou_calc}). Na savršeno predviđene granične okvire metrika IoU će davati vrednost 1.0, dok u slučaju da se granični okviri ne seku vrednost će biti 0. Idealni slučajevi da je metrika 1.0 su retki, i u praksi se smatra dobrim rezultatom kada IoU ima za vrednost 0.8.
 
 \begin{figure}[!ht]
     \centering
@@ -515,7 +479,6 @@ Presek po uniji predstavlja metriku evaluacije koja se koristi za merenje tačno
 % +++++++++++++++++++++++++++++++
 
 Matrica konfuzije je tabelarni prikaz brojeva ispravno i pogrešno klasifikovanih objekata na osnovu kojih se mogu vršiti ocene modela klasifikacije. Za višeklasnu klasifikaciju detekcije objekata matrica konfuzije se proširuje jednom kolonom i vrstom. Nova kolona služi za zapis broja objekata koji su klasifikovani na slici, a na njoj se ne nalaze. Vrsta služi za zapis broja objekata koji se nalaze na slici, ali nisu klasifikovani.
-%Objekti se klasifikuju ispravno ili pogrešno i na osnovu IoU praga (obično se u praksi koristi 0.5) i praga ocene pouzdanosti. IZMENA (4.1-3)
 Objekat se klasifikuje ispravno kada ispunjava sledeće uslove:
 \begin{itemize}
     \item model je tačno klasifikovao objekat, tj. dodelio mu je pravu klasu,
@@ -524,8 +487,7 @@ Objekat se klasifikuje ispravno kada ispunjava sledeće uslove:
 \end{itemize}
 U slučaju da objekat neispunjava jedan od datih uslova, klasifikuje se pogrešno. 
 
-
-Matrica kofnuzije se računa i za svaku klasu pojedinačno i slična je binarnoj klasifikaciji. Prilikom računanja matrice konfuzije, posmatra se jedna konkretna klasa i ta klasa se smatra pozitivnom, dok skup koji sadrži sve objekte ostalih klasa se smatra negativnom klasom. % IZMENA (4.1-4) 
+Matrica konfuzije se računa i za svaku klasu pojedinačno i slična je binarnoj klasifikaciji. Prilikom računanja matrice konfuzije, posmatra se jedna konkretna klasa i ta klasa se smatra pozitivnom, dok skup koji sadrži sve objekte ostalih klasa se smatra negativnom klasom.
 Objekat se klasifikuje kao pozitivan ako ispunjava sledeće uslove:
 \begin{itemize}
     \item objekat pripada pozitivnoj klasi model mu je dodelio pozitivnu klasu,
@@ -559,25 +521,25 @@ Odziv predstavlja procenat pozitivnih objekata koji su ispravno klasifikovani i 
 
 Visok odziv znači da postoji mali broj lažno negativnih objekata.
 
-Preciznost i odziv se mogu sumirati u meru, koja se zove $F_1$-mera (eng.~\textit{$F_1$-score}) i definiše se formulom:
+Preciznost i odziv se mogu sumirati u meru, koja se zove $F_1$-mera (eng.~\textit{$F_1$-score}) \cite{sasaki2007truth} i definiše se formulom:
 \begin{equation}
 \label{eq:f1}
     F_1 = 2\frac{Precision \cdot Recall}{Precision+Recall}
 \end{equation}
+$F_1$-mera je harmonična sredina preciznosti i odziva i ona daje relativno niske ocene kada su preciznost ili odziv niski. 
 
 Srednja $F_1$-mera ili (eng.~\textit{macro-averaged $F_1$-score}) računa se kao aritmetička sredina:
 \begin{equation}
 \label{eq:f1a}
     F_{1avg} = \frac{1}{n}\sum_{k=0}^{k=n-1} F_{1k}
 \end{equation}
-gde je \(F_{1k}\) vrednost $F_1$-mere za \(k\)-tu klasu.
+gde je \(F_{1k}\) vrednost $F_1$-mere za \(k\)-tu klasu. Srednja $F_1$-mera se izračunava korišćenjem aritmetičke sredine svih $F_1$-mera za svaku klasu i koristi se za procenu kvaliteta sa više klasa.
 
 Srednja težinska $F_1$-mera se računa sledećom formulom:
 \begin{equation}
 \label{eq:f1wa}
     F_{1wavg} = \sum_{k=0}^{k=n-1} (F_{1k} S_{k})
 \end{equation}
-% IZMENA (5.4-9) ovde sam pogrešno rekao nije ukupan broj nego broj propocijalan ukupnom broju instanci
 gde su \(F_{1k}\) i \(S_{k}\) vrednost $F_1$-mere za \(k\)-tu klasu i proporcijalan broj instanci \(k\)-te klase u odnosu na ukupn broj instanci u skupu podataka.
 
 % +++++++++++++++++++++++++++++++
@@ -587,7 +549,6 @@ gde su \(F_{1k}\) i \(S_{k}\) vrednost $F_1$-mere za \(k\)-tu klasu i proporcija
 
 Prosečna preciznost (eng.~\textit{average precision}) je način računanja površine ispod krive preciznosti i odziva za jednu klasu. Vrednosti preciznosti i odziva se računaju za zadate vrednosti IoU pragova iz intervala [0.5 do 1.0), najčešće sa korakom 0.05.
 Niz izračunatih vrednosti odziva i preciznost se dopunjuje sa \textbf{0} i \textbf{1}, respektivno. 
-
 
 Prosečna preciznost se računa sledećom formulom:
 \begin{equation}
@@ -609,7 +570,7 @@ gde \(N\) predstavlja broj klasa, a \(AP_{i}\) prosečnu preciznost za klasu
 
 Fréchet-ova udaljenost (eng.~\textit{Fréchet inception distance, FID}) je metrika koja se koristi za procenu kvaliteta slika koje su generisane od strane generativnih suparničkih mreža \cite{heusel2017gans}. Fréchet-ova udaljenost upoređuje distribuciju generisanih slika sa distribucijom stvarnih slika koje su korišćene za obuku generatora. Fréchet-ova udaljenost za dve iste slike daje vrednost nula, dok za različite daje broj koji je veći od nule.  
 
-Fréchet-ova udaljenost se računa za dve zajedničke normalne raspodele \(\mathcal{N}(\mu,\Sigma)\) i \(\mathcal{N}(\mu',\Sigma')\) sledećom formulom \cite{dowson1982frechet}:
+Fréchet-ova udaljenost se računa za dve zajedničke normalne raspodele \(\mathcal{N}(\mu,\Sigma)\) i \(\mathcal{N}(\mu',\Sigma')\) sledećom formulom \cite{dowson1982frechet, heusel2017gans}:
 \begin{equation}
     d_{F}(\mathcal N(\mu, \Sigma), \mathcal N(\mu', \Sigma'))^2 =
         \| \mu - \mu' \|^{2}_{2} + 
@@ -621,38 +582,20 @@ U praktičnoj upotrebi, distribucije slika se dobijaju računanjem srednjih vred
 
 
 % ------------------------------------------------------------------------------
+\clearpage
 \chapter{Implementacija i rezultati}
 \label{section5}
 % ------------------------------------------------------------------------------
 
 U okviru implementacije, dostupan skup podataka se proširuje metodama augmentacije i sintetičkim podacima koje generiše model \textit{StlyeGAN2}.
 Da bi se ocenilo da li primenjene tehnike omogućavaju poboljšanje, vrši se i obučavanje modela na osnovnom skupu podataka i njegovo poređenje sa modelima koji su obučeni na proširenom skupu podataka.
-Kod koji je razvijen u okviru rada na tezi je dostupan na adresi  \underline{\href{https://github.com/Grula/vehicle-detection}{\textit{github}-a za detekciju objekata}}\footnote{https://github.com/Grula/vehicle-detection} \cite{vehicleGit2022}. Podaci koji su korišćeni u ovom radu, kao i generisani podaci, dostupni su na \href{https://drive.google.com/file/d/1EkrO28-iBCVWyPqy5mJXn8P8EoKQ6xUH/view?usp=sharing}{\underline{ovoj adresi}}\footnote{https://drive.google.com/file/d/1EkrO28-iBCVWyPqy5mJXn8P8EoKQ6xUH/view?usp=sharing} \cite{vehicleData2022}. Za obuku modela korišćena je platforma \href{https://research.google.com/colaboratory/}{\underline{\textit{Google Colab}}}\footnote{https://research.google.com/colaboratory}. Platforma je obezbeđivala grafičku kartu NVIDIA Tesla P100-PCIE sa 16GB RAM memorije. 
-
+Kod koji je razvijen u okviru rada na tezi je dostupan na adresi  \underline{\href{https://github.com/Grula/vehicle-detection}{\textit{github}-a}}\footnote{https://github.com/Grula/vehicle-detection} \cite{vehicleGit2022}. Podaci koji su korišćeni u ovom radu, kao i generisani podaci, dostupni su na \href{https://drive.google.com/file/d/1EkrO28-iBCVWyPqy5mJXn8P8EoKQ6xUH/view?usp=sharing}{\underline{ovoj adresi}}\footnote{https://drive.google.com/file/d/1EkrO28-iBCVWyPqy5mJXn8P8EoKQ6xUH/view?usp=sharing} \cite{vehicleData2022}. Za obuku modela korišćena je platforma \href{https://research.google.com/colaboratory/}{\underline{\textit{Google Colab}}}\footnote{https://research.google.com/colaboratory}. Platforma je obezbeđivala grafičku kartu NVIDIA Tesla P100-PCIE sa 16GB RAM memorije. 
 
 % #######################################
 \section{Dostupni podaci}
 % #######################################
 
-Institut BRAIN (eng.~\textit{Brazilian Atrifical Inteligence Nucleus}), u okviru fakulteta FASCENS (pt.~\textit{Faculdade de Engenharia de Sorocaba}, eng.~\textit{Faculty of Engineering of Sorocaba}) Sao Paulo, Brazil je obezbedio označeni skup podataka, pod nazivom \bvs{} (eng.~\textit{Brazilian vehicle set, BVS}), koji je korišćen u ovom radu. Skup podataka \bvs{} sadrži četiri klase: \textit{car}, \textit{motorbike}, \textit{truck} i \textit{bus}. Primeri iz ovih klasa su prikazani na slici \ref{fig:section3_allclasses}. Ukupna količina podataka iznosi 1872 slike, od kojih većina pripada klasama \textit{car} i \textit{motorbike}. U skupu podataka \bvs, rezolucija svih slika iznosi 800$\times$600px. 
-
-Slike se dele u dva skupa, skup za obuku i skup za test modela. Nasumično je uzeto 10\% slika iz svake klase za test skup. Test skup nije učestvovao ni u jednoj tehnici augmentacije. 
-
-Ukupan broj slika svake klase, broj slika koji pripadaju skupu za obuku i broj slika koji pripada test skupu je prikazan u tabeli \ref{tab:section4_dostpunipodaci}. Iz tabele \ref{tab:section4_dostpunipodaci} se vidi da je neizbalansiranost između klasa izuzetno visoka, čak 1:15 između klasa \textit{bus} i \textit{car}.
-
-\begin{table}
-    \begin{center}
-    \caption{Ukupan broj slika za svaku klasu, i broj nakon podele u skup za obuku i u skup za test }\label{tab:section4_dostpunipodaci}
-    \begin{tabular}{l|c|c|c}
-    klasa & ukupan broj & skup za obuku & test skup\\ 
-    \hline
-    car & 889 & 800 & 89 \\
-    motorbike & 966 & 869 & 97 \\
-    truck & 10 & 9 & 1 \\
-    bus & 7 & 6 & 1 \\
-    \end{tabular}
-    \end{center}
-\end{table}
+Institut BRAIN (eng.~\textit{Brazilian Atrifical Inteligence Nucleus}), u okviru fakulteta FACENS\footnote{(www.facens.br)} (pt.~\textit{Centro Universitário FACENS}, eng.~\textit{Faculty of Engineering of Sorocaba}) Sao Paulo, Brazil je obezbedio označeni skup podataka, pod nazivom \bvs{} (eng.~\textit{Brazilian vehicle set, BVS}), koji je korišćen u ovom radu. Skup podataka \bvs{} sadrži četiri klase: \textit{car}, \textit{motorbike}, \textit{truck} i \textit{bus}. Primeri iz ovih klasa su prikazani na slici \ref{fig:section3_allclasses}. Ukupna količina podataka iznosi 1872 slike, od kojih većina pripada klasama \textit{car} i \textit{motorbike}. U skupu podataka \bvs, rezolucija svih slika iznosi 800$\times$600px. 
 
 \begin{figure}
     \centering
@@ -684,11 +627,28 @@ Ukupan broj slika svake klase, broj slika koji pripadaju skupu za obuku i broj s
 \end{figure}
 
 
+\clearpage
+Slike se dele u dva skupa, skup za obuku i skup za test modela. Nasumično je uzeto 10\% slika iz svake klase za test skup. Test skup nije učestvovao ni u jednoj tehnici augmentacije i nije korišćen ni na koji način pri štimovanju modela. Ukupan broj slika svake klase, broj slika koji pripadaju skupu za obuku i broj slika koji pripada test skupu je prikazan u tabeli \ref{tab:section4_dostpunipodaci}. Iz tabele \ref{tab:section4_dostpunipodaci} se vidi da je neizbalansiranost između klasa izuzetno visoka, čak 1:15 između klasa \textit{bus} i \textit{car}.
+
+\begin{table}[htb]
+    \begin{center}
+    \caption{Ukupan broj slika za svaku klasu, i broj nakon podele u skup za obuku i u skup za test }\label{tab:section4_dostpunipodaci}
+    \begin{tabular}{l|c|c|c}
+    klasa & ukupan broj & skup za obuku & test skup\\ 
+    \hline
+    car & 889 & 800 & 89 \\
+    motorbike & 966 & 869 & 97 \\
+    truck & 10 & 9 & 1 \\
+    bus & 7 & 6 & 1 \\
+    \end{tabular}
+    \end{center}
+\end{table}
+
+
 % #######################################################################
 \section{Kreiranje sintetičkih podataka}
 % #######################################################################
 
-% Skup za obučavanje je proširivan na dva načina: slike su generisane standardnim metodama augmentacije i modelom \textit{StyleGAN2}. IZMENA std aug (3.2-1)
 Skup za obučavanje je proširivan na dva načina: slike su generisane standardnim transformacijama za augmentaciju i modelom \textit{StyleGAN2}. U tabeli \ref{tab:section4_generisaneslike} je dat prikaz tačnog broja slika koji je generisan da bi se dobile izbalansirane klase, tačnije da svaka klasa sadrži podjednaki broj slika u skupu za obuku. 
 Broj slika koji je izabran za proširivanje skupa za obuku je izabran na osnovu klase koja je sadržala najveću količinu podataka, tačnije klase \textit{motorbike}. Klasa \textit{motorbike} je proširena sa 869 slika, tačnije sa onoliko slika koliko je prisutno u skupu za obuku. Nakon proširenja skupa za obuku, svaka klasa sadrži po 1738 slika.
 
@@ -705,6 +665,7 @@ Broj slika koji je izabran za proširivanje skupa za obuku je izabran na osnovu 
 
 % +++++++++++++++++++++++++++++++
 % \subsection{Generisanje podataka standardnim augmentacijama} IZMENA std aug (3.2-1)
+\clearpage
 \subsection{Generisanje podataka standardnim transformacijama slika}
 % +++++++++++++++++++++++++++++++
 
@@ -714,8 +675,7 @@ Skup augmentacija koje se primenjuju su:
     \item refleksija --- vrši se samo u horizontalnom smeru i vodi se računa o promeni koordinata graničnih okvira, 
     \item rotacija --- vrši sa nasumičnim uglom između jednog i pet stepeni i prazan prostor se dopunjava bojama graničnih piksela,
     \item translacija ---  pomera sliku u nasumičnom smeru za deset piksela i prazan prostor se dopunjava bojama graničnih piksela,
-    % IZMENA (5.2-1)
-    \item Gausov šum --- slika se pretvara u interval -1 do 1 i na nju se dodaje šum sa konstantnom standardnom devijacijom 0.1 i srednjom vrednošću 0, nakon dodavanja se slika vraća u interval 0 do 255.
+    \item Gausov šum --- pikseli sa slike se preslikavaju u interval -1 do 1 i na njih se dodaje šum sa konstantnom standardnom devijacijom 0.1 i srednjom vrednošću 0. Nakon dodavanja šuma, pikseli se vraćaju u interval 0 do 255.
     \item Gausovo zamućenje --- primenjuje se na sliku sa konstantom standardnom devijacijom koja iznosi 7. Vrednost standardne devijacije je izabrana zbog rezolucije slika u skupu \bvs. Korišćenjem vrednosti 7 za standardnu devijaciju, slike se zamućuju dok je i dalje moguće prepoznati objekat na slici.
     \item augmentacija boja --- Parametar osvetljenja se nasumično bira iz uniformne raspodele iz intervala 0.5 do 1.5. Parametri kontrasta, intenziteta i nijanse se nasumično biraju iz uniformne raspodele iz intervala 0.0 do 10.0. Intervali augmentacija boja su izabrani nakon testiranja intervala različitih opsega. Zaključeno je da se najbolji rezultati dobijaju korišćenjem navedenih intervala.
 \end{itemize}
@@ -737,6 +697,7 @@ Skup augmentacija koje se primenjuju su:
 
  
 % +++++++++++++++++++++++++++++++
+\clearpage
 \subsection{Generisanje podataka modelom \textit{StyleGAN2}}
 % +++++++++++++++++++++++++++++++
 
@@ -745,7 +706,6 @@ Skup podataka \bvs{} se proširuje i sintetičkim podacima generisanim od strane
 Međutim, problem male količine podataka se takođe javlja za generisanje novih slika modelom \textit{StyleGAN2}. Korišćenjem metode diferencijabilne augmentacije koja je navedena u poglavlju \ref{section3_increasedata_gan} prevazilazi se problem male količine podataka i model uspešno generiše slike. Implementirani metod diferencijabilne augmentacije je testiran nad skupom podataka CIFAR-10 \cite{2020diffaugment_report}.
 
 Arhitektura modela \textit{StyleGAN2} je implementirana pomoću biblioteke \textit{Tensorflow} 2.0\footnote{Biblioteka \textit{Tensorflow} 2.0 je otvorenog koda i pruža sveobuhvatan ekosistem alata. Objavljena je 2015. godine, a objavio ju je tim \textit{Google Brain}. Osnovna namena je pravljenje modela mašinskog učenja. Biblioteka je namenjena za korišćenje u programskom jeziku \textit{Python}.}.
-% IZMENA Dodao objasnjenje o resurismia
 Generisane slike su dimenzija 512\(\times\)512. Odabrana je ta dimenzija zbog ograničenja memorije grafičke karte. Obuka modela je trajala dvanaest do četrdeset osam sati u zavisnosti od same klase. Na svakih šest sati obuke ili, tačnije, na dvadeset pet hiljada epoha, pravljena je tačka provere (eng.~\textit{checkpoint}). Nakon svake tačke provere generisane su slike za računanje Fréchet-ove udaljenosti.
 
 
@@ -757,38 +717,11 @@ Za evaluaciju modela \textit{StyleGAN2} koristila se metrika Fréchet-ove udalje
 %___________________
 
 Obuka modela \textit{StyleGAN2}-a nad klasama \textit{truck} i \textit{bus} predstavljala je veliki izazov zbog male količine dostupnih podataka. 
-Rezultati Fréchet-ove udaljenosti su dati u tabelama \ref{tab:section4_fid_t}, \ref{tab:section4_fid_b}.
-
-\begin{table}[!htb]
-    \begin{minipage}{.5\linewidth}
-      \caption{Klasa \textit{truck}}\label{tab:section4_fid_t}
-      \centering
-        \begin{tabular}{c|c}
-        broj epohe &  Fréchet-ova udaljenost \\
-        \hline
-        25 hiljada & 432.8 \\
-        \hline
-        50 hiljada & 188.5 \\
-        \end{tabular}
-    \end{minipage}
-    \begin{minipage}{.5\linewidth}
-      \centering
-        \caption{Klasa \textit{bus}}\label{tab:section4_fid_b}
-        \begin{tabular}{c|c}
-        broj epohe &  Fréchet-ova udaljenost \\
-        \hline
-        25 hiljada & 369.2 \\
-        \hline
-        50 hiljada & 220.5 \\
-        \end{tabular}
-    \end{minipage} 
-\end{table}
-
 Obuka modela je trajala dvadeset četiri sata. Za obuku modela je generisano dvesta hiljada slika pomoću metode diferencijabilne augmentacije. Originalan skup slika za obuku klase \textit{bus} je sadržao šest slika, a skup za obuku klase \textit{truck} je sadržao devet slika.
 
-% IZMENA (5.2-5) dodao objašnjenje
-Za klasu \textit{truck} funkcija greške je data na slici \ref{fig:section4_stylegan_truck_loss} i rezultat Fréchet-ove udaljenosti za dve tačke provere je dat u tabeli \ref{tab:section4_fid_t}. Iz funkcije greške za diskriminator može se zapaziti da daljom obukom je moglo doći do poboljšanja diskriminatora. Sa slika generisanih poslednjim težinama modela, moguće je uočiti glavne karakteristike objekata. Kako se objekti na slici mogu prepoznati i zbog uštede resursa obuka se prekinula. Primeri generisanih slika klase \textit{truck} su prikazani na slici \ref{fig:section4_stylegan_truck_images}.
-Za klasu \textit{bus} iz funkcije greške (slika \ref{fig:section4_stylegan_bus_loss}) i rezultata Fréchet-ove udaljenosti (tabela \ref{tab:section4_fid_b}) može se zaključiti da se daljom obukom za narednih dvadeset pet hiljada epoha ne dobijaju znatno bolji rezultati. Primeri generisanih slika klase \textit{bus} su prikazani na slici \ref{fig:section4_stylegan_bus_images}.
+
+\clearpage
+Za klasu \textit{truck} funkcija greške je data na slici \ref{fig:section4_stylegan_truck_loss} i rezultat Fréchet-ove udaljenosti za dve tačke provere je dat u tabeli \ref{tab:section4_fid_t}. Iz funkcije greške za diskriminator može se zapaziti da daljom obukom je moglo doći do poboljšanja diskriminatora. Povećanje funkcije greške diskriminatora znači da je generator počeo da generiše slike koje je diskriminatoru bilo teže da razlikuje od stvarnih. Sa slika generisanih poslednjim težinama modela, moguće je uočiti glavne karakteristike objekata. Kako se objekti na slici mogu prepoznati i zbog uštede resursa obuka se prekinula. Primeri generisanih slika klase \textit{truck} su prikazani na slici \ref{fig:section4_stylegan_truck_images}.
 
 
 \begin{figure}[!htbp]
@@ -799,6 +732,32 @@ Za klasu \textit{bus} iz funkcije greške (slika \ref{fig:section4_stylegan_bus_
 \end{figure}
 
 
+
+\begin{table}[!htb]
+\caption{Klasa \textit{truck}}\label{tab:section4_fid_t}
+\centering
+    \begin{tabular}{c|c}
+        broj epohe &  Fréchet-ova udaljenost \\
+        \hline
+        25 hiljada & 432.8 \\
+        \hline
+        50 hiljada & 188.5 \\
+    \end{tabular}
+\end{table}
+
+\begin{figure}[!htbp]
+\centering
+    \includegraphics[width=0.45\textwidth]{matfmaster/stylegan/truck/image0.png}
+    \includegraphics[width=0.45\textwidth]{matfmaster/stylegan/truck/image6.png}
+\caption{Primeri generisanih slika klase \textit{truck}}
+\label{fig:section4_stylegan_truck_images}
+\end{figure}
+
+
+\clearpage
+Za klasu \textit{bus} iz funkcije greške (slika \ref{fig:section4_stylegan_bus_loss}) i rezultata Fréchet-ove udaljenosti (tabela \ref{tab:section4_fid_b}) može se zaključiti da se daljom obukom za narednih dvadeset pet hiljada epoha ne dobijaju znatno bolji rezultati. Primeri generisanih slika klase \textit{bus} su prikazani na slici \ref{fig:section4_stylegan_bus_images}.
+
+
 \begin{figure}[!htbp]
 \centering
   \includegraphics[width=0.49\textwidth]{matfmaster/stylegan/bus/g_loss.png}
@@ -806,59 +765,33 @@ Za klasu \textit{bus} iz funkcije greške (slika \ref{fig:section4_stylegan_bus_
 \caption{Funkcije grešaka za klasu \textit{bus}, generator (levo) i diskriminator (desno). U oba slučaja, \textit{x} osa predstavlja epohe, dok \textit{y} osa predstavlja vrednosti odgovarajuće funkcije greške.}\label{fig:section4_stylegan_bus_loss}
 \end{figure}
 
+\begin{table}[!htb]
+\caption{Klasa \textit{bus}}\label{tab:section4_fid_b}
+\centering
+    \begin{tabular}{c|c}
+        broj epohe &  Fréchet-ova udaljenost \\
+        \hline
+        25 hiljada & 369.2 \\
+        \hline
+        50 hiljada & 220.5 \\
+    \end{tabular}
+\end{table}
+
 
 \begin{figure}[!htbp]
 \centering
-    \includegraphics[width=0.49\textwidth]{matfmaster/stylegan/truck/image0.png}
-    \includegraphics[width=0.49\textwidth]{matfmaster/stylegan/truck/image6.png}
-\caption{Primeri generisanih slika klase \textit{truck}}
-\label{fig:section4_stylegan_truck_images}
-\end{figure}
-
-
-\begin{figure}[!htbp]
-\centering
-    \includegraphics[width=0.49\textwidth]{matfmaster/stylegan/bus/image0.png}  \includegraphics[width=0.49\textwidth]{matfmaster/stylegan/bus/image8.png} 
+    \includegraphics[width=0.45\textwidth]{matfmaster/stylegan/bus/image0.png}  \includegraphics[width=0.45\textwidth]{matfmaster/stylegan/bus/image8.png} 
 \caption{Primeri generisanih slika klase \textit{bus}}
 \label{fig:section4_stylegan_bus_images}
 \end{figure}
 
 %___________________
+\clearpage
 \subsubsection{Klase \textit{car} i \textit{motorbike}}
 %___________________
 
-Obuka modela nad klasom \textit{car} je trajala oko trideset šest sati i metodom diferencijabilne augmentacije je generisano trista hiljada slika. Obuka za klasu \textit{motorbike} je trajala četrdeset osam sati i metodom diferencijabilne augmentacije je generisano četristo hiljada slika.
-
-Za klasu \textit{car}, funkcija greške je prikazana na slici \ref{fig:section4_stylegan_car_loss}. Rezultat Fréchet-ove udaljenosti je prikazan u tabeli \ref{tab:section4_fid_c}. Daljom obukom klase \textit{car} ne dobijaju se značajna poboljšanja modela.
+Obuka modela nad klasom \textit{car} je trajala oko trideset šest sati i metodom diferencijabilne augmentacije je generisano trista hiljada slika. Za klasu \textit{car}, funkcija greške je prikazana na slici \ref{fig:section4_stylegan_car_loss}. Rezultat Fréchet-ove udaljenosti je prikazan u tabeli \ref{tab:section4_fid_c}. Daljom obukom klase \textit{car} ne dobijaju se značajna poboljšanja modela.
 Primeri generisanih slika klase \textit{car} su prikazani na slici \ref{fig:section4_stylegan_car_images}.
-
-Klasa \textit{motorbike} ima malo lošije rezultate funkcije greške koja je prikazana na slici \ref{fig:section4_stylegan_motorbike_loss}. Funkcija greške generatora raste što ukazuje da diskriminator postaje dosta bolji u prepoznavanju stvarnih od lažnih slika. Slike generisane generatorom nisu savršene, ali moguće je prepoznati glavne karakteristike objekata koji su od značaja za obuku modela detekcije objekata. Rezultat Fréchet-ove udaljenosti (tabela \ref{tab:section4_fid_m}) ukazuje da tokom obuke dolazi do poboljšanja generisanih slika. Primeri generisanih slika klase \textit{motorbike} su prikazani na slici \ref{fig:section4_stylegan_motorbike_images}.
-
-\begin{table}[!htb]
-    \begin{minipage}{.5\linewidth}
-      \caption{Klasa \textit{car}}\label{tab:section4_fid_c}
-      \centering
-        \begin{tabular}{c|c}
-        broj epohe &  Fréchet-ova udaljenost \\
-        \hline
-        25 hiljada & 107.6 \\
-        \hline
-        75 hiljada & 87.5 \\
-        \end{tabular}
-    \end{minipage}%
-    \begin{minipage}{.5\linewidth}
-      \centering
-        \caption{Klasa \textit{motorbike}}\label{tab:section4_fid_m}
-        \begin{tabular}{c|c}
-        broj epohe &  Fréchet-ova udaljenost \\
-        \hline
-        25 hiljada & 386.8 \\
-        \hline
-        100 hiljada & 151.1 \\
-        \end{tabular}
-    \end{minipage} 
-\end{table}
-
 
 \begin{figure}[!htbp]
 \centering
@@ -867,6 +800,32 @@ Klasa \textit{motorbike} ima malo lošije rezultate funkcije greške koja je pri
 \caption{Funkcije grešaka za klasu \textit{car}, generator (levo) i diskriminator (desno). U oba slučaja, \textit{x} osa predstavlja epohe, dok \textit{y} osa predstavlja vrednosti odgovarajuće funkcije greške.}\label{fig:section4_stylegan_car_loss}
 \end{figure}
 
+
+\begin{table}[!htb]
+\caption{Klasa \textit{car}}\label{tab:section4_fid_c}
+\centering
+    \begin{tabular}{c|c}
+        broj epohe &  Fréchet-ova udaljenost \\
+        \hline
+        25 hiljada & 107.6 \\
+        \hline
+        75 hiljada & 87.5 \\
+    \end{tabular}
+\end{table}
+
+
+\begin{figure}[!htbp]
+\centering
+    \includegraphics[width=0.45\textwidth]{matfmaster/stylegan/car/image1.png}  \includegraphics[width=0.45\textwidth]{matfmaster/stylegan/car/image2.png}
+\caption{Primeri generisanih slika klase \textit{car}}
+\label{fig:section4_stylegan_car_images}
+\end{figure}
+
+
+\clearpage
+Obuka za klasu \textit{motorbike} je trajala četrdeset osam sati i metodom diferencijabilne augmentacije je generisano četristo hiljada slika. Klasa \textit{motorbike} ima malo lošije rezultate funkcije greške koja je prikazana na slici \ref{fig:section4_stylegan_motorbike_loss}. Funkcija greške generatora raste što ukazuje da diskriminator postaje dosta bolji u prepoznavanju stvarnih od lažnih slika. Slike generisane generatorom nisu savršene, ali moguće je prepoznati glavne karakteristike objekata koji su od značaja za obuku modela detekcije objekata. Rezultat Fréchet-ove udaljenosti (tabela \ref{tab:section4_fid_m}) ukazuje da tokom obuke dolazi do poboljšanja generisanih slika. Primeri generisanih slika klase \textit{motorbike} su prikazani na slici \ref{fig:section4_stylegan_motorbike_images}.
+
+
 \begin{figure}[!htbp]
 \centering
   \includegraphics[width=0.49\textwidth]{matfmaster/stylegan/motorbike/g_loss.png}
@@ -874,17 +833,23 @@ Klasa \textit{motorbike} ima malo lošije rezultate funkcije greške koja je pri
 \caption{Funkcije grešaka za klasu \textit{motorbike}, generator (levo) i diskriminator (desno). U oba slučaja, \textit{x} osa predstavlja epohe, dok \textit{y} osa predstavlja vrednosti odgovarajuće funkcije greške. }\label{fig:section4_stylegan_motorbike_loss}
 \end{figure}
 
-\begin{figure}[!htbp]
+
+\begin{table}[!htb]
+\caption{Klasa \textit{motorbike}}\label{tab:section4_fid_m}
 \centering
-    \includegraphics[width=0.49\textwidth]{matfmaster/stylegan/car/image1.png}  \includegraphics[width=0.49\textwidth]{matfmaster/stylegan/car/image2.png}
-\caption{Primeri generisanih slika klase \textit{car}}
-\label{fig:section4_stylegan_car_images}
-\end{figure}
+    \begin{tabular}{c|c}
+        broj epohe &  Fréchet-ova udaljenost \\
+        \hline
+        25 hiljada & 386.8 \\
+        \hline
+        100 hiljada & 151.1 \\
+    \end{tabular}
+\end{table}
 
 \begin{figure}[!htbp]
 \centering
-    \includegraphics[width=0.49\textwidth]{matfmaster/stylegan/motorbike/image2.png}
-    \includegraphics[width=0.49\textwidth]{matfmaster/stylegan/motorbike/image9.png}
+    \includegraphics[width=0.45\textwidth]{matfmaster/stylegan/motorbike/image2.png}
+    \includegraphics[width=0.45\textwidth]{matfmaster/stylegan/motorbike/image9.png}
 \caption{Primeri generisanih slika klase \textit{motoribke}}
 \label{fig:section4_stylegan_motorbike_images}
 \end{figure}
@@ -893,29 +858,19 @@ Generisane slike nisu savršene, ali je moguće prepoznati glavne karakteristike
 
 
 % #######################################################################
-% \clearpage
+\clearpage
 \section{Model za detekciju i predviđanje objekata VGG16}
 % #######################################################################
 
 Osnovni model VGG16 je ograničen na klasifikaciju slika bez predviđanja graničnih okvira i u okviru ovog rada osnovni model je proširen odgovarajućim mrežama da se omogući predviđanje graničnih okvira. Osnovni model je proširen na sledeći način:
 \begin{itemize}
-%IZMENA (5.3-2)
 \item Na poslednji sloj dodato je račvanje na dve nove duboko povezane mreže dubine četiri.
-\item Na izlazu prve mreže dodata je aktivaciona funkcija \textit{softmax} sa četiri neurona, koja se tumači kao dodeljivanje verovatnoće da objekat pripada jednoj od četiri klase.
+\item Na izlazu prve mreže dodata je aktivaciona funkcija \textit{softmax}  \cite{ml2019} sa četiri neurona, koja se tumači kao dodeljivanje verovatnoće da objekat pripada jednoj od četiri klase.
 \item Na izlazu druge mreže dodata je sigmoidna aktivaciona funkcija sa četiri neurona, koja se tumači kao dodeljivanje relativnih graničnih okvira predviđenim objektima.
 \end{itemize}
 Prošireni osnovni model je obučen na skupu podataka \bvs{} u trajanju od oko deset minuta.
 
 Zbog problema neizbalansiranosti klasa koji se javlja u skupu podataka \bvs, dobija se rezultat modela koji ima visoku pristrasnost ka klasi \textit{car}, kao što se vidi iz tabele \ref{tab:section4_vgg16_confusionmatrix}. Model pogrešno daje izlaze graničnih okvira, kao što je prikazano na slici \ref{fig:section4_vgg16prediction}.
-
-% IZMENA (5.3-3) na osnovu cega je model jednostavan? treba obrsati
-Rezultati evaluacije modela su dati u tabeli \ref{tab:section4_vgg16_results}. Iz rezultata se vidi da se model ponaša loše nad celim skupom podataka. Neki od razloga koji utiču da model daje loše rezultate je visoka neizbalansiranost između klasa i mala količina dostupnih podataka.%i model je suviše jednostavan i ne može da obradi sve moguće karakteristike koje se nalaze na slikama.
-Preciznost klasa u odnosu na IoU prag je prikazana na slici \ref{fig:section4_vgg16_prc}.
-
-%Kako je osnovni model VGG16 proširen, ne postoje slobodno dostupne odgovarajuće težine drugog modela koje mogu da se koriste za metodu transfernog učenja. IZMENA (0.0-3)
-Kako je osnovni model VGG16 proširen, ne postoje slobodno dostupne odgovarajuće težine drugog modela koje mogu da se koriste za učenje sa prenosom znanja.
-Korišćenjem proširenog skupa podataka \bvs{standard} ili \bvs{style}, dostupna količina podataka bi i dalje bila nedovoljna. Za obuku modela potrebno je desetine hiljada slika koje ni u proširenim skupovima \bvs{} nisu dostupne.
-
 
 \begin{table}[h!]
     \begin{center}
@@ -932,6 +887,38 @@ Korišćenjem proširenog skupa podataka \bvs{standard} ili \bvs{style}, dostupn
     \label{tab:section4_vgg16_confusionmatrix}
     \end{center}
 \end{table}
+
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.35\textwidth}
+        \includegraphics[width=\textwidth]{matfmaster/vgg16_base/car_real.jpg}
+        \includegraphics[width=\textwidth]{matfmaster/vgg16_base/motorbike_real.jpg}
+        \includegraphics[width=\textwidth]{matfmaster/vgg16_base/bus_real.jpg}
+        \includegraphics[width=\textwidth]{matfmaster/vgg16_base/truck_real.jpg}
+        \caption{Stvarni okviri}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[b]{0.35\textwidth}
+        \includegraphics[width=\textwidth]{matfmaster/vgg16_base/car_pred.jpg}
+        \includegraphics[width=\textwidth]{matfmaster/vgg16_base/motorbike_pred.jpg}
+        \includegraphics[width=\textwidth]{matfmaster/vgg16_base/bus_pred.jpg}
+        \includegraphics[width=\textwidth]{matfmaster/vgg16_base/truck_pred.jpg}
+        \caption{Predviđeni okviri}
+    \end{subfigure}
+    ~
+    \caption{Primeri rezultata modela VGG16 nad test skupom podataka}
+    \label{fig:section4_vgg16prediction}
+\end{figure}
+
+
+
+\clearpage
+Rezultati evaluacije modela su dati u tabeli \ref{tab:section4_vgg16_results}. Iz rezultata se vidi da se model se ne ponaša dobro nad celim skupom podataka. Neki od razloga koji utiču da model daje nezadovoljavajuće rezultate je visoka neizbalansiranost između klasa i mala količina dostupnih podataka.
+Preciznost klasa u odnosu na IoU prag je prikazana na slici \ref{fig:section4_vgg16_prc}.
+
+Kako je osnovni model VGG16 proširen, ne postoje slobodno dostupne odgovarajuće težine drugog modela koje mogu da se koriste za učenje sa prenosom znanja. 
+Korišćenjem proširenog skupa podataka \bvs{standard} ili \bvs{style}, dostupna količina podataka bi i dalje bila nedovoljna. Za obuku modela potrebno je desetine hiljada slika koje ni u proširenim skupovima \bvs{} nisu dostupne. 
 
 
 \begin{table}[h!]
@@ -963,32 +950,10 @@ Korišćenjem proširenog skupa podataka \bvs{standard} ili \bvs{style}, dostupn
 
 
 
-\begin{figure}
-    \centering
-    \begin{subfigure}[b]{0.35\textwidth}
-        \includegraphics[width=\textwidth]{matfmaster/vgg16_base/car_real.jpg}
-        \includegraphics[width=\textwidth]{matfmaster/vgg16_base/motorbike_real.jpg}
-        \includegraphics[width=\textwidth]{matfmaster/vgg16_base/bus_real.jpg}
-        \includegraphics[width=\textwidth]{matfmaster/vgg16_base/truck_real.jpg}
-        \caption{Stvarni okviri}
-    \end{subfigure}
-    ~
-    \begin{subfigure}[b]{0.35\textwidth}
-        \includegraphics[width=\textwidth]{matfmaster/vgg16_base/car_pred.jpg}
-        \includegraphics[width=\textwidth]{matfmaster/vgg16_base/motorbike_pred.jpg}
-        \includegraphics[width=\textwidth]{matfmaster/vgg16_base/bus_pred.jpg}
-        \includegraphics[width=\textwidth]{matfmaster/vgg16_base/truck_pred.jpg}
-        \caption{Predviđeni okviri}
-    \end{subfigure}
-    ~
-    \caption{Primeri rezultata modela VGG16 nad test skupom podataka}
-    \label{fig:section4_vgg16prediction}
-\end{figure}
-
 
 
 % #######################################################################
-% \clearpage
+\clearpage
 \section{Model za detekciju i predviđanje objekata YOLO}
 % #######################################################################
 
@@ -1003,18 +968,14 @@ Koristi se model YOLO koji je obučen na skupu podataka COCO koji sadrži osamde
 
 Iz rezultata matrice konfuzije (tabela \ref{tab:YOLO4_COCO_confusion_mat}) i metoda evaluacije modela (tabela \ref{tab:YOLO4_COCO_results}) zaključuje se sledeće:
 \begin{itemize}
-    \item Klasu \textit{car} model $\yolo_{coco}$ predviđa sa visokom ocenom preciznosti. Predviđena je osamdeset i jedna instanca od ukupno osamdeset i devet. Iz matrice konfuzije može da se vidi da je model $\yolo_{coco}$ za tri instance imao ocenu pouzdanosti manju od 0.5. Takođe, pogrešno se klasifikuje pet instanci kao instance klase \textit{truck}. Prosečna preciznost za klasu \textit{car} iznosi 0.88, dok srednja $F_1$-mera iznosi 0.91.
-    \item Klasa \textit{motorbike} se predviđa lošije od klase \textit{car}. Model $\yolo_{coco}$ predviđa trideset sedam od ukupno devedeset sedam instanci. Većina instanci, tačnije četrdeset devet, za ocenu pouzdanosti ima vrednost manju od 0.5. Ocene pouzdanosti klase ukazuju da model nije siguran pri predviđanju instanci iz klase \textit{motorbike}. Prosečna preciznost iznosi 0.77 i srednja $F_1$-mera iznosi 0.48.
+    \item Instance klase \textit{car} model $\yolo_{coco}$ predviđa sa visokom ocenom preciznosti. Predviđena je osamdeset i jedna instanca od ukupno osamdeset i devet. Iz matrice konfuzije može da se vidi da je model $\yolo_{coco}$ za tri instance imao ocenu pouzdanosti manju od 0.5. Takođe, pogrešno se klasifikuje pet instanci kao instance klase \textit{truck}. Prosečna preciznost za klasu \textit{car} iznosi 0.88, dok srednja $F_1$-mera iznosi 0.91.
+    \item Instance klase \textit{motorbike} se predviđaju lošije od instanci klase \textit{car}. Model $\yolo_{coco}$ predviđa trideset sedam od ukupno devedeset sedam instanci. Većina instanci, tačnije četrdeset devet, za ocenu pouzdanosti ima vrednost manju od 0.5. Ocene pouzdanosti klase ukazuju da model nije siguran pri predviđanju instanci iz klase \textit{motorbike}. Prosečna preciznost iznosi 0.77 i srednja $F_1$-mera iznosi 0.48.
     \item Klasa \textit{bus} sadrži jednu sliku za test i ona se ne predviđa modelom $\yolo_{coco}$. Prosečna preciznost i srednja $F_1$-mera iznose 0.
-    \item Klasa \textit{truck} se uspešno predviđa modelom $\yolo_{coco}$. Prosečna preciznost iznosi 1.0 i srednja $F_1$-mera iznosi 0.99.
+    \item Instanca klase \textit{truck} se uspešno predviđa modelom $\yolo_{coco}$. Prosečna preciznost iznosi 1.0 i srednja $F_1$-mera iznosi 0.99.
 \end{itemize}
 
-Preciznost klasa u odnosu na IoU prag je prikazana na slici \ref{fig:YOLO4_COCO_prc}. Model $\yolo_{coco}$ ima srednju prosečnu preciznost (mAP) koja iznosi 0.66 i srednju težinsku $F_1$-meru koja iznosi 0.69. Kod predviđanja modela $\yolo_{coco}$ možemo da zaključimo da dobro prepoznaje objekte klase \textit{car} i \textit{truck}. Problem koji se uočava kod predviđanja tih klasa je da postoje objekti koji imaju slične karakteristike. Takav problem se može uočiti na slici \ref{fig:YOLO4_COCO_car_vs_truck}. Model $\yolo_{coco}$ je uspešno klasifikovao 40\% instanci klase \textit{motorbike} iz test skupa \bvs. Instanca klase \textit{bus} se ne klasifikuje ispravno modelom  $\yolo_{coco}$.
 
-Na slici \ref{fig:YOLO4_COCO_predictions} su prikazana neka predviđanja modela $\yolo_{coco}$. Slika prikazuje da su se uspešno detektovali neki od objekata koji pripadaju klasama \textit{car} (gore desno), \textit{motorbike} (sredina desno) i \textit{truck} (dole levo). Na slici koja pripada klasi \textit{motorbike} (sredina levo), uočavamo da je model uspešno detektovao čoveka, ali nije uspeo da detektuje objekat klase \textit{motorbike}, odnosno ocena pouzdanosti je bila veoma mala, tj. iznosila je 0.2. 
-
-
-\begin{table}
+\begin{table}[htb]
     \begin{center}
     \caption{Matrica konfuzije modela $\yolo_{coco}$ za IoU prag 0.5 i prag ocene pouzdanosti za prepoznatu klasu veći od 0.5 }
     \begin{tabular}{ l|c|c|c|c|c|}
@@ -1031,7 +992,7 @@ Na slici \ref{fig:YOLO4_COCO_predictions} su prikazana neka predviđanja modela 
 \end{table}
 
 
-\begin{table}
+\begin{table}[htb]
     \begin{center}
     \caption{Rezultati evaluacije modela $\yolo_{coco}$}
         \begin{tabular}{|m{10em}|c|c|}
@@ -1050,7 +1011,8 @@ Na slici \ref{fig:YOLO4_COCO_predictions} su prikazana neka predviđanja modela 
     \end{center}
 \end{table}
 
-
+\clearpage
+Preciznost klasa u odnosu na IoU prag je prikazana na slici \ref{fig:YOLO4_COCO_prc}. Model $\yolo_{coco}$ ima srednju prosečnu preciznost (mAP) koja iznosi 0.66 i srednju težinsku $F_1$-meru koja iznosi 0.69. Kod predviđanja modela $\yolo_{coco}$ možemo da zaključimo da dobro prepoznaje objekte klase \textit{car} i \textit{truck}. Problem koji se uočava kod predviđanja tih klasa je da postoje objekti koji imaju slične karakteristike. Takav problem se može uočiti na slici \ref{fig:YOLO4_COCO_car_vs_truck}. Model $\yolo_{coco}$ je uspešno klasifikovao 40\% instanci klase \textit{motorbike} iz test skupa \bvs. Instanca klase \textit{bus} se ne klasifikuje ispravno modelom  $\yolo_{coco}$.
 
 \begin{figure}[!ht]
     \centering
@@ -1058,6 +1020,17 @@ Na slici \ref{fig:YOLO4_COCO_predictions} su prikazana neka predviđanja modela 
     \caption{Preciznost u odnosu na IoU prag [0.5,1) modela $\yolo_{coco}$}
     \label{fig:YOLO4_COCO_prc}
 \end{figure}
+
+
+\begin{figure}[htbp]
+    \centering
+      \includegraphics[width=0.49\textwidth]{matfmaster/glava4/carproblem.jpg}
+      \includegraphics[width=0.49\textwidth]{matfmaster/glava4/truckproblem.jpg}
+    \caption{Slične karakteristike dveju različitih klasa, klasa \textit{car} (levo) i klasa \textit{truck} (desno) } \label{fig:YOLO4_COCO_car_vs_truck}
+\end{figure}
+
+Na slici \ref{fig:YOLO4_COCO_predictions} su prikazana neka predviđanja modela $\yolo_{coco}$. Slika prikazuje da su se uspešno detektovali neki od objekata koji pripadaju klasama \textit{car} (gore desno), \textit{motorbike} (sredina desno) i \textit{truck} (dole levo). Na slici koja pripada klasi \textit{motorbike} (sredina levo), uočavamo da je model uspešno detektovao čoveka, ali nije uspeo da detektuje objekat klase \textit{motorbike}, odnosno ocena pouzdanosti je bila veoma mala, tj. iznosila je 0.2. 
+
 
 
 \begin{figure}[htbp]
@@ -1071,40 +1044,23 @@ Na slici \ref{fig:YOLO4_COCO_predictions} su prikazana neka predviđanja modela 
     \caption{Slike iz test skupa i predviđanja nad njima modelom $\yolo_{coco}$, klasa \textit{car} (gore), klasa \textit{motorbike} (sredina),  klasa \textit{truck} (dole levo) i  klasa \textit{bus} (dole desno). Objekti na slikama bez graničnih okvira nisu uspešno detektovani.} \label{fig:YOLO4_COCO_predictions}
 \end{figure}
 
-\begin{figure}[htbp]
-    \centering
-      \includegraphics[width=0.49\textwidth]{matfmaster/glava4/carproblem.jpg}
-      \includegraphics[width=0.49\textwidth]{matfmaster/glava4/truckproblem.jpg}
-    \caption{Slične karakteristike dveju različitih klasa, klasa \textit{car} (levo) i klasa \textit{truck} (desno) } \label{fig:YOLO4_COCO_car_vs_truck}
-\end{figure}
-
 
 % +++++++++++++++++++++++++++++++
-% \clearpage
-% \subsection{Obuka modela pomoću tehinke transfernog učenja} IZMENA (0.0-3)
+\clearpage
 \subsection{Obuka modela pomoću prenosa znanja}
 % +++++++++++++++++++++++++++++++
 Radi poboljšanja rezultata, naredni modeli su obučeni koristeći težine modela obučene na skupu podataka COCO. Kako postoji razlika u broju klasa između skupa podataka BVS i COCO skupa, neki delovi težina su odbačeni.
 
-% IZMENA (5.4-3), objasnjenje zasto 512x512
 Modeli su obučeni na slikama rezolucije do 512$\times$512. Slikama je nasumično menjana veličina iz intervala 224$\times$224 do 512$\times$512, sa korakom 32$\times$32. Obuka modela je bila ograničena na sto pedeset epoha. Za obuku modela korišćen je optimizator ADAM sa početnom stopom učenja $1e^{-3}$. Tokom obuke modela stopa obuke je množena sa faktorom 0.9. Takođe, postavljena je zastavica za rano zaustavljanje, ukoliko se u deset uzastopnih epoha funkcija greške nije umanjila. Iz skupa za obuku odvojeno je 10\% podataka za validaciju. 
-% U prvih deset epoha obuka modela je vršena u samo poslednja tri sloja, dok su ostali slojevi bili zamrznuti. Nakon deset epoha, odmrznuti su ostali slojevi i nastavljeno je sa normalnom obukom modela. U prvih deset epoha, stopa obuke optimizatora modela je iznosila $1e^{-5}$, dok je za model obučen na skupu podataka \bvs{style} iznosila $1e^{-7}$. Tokom obuke drugog dela mreže, u slučaju da se funkcija greške nije smanjivala stopa obuke je množena sa 0.1. Time se postizalo usavršavanje modela. Takođe, postavljena je zastavica za rano zaustavljanje ukoliko se u deset uzastopnih epoha funkcija greške nije umanjila.
 
 
 %_______________________________________________________________________________________
-% \subsubsection{Obuka modela pomoću tehnike transfernog učenja na skupu podataka BVS} IZMENA (0.0-3)
 \subsubsection{Obuka modela pomoću prenosa znanja na skupu podataka BVS}
 %_______________________________________________________________________________________
 
-% Nova obuka
-% lr = 1e-3 , decay = 0.9
-% batchsize = 8
-% loss 
-% vreme obuke : ~2h
 Za detekciju objekata koristi se model YOLO koji je obučen na skupu podataka \bvs{} koji sadrži četiri klase i 1872 slike. Dalje u radu, model YOLO obučen na skupu podataka \bvs{} se označava sa $\yolo_{\bvs}$. Na slici \ref{fig:YOLO4_BVS_loss} je prikazana funkcija greške i stopa obuke modela $\yolo_{\bvs}$. Iz funkcije greške se vidi da je došlo do ranog zaustavljanja obuke modela nakon devedeset devet epoha. Obuka modela je trajala oko dva sata.
 
-
-\begin{figure}[!ht]
+\begin{figure}[htb]
 \centering
     \includegraphics[width=0.49\textwidth]{matfmaster/yolo/v4/BVS_set/epoch_loss.png}
     \includegraphics[width=0.49\textwidth]{matfmaster/yolo/v4/BVS_set/epoch_learning_rate.png}
@@ -1112,16 +1068,17 @@ Za detekciju objekata koristi se model YOLO koji je obučen na skupu podataka \b
 \label{fig:YOLO4_BVS_loss}
 \end{figure}
 
+
 Iz rezultata matrice konfuzije (tabela \ref{tab:YOLO4_BVS_confusion_matrix}) i metoda evaluacije modela (tabela \ref{tab:YOLO4_BVS_results}) zaključuje se sledeće:
 \begin{itemize}
-    \item klasu \textit{car} model $\yolo_{\bvs}$ uspešno predviđa u 100\% slučajeva. Predviđeno je osamdeset devet od osamdeset devet instanci. Prosečna preciznost za klasu \textit{car} iznosi 1.00 i srednja $F_1$-mera iznosi 0.99.
-    \item klasu \textit{motorbike} model takođe uspešno predviđa u 100\% slučajeva. Prosečna preciznost i srednja $F_1$-mera iznose 1.00 i srednja $F_1$-mera iznosi 0.99, kao i kod klase \textit{car}.
-    \item klasa \textit{bus} se predviđa kao instanca klase \textit{motorbike}.
-    \item klasa \textit{truck} se predviđa kao instanca klase \textit{car}.
+    \item instance klase \textit{car} model $\yolo_{\bvs}$ uspešno predviđa u 100\% slučajeva. Predviđeno je osamdeset devet od osamdeset devet instanci. Prosečna preciznost za klasu \textit{car} iznosi 1.00 i srednja $F_1$-mera iznosi 0.99.
+    \item instance klase \textit{motorbike} model takođe uspešno predviđa u 100\% slučajeva. Prosečna preciznost iznosi 1.00 i srednja $F_1$-mera iznosi 0.99, kao i kod klase \textit{car}.
+    \item instanca klase \textit{bus} se predviđa kao instanca klase \textit{motorbike}.
+    \item instanca klase \textit{truck} se predviđa kao instanca klase \textit{car}.
 \end{itemize}
 
 
-\begin{table}
+\begin{table}[htb]
     \begin{center}
     \caption{Matrica konfuzije modela $\yolo_{bvs}$ za IoU prag 0.5 i prag ocene pouzdanosti za prepoznatu klasu 0.5 }
     \begin{tabular}{ l|c|c|c|c|c|}
@@ -1137,7 +1094,7 @@ Iz rezultata matrice konfuzije (tabela \ref{tab:YOLO4_BVS_confusion_matrix}) i m
 \end{table}
 
 
-\begin{table}
+\begin{table}[htb]
     \begin{center}
     \caption{Rezultati evaluacije modela $\yolo_{bvs}$}
         \begin{tabular}{|m{10em}|c|c|}
@@ -1157,7 +1114,7 @@ Iz rezultata matrice konfuzije (tabela \ref{tab:YOLO4_BVS_confusion_matrix}) i m
 \end{table}
 
 Preciznost klasa u odnosu na IoU prag je prikazana na slici \ref{fig:YOLO4_BVS_prc}. Model $\yolo_{bvs}$ ima srednju prosečnu preciznost (mAP), koja iznosi 0.5 i srednju težinsku $F_1$-meru koja iznosi 0.97. 
-Srednja prosečna preciznost je manja u odnosu na model $\yolo_{coco}$. Srednja težinska $F_1$-mera je veća nego kod modela $\yolo_{coco}$ što predstavlja izuzetno poboljšanje. Može se zaključiti da se model ponaša odlično pri detekciji klasa \textit{car} i \textit{motorbike}, dok za klasu \textit{bus} predviđanje je pogrešno. Može se primetiti da se problem, pomenut kod modela $\yolo_{coco}$, za neke instance klase \textit{car} i \textit{truck} i dalje javlja. Primer rezultata detekcije je prikazan na slici \ref{fig:YOLO4_BVS_predictions}. Može se zaključiti da model $\yolo_{\bvs}$ daje bolje rezultate od modela $\yolo_{coco}$.
+Srednja prosečna preciznost je manja u odnosu na model $\yolo_{coco}$. Srednja težinska $F_1$-mera je veća nego kod modela $\yolo_{coco}$ što predstavlja izuzetno poboljšanje. Može se zaključiti da se model ponaša odlično pri detekciji instanci klasa \textit{car} i \textit{motorbike}, dok je za instancu klase \textit{bus} predviđanje pogrešno. Može se primetiti da se problem, pomenut kod modela $\yolo_{coco}$, za neke instance klase \textit{car} i \textit{truck} i dalje javlja. Primer rezultata detekcije je prikazan na slici \ref{fig:YOLO4_BVS_predictions}. Može se zaključiti da model $\yolo_{\bvs}$ daje bolje rezultate od modela $\yolo_{coco}$.
 
 
 
@@ -1184,26 +1141,11 @@ Srednja prosečna preciznost je manja u odnosu na model $\yolo_{coco}$. Srednja 
 
 
 %_______________________________________________________________________________________
-% \clearpage
-% \subsubsection{Obuka modela pomoću tehnike transfernog učenja na skupu podataka \bvs{standard}} IZMENA (0.0-3)
+\clearpage
 \subsubsection{Obuka modela pomoću prenosa znanja na skupu podataka \bvs{standard}}
 %_______________________________________________________________________________________
 
-%
-%
-%
-%
-%
-%
 Za detekciju objekata koristi se model YOLO koji je obučen na skupu podataka \bvs{standard} koji sadrži četiri klase i 6952 slike. Dalje u radu model YOLO obučen na skupu podataka \bvs{standard} se označava sa $\yolo_{\bvs{standard}}$. Funkcija greške modela i stopa obuke su prikazane na slici \ref{fig:YOLO4_BVSstandard_loss}. Iz funkcije greške se vidi da je došlo do ranog zaustavljanja obuke modela nakon pedeset devet epoha. Obuka modela je trajala deset sati.
-
-
-% \begin{figure}[!htbp]
-% \centering
-%   \includegraphics[width=0.70\textwidth]{matfmaster/yolo/v4/BVSstandard_set/epoch_loss.png}
-% \caption{Funkcija greške  $\yolo_{\bvs{standard}}$ modela}
-% \label{fig:YOLO4_BVSstandard_loss}
-% \end{figure}
 
 \begin{figure}[!ht]
 \centering
@@ -1213,18 +1155,17 @@ Za detekciju objekata koristi se model YOLO koji je obučen na skupu podataka \b
 \label{fig:YOLO4_BVSstandard_loss}
 \end{figure}
 
-% \footnote{Za računanje prosečne preciznosti i srednje $F_1$-mere nije se koristila ocena pouzdanosti, već samo da li je objekat uspešno klasifikovan ili ne.}
 Iz rezultata matrice konfuzije (tabela \ref{tab:YOLO4_BVSstandard_confusion_mat}) i metoda evaluacije modela (tabela \ref{tab:YOLO4_BVSstandard_results}) zaključuje se sledeće:
 \begin{itemize}
-    \item klasu \textit{car} model $\yolo_{\bvs{standard}}$ predviđa u 100\% slučajeva. Predviđeno je osamdeset devet od osamdeset devet instanci. Prosečna preciznost za klasu \textit{car} iznosi 1.00, dok srednja $F_1$-mera iznosi 0.99. Ovi rezultati ukazuju na veoma dobro predviđanje modela  $\yolo_{\bvs{standard}}$ nad klasom \textit{car}.
-    \item klasa \textit{motorbike} se predviđa kao i klasa \textit{car}. Model  $\yolo_{\bvs{standard}}$ predviđa devedeset sedam od devedeset sedam instanci. Prosečna preciznost iznosi 1.00 i srednja $F_1$-mera iznosi 0.99.
-    \item klasa \textit{bus} se ne predviđa modelom  $\yolo_{\bvs{standard}}$.
-    \item klasa \textit{truck} se pogrešno predviđa kao klasa \textit{car}. 
+    \item instance klase \textit{car} model $\yolo_{\bvs{standard}}$ predviđa uspešno u 100\% slučajeva (tj.~predviđeno je osamdeset devet od osamdeset devet instanci). Prosečna preciznost za klasu \textit{car} iznosi 1.00, dok srednja $F_1$-mera iznosi 0.99. Ovi rezultati ukazuju na veoma dobro predviđanje modela  $\yolo_{\bvs{standard}}$ nad klasom \textit{car}.
+    \item instance klase \textit{motorbike} model predviđa uspešno kao i instance klase \textit{car}. Model  $\yolo_{\bvs{standard}}$ predviđa devedeset sedam od devedeset sedam instanci. Prosečna preciznost iznosi 1.00 i srednja $F_1$-mera iznosi 0.99.
+    \item instanca klase \textit{bus} nije predviđena modelom  $\yolo_{\bvs{standard}}$, tačnije ocena pouzdanosti je manja od 0.5.
+    \item instanca klasa \textit{truck} se pogrešno predviđa kao instanca klasa \textit{car}. 
 \end{itemize}
 
 
 
-\begin{table}
+\begin{table}[htb]
     \begin{center}
     \caption{Matrica konfuzije modela $\yolo_{\bvs{standard}}$ za IoU prag 0.5 i prag pozdanosti za prepoznatu klasu 0.5 }
     \begin{tabular}{ l|c|c|c|c|c|}
@@ -1240,9 +1181,7 @@ Iz rezultata matrice konfuzije (tabela \ref{tab:YOLO4_BVSstandard_confusion_mat}
     \end{center}
 \end{table}
 
-
-
-\begin{table}
+\begin{table}[htb]
     \begin{center}
     \caption{Rezultati modela $\yolo_{\bvs{standard}}$}
         \begin{tabular}{|m{10em}|c|c|}
@@ -1261,7 +1200,7 @@ Iz rezultata matrice konfuzije (tabela \ref{tab:YOLO4_BVSstandard_confusion_mat}
     \end{center}
 \end{table}
 
-% IZMENA ne uyima u obzir performulisati
+\clearpage
 Preciznost klasa u odnosu na IoU prag je prikazana na slici \ref{fig:YOLO4_BVSstandard_prc}. Model $\yolo_{\bvs{standard}}$ ima srednju prosečnu preciznost (mAP), koja iznosi 0.50 i srednju težinsku $F_1$-meru koja iznosi 0.97. Kod predviđanja modela  $\yolo_{\bvs{standard}}$ možemo da zaključimo da dobro prepoznaje objekte klase \textit{car} i \textit{motorbike}. Srednja prosečna preciznost je manja u odnosu na model $\yolo_{coco}$. Rezultati dobijeni modelom $\yolo_{\bvs{standard}}$ su veoma slični sa rezultatima modela $\yolo_{\bvs}$. Primer rezultata detekcije je prikazan na slici \ref{fig:YOLO4_BVSstandard_predictions}. Može se zaključiti da model $\yolo_{\bvs{standard}}$ daje bolje rezultate od modela $\yolo_{coco}$.
 
 
@@ -1285,17 +1224,9 @@ Preciznost klasa u odnosu na IoU prag je prikazana na slici \ref{fig:YOLO4_BVSst
 
 
 %_______________________________________________________________________________________
-% \clearpage
-% \subsubsection{Obuka modela pomoću tehnike transfernog učenja na skupu \bvs{style}} IZMENA (0.0-3)
+\clearpage
 \subsubsection{Obuka modela pomoću prenosa znanja na skupu \bvs{style}}
 %_______________________________________________________________________________________
-% Adam optimizator
-% LR: 1e-3, decay = 0.9
-% Vreme obuke : ~5h
-% batch_size = 8
-% trajanje : 57epoha
-
-
 
 Za detekciju objekata koristi se model YOLO koji je obučen na skupu podataka \bvs{style} koji sadrži četiri klase i 6952 slike. Dalje u radu model YOLO obučen na skupu podataka \bvs{style} se označava sa $\yolo_{\bvs{style}}$. Funkcija greške modela je prikazana na slici \ref{fig:YOLO4_BVSstyle_loss}. Iz funkcije greške se vidi da je došlo do ranog zaustavljanja obuke modela nakon pedeset sedam epoha. Obuka modela je trajala oko pet sati.
 
@@ -1310,15 +1241,13 @@ Za detekciju objekata koristi se model YOLO koji je obučen na skupu podataka \b
 
 Iz rezultata matrice konfuzije (tabela \ref{tab:YOLO4_BVSstyle_confusion_mat}) i metoda evaluacije modela (tabela \ref{tab:YOLO4_BVSstyle_results}) zaključuje se sledeće:
 \begin{itemize}
-    \item klasu \textit{car} model $\yolo_{\bvs{style}}$ predviđa u 100\% slučajeva. Predviđeno je osamdeset devet od osamdeset devet instanci. Prosečna preciznost za klasu \textit{car} iznosi 1,0, dok srednja $F_1$-mera iznosi 0.99. Ovi rezultati ukazuju na savršeno predviđanje modela $\yolo_{\bvs{style}}$ nad klasom \textit{car}.
-    \item klasa \textit{motorbike} se predviđa podjednako dobro kao i  klasa \textit{car}. Model $\yolo_{\bvs{style}}$ predviđa devedeset sedam od devedeset sedam instanci. Prosečna preciznost iznosi 1.0 i srednja $F_1$-mera iznosi 0.98.
-    \item klasu \textit{bus} model $\yolo_{\bvs{style}}$ uspešno predviđa. Prosečna preciznost i srednja $F_1$-mera iznose 1.00.
-    \item klasa \textit{truck} se pogrešno predviđa kao klasa \textit{car}. 
+    \item instance klase \textit{car} model $\yolo_{\bvs{style}}$ predviđa uspešno u 100\% slučajeva (tj.~predviđeno je osamdeset devet od osamdeset devet instanci). Prosečna preciznost za klasu \textit{car} iznosi 1,0, dok srednja $F_1$-mera iznosi 0.99. Ovi rezultati ukazuju na savršeno predviđanje modela $\yolo_{\bvs{style}}$ nad klasom \textit{car}.
+    \item instance klase \textit{motorbike} se predviđaju podjednako dobro kao i instance klase \textit{car}. Model $\yolo_{\bvs{style}}$ predviđa devedeset sedam od devedeset sedam instanci. Prosečna preciznost iznosi 1.0 i srednja $F_1$-mera iznosi 0.98.
+    \item instancu klase \textit{bus} model $\yolo_{\bvs{style}}$ uspešno predviđa. Prosečna preciznost i srednja $F_1$-mera iznose 1.00.
+    \item instancu klase \textit{truck} model pogrešno predviđa kao instancu klase \textit{car}. 
 \end{itemize}
 
-
-
-\begin{table}
+\begin{table}[htb]
     \begin{center}
     \caption{Matrica konfuzije modela $\yolo_{\bvs{style}}$ za IoU prag 0.5 i prag pouzdanosti za prepoznatu klasu 0.5 }
     \begin{tabular}{ l|c|c|c|c|c|}
@@ -1334,9 +1263,7 @@ Iz rezultata matrice konfuzije (tabela \ref{tab:YOLO4_BVSstyle_confusion_mat}) i
     \end{center}
 \end{table}
 
-
-
-\begin{table}
+\begin{table}[htb]
     \begin{center}
     \caption{Rezultati modela $\yolo_{\bvs{style}}$}
         \begin{tabular}{|m{10em}|c|c|}
@@ -1356,7 +1283,9 @@ Iz rezultata matrice konfuzije (tabela \ref{tab:YOLO4_BVSstyle_confusion_mat}) i
     \end{center}
 \end{table}
 
-Preciznost klasa u odnosu na IoU prag je prikazana na slici \ref{fig:YOLO4_BVSstyle_prc}. Model $\yolo_{\bvs{style}}$ ima srednju prosečnu preciznost (mAP), koja iznosi 0.75. Srednja prosečna preciznost je najveća u poređenju sa svim YOLO modelima. Srednja težinska $F_1$-mera iznosi 0.98 i ona takođe, predstavlja najbolji dobijeni rezultat. Kod predviđanja modela $\yolo_{\bvs{style}}$ možemo da zaključimo da dobro predviđa objekte klase \textit{car}, \textit{motorbike} i \textit{bus}. Model $\yolo_{\bvs{style}}$ daje najbolje rezultate. Gubitak, kao i kod modela $\yolo_{\bvs{standard}}$ i $\yolo_{\bvs}$, javlja se u predviđanju klase \textit{truck}. Primer rezultata detekcije je prikazan na slici \ref{fig:YOLO4_BVSstyle_predictions}. Može se zaključiti da model $\yolo_{\bvs{style}}$ daje najbolje rezultate.
+
+\clearpage
+Preciznost klasa u odnosu na IoU prag je prikazana na slici \ref{fig:YOLO4_BVSstyle_prc}. Model $\yolo_{\bvs{style}}$ ima srednju prosečnu preciznost (mAP), koja iznosi 0.75. Srednja prosečna preciznost je najveća u poređenju sa svim YOLO modelima. Srednja težinska $F_1$-mera iznosi 0.98 i ona takođe, predstavlja najbolji dobijeni rezultat. Kod predviđanja modela $\yolo_{\bvs{style}}$ možemo da zaključimo da dobro predviđa objekte klase \textit{car}, \textit{motorbike} i \textit{bus}. Model $\yolo_{\bvs{style}}$ daje najbolje rezultate. Gubitak, kao i kod modela $\yolo_{\bvs{standard}}$ i $\yolo_{\bvs}$, javlja se u predviđanju instanca klase \textit{truck}. Primer rezultata detekcije je prikazan na slici \ref{fig:YOLO4_BVSstyle_predictions}.
 
 
 
@@ -1381,44 +1310,62 @@ Preciznost klasa u odnosu na IoU prag je prikazana na slici \ref{fig:YOLO4_BVSst
 \end{figure}
 
 
+% #######################################################################
+\clearpage
+\section{Komparativna analiza rezultata}
+% #######################################################################
+
+Model VGG16 je obučen na podacima \bvs{}, dok je model YOLO obučen na podacima \bvs, \bvs{standard} i \bvs{style}. Dobijeni su rezultati koji su prikazani u tabeli \ref{tab:YOLO4_all_results}.
+
+\begin{table}[htb]
+    \begin{center}
+    \caption{Rezultati obučenih modela za detekciju objekata}
+    \begin{tabular}{ l|c|c|}
+                                &  \pbox{5cm}{Srednja prosečna preciznost (jedn.~\ref{eq:map})}          & \pbox{5cm}{Srednja težinska $F_1$-mera (jedn.~\ref{eq:f1wa})}      \\ \hline \hline
+    VGG16                       & 0.24         & 0.27         \\ 
+    $\yolo_{coco}$              & 0.66         & 0.69         \\ 
+    $\yolo_{\bvs}$              & 0.50         & 0.97         \\ 
+    $\yolo_{\bvs{standard}}$    & 0.50         & 0.97         \\ 
+    $\yolo_{\bvs{style}}$       & 0.75         & 0.98         \\ 
+    \hline
+    \end{tabular}
+    \label{tab:YOLO4_all_results}
+    \end{center}
+\end{table}
+
+
+% Rezultati dobijeni modelom VGG16 imaju srednju prosečnu preciznost koja iznosti 0.24, dok srednja težinska $F_1$-mera iznosti 0.27. Model $\yolo_{coco}$ ima srednju prosečnu preciznost koja iznosti 0.66 i srednju težinsku $F_1$-meru koja iznosti 0.69. Model  $\yolo_{\bvs}$ i model $\yolo_{\bvs{standard}}$ imaju iste rezultate koji iznose za srednju prosečnu preciznost 0.50 i srendju težinsku $F_1$-meru 0.97. Model $\yolo_{\bvs{style}}$ za srednju prosečnu preciznost ima vrednost 0.75 i za srednju težinsku $F_1$-meru 0.98.
+
+Na osnovu srednje prosečne preciznosti, za modele navedene u tabeli  \ref{tab:YOLO4_all_results} može da se uoči da najbolje rezultate daje model 
+$\yolo_{\bvs{style}}$, dok model VGG16 ne daje zadovoljavajuće rezultate.
+Neki od razloga koji utiču da model VGG16 daje nezadovoljavajuće rezultate je visoka neizbalansiranost između klasa i mala količina dostupnih podataka.
+Što se tiče modela $\yolo_{\bvs}$ i $\yolo_{\bvs{standard}}$, koji daju iste rezultate za metrike evaluacije, došlo je do neznatnog ali, nedovoljnog poboljšanja kod modela $\yolo_{\bvs{standard}}$ u odnosu na model $\yolo_{\bvs}$. Naime, došlo je do poboljšanja prepoznavanja instance klase \textit{bus}, ali ocena pouzdanosti nije prešla zadati prag (0.5).
+
+
+
+
+
+
 % ------------------------------------------------------------------------------
 % \chapter{Diskusija}
 % ------------------------------------------------------------------------------
 
 
 % ------------------------------------------------------------------------------
+\clearpage
 \chapter{Zaključak}
 \label{section6}
 % ------------------------------------------------------------------------------
-% IZMENA std aug (3.2-1) ... standardnim augmentacijama (translacija, ... 
-U ovom radu je rešavan problem proširivanja skupa podataka koji se koriste za obučavanje modela za detekciju objekata. Skup podataka je proširivan slikama koje su dobijene standardnim transformacijama (translacija, okretanje, menjanje boja i itd.) i sintetički generisanim slikama od strane generativnih suparničkih mreža. Ukupno je dodato oko pet hiljada slika u skup podataka. Tako prošireni skupovi podataka, \bvs{standard} i \bvs{style}, su zasebno korišćeni za obučavanje modela za detekciju objekata YOLO, dok je model VGG16 obučen na originalnom skupu podataka \bvs.
-% Radi poboljšanja rezultata kod modela YOLO, korišćena je i metoda transfernog učenja. IZMENA (0.3-3)
-Radi poboljšanja rezultata kod modela YOLO, korišćena je obuka sa prenosom znanja.
-Težine modela koje su se koristile su bile naučene na skupu podataka COCO. Model YOLO je učio na skupovima podataka \bvs, \bvs{standard} i \bvs{style}.
+U ovom radu je rešavan problem proširivanja skupa podataka koji se koriste za obučavanje modela za detekciju objekata. Skup podataka je proširivan slikama koje su dobijene standardnim transformacijama (translacija, okretanje, menjanje boja i itd.) i sintetički generisanim slikama od strane generativnih suparničkih mreža. Ukupno je dodato oko pet hiljada slika u skup podataka. Tako prošireni skupovi podataka, \bvs{standard} i \bvs{style}, zasebno su korišćeni za obučavanje modela za detekciju objekata YOLO, dok je model VGG16 obučen na originalnom skupu podataka \bvs.
+Radi poboljšanja rezultata kod modela YOLO, korišćena je i obuka sa prenosom znanja. Težine modela koje su se koristile su bile naučene na skupu podataka COCO.
 
+Rezultati koji se dobijaju nakon obuke modela YOLO na skupovima podataka \bvs, \bvs{standard} i \bvs{style} su bolji od rezultata koji se dobijaju sa modelom VGG16. Kod modela YOLO koji su obučeni na skupovima podataka \bvs, \bvs{standard} i \bvs{style}, iz rezultata može da se zaključi da se preciznost popravila kod klasa \textit{car} i \textit{motorbike} u odnosu na model $\yolo_{COCO}$. Kod modela YOLO koji je obučen na skupovima podataka \bvs{} i \bvs{standard}, srednja prosečna preciznost je opala jer se instance klase \textit{truck} više ne prepoznaju, što može da bude uzrok deljenja karakteristika klase \textit{truck} sa klasom \textit{car}. Model YOLO koji je obučen na skupu podataka \bvs{style} uspešno predviđa i instancu klase \textit{bus}. Može se zaključiti da model $\yolo_{\bvs{style}}$ daje najbolje rezultate.
 
-Rezultati koji se dobijaju nakon obuke modela YOLO na skupovima podataka \bvs, \bvs{standard} i \bvs{style} su bolji od rezultata koji se dobijaju sa modelom VGG16. Kod modela YOLO koji su obučeni na skupovima podataka \bvs, \bvs{standard} i \bvs{style}, iz rezultata može da se zaključi da se preciznost popravila kod klasa \textit{car} i \textit{motorbike} u odnosu na model $\yolo_{COCO}$. Kod modela YOLO koji je obučen na skupovima podataka \bvs{} i \bvs{standard}, srednja prosečna preciznost je opala jer se klasa \textit{truck} više ne prepoznaje, što može da bude uzrok deljenja karakteristika sa klasom \textit{car}. Model YOLO koji je obučen na skupu podataka \bvs{style} uspešno predviđa i klasu \textit{bus}. Može se zaključiti da model $\yolo_{\bvs{style}}$ daje najbolje rezultate.
-
-Bolji rezultati za detekcije objekta mogu se dobiti povećanjem količine podataka koja je dostupna modelima \textit{StlyeGAN2} i njihovom obukom duži vremenski period. Time se skup za obuku proširuje kvalitetnijim i raznovrsnijim slikama koje su generisane od strane modela \textit{StlyeGAN2}.
+Bolji rezultati za detekcije objekta mogu se dobiti povećanjem količine podataka koja je dostupna modelima \textit{StlyeGAN2} i njihovom obukom duži vremenski period. Time bi se skup za obuku proširio kvalitetnijim i raznovrsnijim slikama.
 Unapređenje takođe može da se postigne korišćenjem unije skupova podataka \bvs{standard} i \bvs{style}.
 
-% IZMENA (6-1)
 Zahvaljujući razvoju novih tehnologija, možda će biti moguće generisati sintetičke podatke potpuno novim metodama. Na primer, modeli \textit{DALL-E 2} \cite{reddy2021dall} i \textit{MidJourney} \cite{midjourney2022} su u stanju da generišu realistične slike na osnovu njihovih opisa u tekstualnom obliku. Ovakav pristup, međutim, zahteva nove podatke, tj.~tekstualne opise slika.
 
-% Na slici \ref{fig:section5_generatedfromtext} su dati primeri trenutno aktuelnih modela (DALLE 2 \cite{reddy2021dall} i MidJourney\cite{}) koji su u stanju da naprave slike koje približno odgovaraju našem skupu podataka.
-
-% \begin{figure}[!htbp]
-% \centering
-%   \includegraphics[width=0.32\textwidth]{matfmaster/glava5/DALL·E_car.png}
-%   \includegraphics[width=0.32\textwidth]{matfmaster/glava5/DALL·E_bike.png}
-%   \includegraphics[width=0.32\textwidth]{matfmaster/glava5/DALL·E_truck.png}
-%   \includegraphics[width=0.32\textwidth]{matfmaster/glava5/DALL·E_bus.png}  \includegraphics[width=0.32\textwidth]{matfmaster/glava5/midjounrey_bus1.png}
-%   \includegraphics[width=0.32\textwidth]{matfmaster/glava5/midjourney_3.png}
-%   \includegraphics[width=0.32\textwidth]{matfmaster/glava5/DALL E_motorbike_2.png}
-%   \includegraphics[width=0.32\textwidth]{matfmaster/glava5/DALL·E bus_2.png}
-%     \includegraphics[width=0.32\textwidth]{matfmaster/glava5/DALL E_truck2.png}
-% \caption{Slike generisane iz opisa teksta}\label{fig:section5_generatedfromtext}
-% \end{figure}
 
 % ------------------------------------------------------------------------------
 % Literatura

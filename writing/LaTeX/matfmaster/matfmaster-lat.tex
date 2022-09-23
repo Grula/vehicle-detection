@@ -126,7 +126,7 @@ Korišćenjem navedenih metoda proširivanja skupa podataka i učenja sa prenoso
 Ideje koje su ovde predstavljene zasnivaju se na prethodnim istraživanjima. Kod nekih istraživanja gde su na raspolaganju bile male količine podataka, pomoću standardnih transformacija slika, generisane su nove slike koje su korišćene u obuci modela i koje su pozitivno uticale na krajnje rezultate  \cite{brigato2021close}. Pored toga, predloženo je i generisanje novih slika generativnim suparničkim mrežama za proširenje skupa podataka radi povećanja performansi \cite{brigato2021close,liu2019generative}. Obuka generativnih suparničkih mreža sa malom količinom podataka ne daje zadovoljavajuće rezultate \cite{brigato2021close}, pa se pojavom metode diferencijabilne augmentacije za generativne suparničke mreže \cite{zhao2020differentiable} stvara mogućnost generisanja novih podataka pomoću malog skupa podataka. 
 Cilj ovog rada je proširivanje skupa podataka standarnim transformacijama slika i generisanje sintetičkih podataka generativnim suparničkim mrežama sa malom količinom podataka, koje ranije nisu bile u fokusu i koje su postale dostupne metodom diferencijabilne augmentacije.
 
-U glavi \ref{section2} je dat kratak pregled modela za detekciju objekata koji se koriste u ovom radu. U glavi \ref{section3} je dat pregled tehnika i generativne suparničke mreže koje se koriste u rešavanju problema male količine podataka, dok u glavi \ref{section4} se opisuju tehnike evaluacije tih modela. U glavi \ref{section5} su predstavljeni eksperimenti i rezultati dobijenih modela. U glavi \ref{section6} su ukratko prikazani problemi sa kojima se ovaj rad susreće, metode njihovog prevazilaženja i moguća dalja unapređenja rešenja.
+U glavi \ref{section2} dat je kratak pregled modela za detekciju objekata koji se koriste u ovom radu. U glavi \ref{section3} dat je pregled tehnika i generativne suparničke mreže koje se koriste u rešavanju problema male količine podataka, dok se u glavi \ref{section4} opisuju tehnike evaluacije tih modela. U glavi \ref{section5} su predstavljeni eksperimenti i rezultati dobijenih modela. U glavi \ref{section6} su ukratko prikazani problemi sa kojima se ovaj rad susreće, metode njihovog prevazilaženja i moguća dalja unapređenja rešenja.
 
 
 % ------------------------------------------------------------------------------
@@ -330,7 +330,7 @@ Tehnika osvetljenja (eng.~\textit{brightness}) podrazumeva množenje svakog piks
 \end{figure}
 
 
-Tehnika menjanja kontrasta (eng.~\textit{contrast}) predstavlja menjanje stepena razlike između svetlijih i tamnijih delova slike. Povećanjem kontrasta se povećava razlika između svetlijih i tamnijih delova, dok smanjivanjem razlika se umanjuje. Primer promene kontrasta je prikazan na slici \ref{fig:section3_contrast}.
+Tehnika menjanja kontrasta (eng.~\textit{contrast}) predstavlja menjanje stepena razlike između svetlijih i tamnijih delova slike. Povećanjem kontrasta povećava se razlika između svetlijih i tamnijih delova, dok smanjivanjem razlika se umanjuje. Primer promene kontrasta je prikazan na slici \ref{fig:section3_contrast}.
 
 \begin{figure}[ht]
     \centering
@@ -595,7 +595,8 @@ Kod koji je razvijen u okviru rada na tezi je dostupan na adresi  \underline{\hr
 \section{Dostupni podaci}
 % #######################################
 
-Institut BRAIN (eng.~\textit{Brazilian Atrifical Inteligence Nucleus}), u okviru fakulteta FACENS\footnote{(www.facens.br)} (pt.~\textit{Centro Universitário FACENS}, eng.~\textit{Faculty of Engineering of Sorocaba}) Sao Paulo, Brazil je obezbedio označeni skup podataka, pod nazivom \bvs{} (eng.~\textit{Brazilian vehicle set, BVS}), koji je korišćen u ovom radu. Skup podataka \bvs{} sadrži četiri klase: \textit{car}, \textit{motorbike}, \textit{truck} i \textit{bus}. Primeri iz ovih klasa su prikazani na slici \ref{fig:section3_allclasses}. Ukupna količina podataka iznosi 1872 slike, od kojih većina pripada klasama \textit{car} i \textit{motorbike}. U skupu podataka \bvs, rezolucija svih slika iznosi 800$\times$600px. 
+U ovom radu korišćeni su podaci dobijeni od Instituta BRAIN (eng.~\textit{Brazilian Atrifical Inteligence Nucleus}), koji se nalazi u okviru fakulteta FFACENS\footnote{(www.facens.br)} (pt.~\textit{Centro Universitário FACENS}, eng.~\textit{Faculty of Engineering of Sorocaba}) Sao Paulo, Brazil. Dobijeni skup podataka, u radu na dalje, biće korišćen pod nazivom BVS (eng. Brazilian vehicle set, BVS).
+Skup podataka \bvs{} sadrži četiri klase: \textit{car}, \textit{motorbike}, \textit{truck} i \textit{bus}. Primeri iz ovih klasa su prikazani na slici \ref{fig:section3_allclasses}. Ukupna količina podataka iznosi 1872 slike, od kojih većina pripada klasama \textit{car} i \textit{motorbike}. U skupu podataka \bvs, rezolucija svih slika iznosi 800$\times$600px. 
 
 \begin{figure}
     \centering
@@ -928,12 +929,12 @@ Korišćenjem proširenog skupa podataka \bvs{standard} ili \bvs{style}, dostupn
         \toprule
         klasa     & prosečna preciznost (jedn.~\ref{eq:ap}) & srednja $F_1$-mera (jedn.~\ref{eq:f1a})  \\ \hline
         \midrule
-        car       & 0.95  & 0.57 \\ \hline
+        car       & 0.19  & 0.58 \\ \hline
         motorbike & 0.0   & 0.0 \\ \hline
         bus       & 0.0   & 0.0 \\ \hline
         truck     & 0.0   & 0.0 \\ \hline
         \bottomrule
-        Srednja prosečna preciznost (jedn.~\ref{eq:map}) & \multicolumn{2}{c|}{0.24}  \\ \hline
+        Srednja prosečna preciznost (jedn.~\ref{eq:map}) & \multicolumn{2}{c|}{0.04}  \\ \hline
         Srednja težinska $F_1$-mera (jedn.~\ref{eq:f1wa}) & \multicolumn{2}{c|}{0.27}  \\ \hline
     \end{tabular}
     \label{tab:section4_vgg16_results}
@@ -968,8 +969,8 @@ Koristi se model YOLO koji je obučen na skupu podataka COCO koji sadrži osamde
 
 Iz rezultata matrice konfuzije (tabela \ref{tab:YOLO4_COCO_confusion_mat}) i metoda evaluacije modela (tabela \ref{tab:YOLO4_COCO_results}) zaključuje se sledeće:
 \begin{itemize}
-    \item Instance klase \textit{car} model $\yolo_{coco}$ predviđa sa visokom ocenom preciznosti. Predviđena je osamdeset i jedna instanca od ukupno osamdeset i devet. Iz matrice konfuzije može da se vidi da je model $\yolo_{coco}$ za tri instance imao ocenu pouzdanosti manju od 0.5. Takođe, pogrešno se klasifikuje pet instanci kao instance klase \textit{truck}. Prosečna preciznost za klasu \textit{car} iznosi 0.88, dok srednja $F_1$-mera iznosi 0.91.
-    \item Instance klase \textit{motorbike} se predviđaju lošije od instanci klase \textit{car}. Model $\yolo_{coco}$ predviđa trideset sedam od ukupno devedeset sedam instanci. Većina instanci, tačnije četrdeset devet, za ocenu pouzdanosti ima vrednost manju od 0.5. Ocene pouzdanosti klase ukazuju da model nije siguran pri predviđanju instanci iz klase \textit{motorbike}. Prosečna preciznost iznosi 0.77 i srednja $F_1$-mera iznosi 0.48.
+    \item Instance klase \textit{car} model $\yolo_{coco}$ predviđa sa visokom ocenom preciznosti. Predviđena je osamdeset i jedna instanca od ukupno osamdeset i devet. Iz matrice konfuzije može da se vidi da je model $\yolo_{coco}$ za tri instance imao ocenu pouzdanosti manju od 0.5. Takođe, pogrešno se klasifikuje pet instanci kao instance klase \textit{truck}. Prosečna preciznost za klasu \textit{car} iznosi 0.78, dok srednja $F_1$-mera iznosi 0.91.
+    \item Instance klase \textit{motorbike} se predviđaju lošije od instanci klase \textit{car}. Model $\yolo_{coco}$ predviđa trideset sedam od ukupno devedeset sedam instanci. Većina instanci, tačnije četrdeset devet, za ocenu pouzdanosti ima vrednost manju od 0.5. Ocene pouzdanosti klase ukazuju da model nije siguran pri predviđanju instanci iz klase \textit{motorbike}. Prosečna preciznost iznosi 0.23 i srednja $F_1$-mera iznosi 0.48.
     \item Klasa \textit{bus} sadrži jednu sliku za test i ona se ne predviđa modelom $\yolo_{coco}$. Prosečna preciznost i srednja $F_1$-mera iznose 0.
     \item Instanca klase \textit{truck} se uspešno predviđa modelom $\yolo_{coco}$. Prosečna preciznost iznosi 1.0 i srednja $F_1$-mera iznosi 0.99.
 \end{itemize}
@@ -999,12 +1000,12 @@ Iz rezultata matrice konfuzije (tabela \ref{tab:YOLO4_COCO_confusion_mat}) i met
         \toprule
         klasa     & prosečna preciznost (jedn.~\ref{eq:ap}) & srednja $F_1$-mera (jedn.~\ref{eq:f1a})  \\ \hline
         \midrule
-        car       & 0.88  & 0.91 \\ \hline
-        motorbike & 0.77  & 0.48 \\ \hline
+        car       & 0.78  & 0.91 \\ \hline
+        motorbike & 0.23  & 0.48 \\ \hline
         bus       & 0.0   & 0.0  \\ \hline
         truck     & 1.0   & 0.99 \\ \hline
         \bottomrule
-        Srednja prosečna preciznost (jedn.~\ref{eq:map}) & \multicolumn{2}{c|}{0.66}  \\ \hline
+        Srednja prosečna preciznost (jedn.~\ref{eq:map}) & \multicolumn{2}{c|}{0.50}  \\ \hline
         Srednja težinska $F_1$-mera (jedn.~\ref{eq:f1wa}) & \multicolumn{2}{c|}{0.69}  \\ \hline
     \end{tabular}
     \label{tab:YOLO4_COCO_results}
@@ -1012,7 +1013,7 @@ Iz rezultata matrice konfuzije (tabela \ref{tab:YOLO4_COCO_confusion_mat}) i met
 \end{table}
 
 \clearpage
-Preciznost klasa u odnosu na IoU prag je prikazana na slici \ref{fig:YOLO4_COCO_prc}. Model $\yolo_{coco}$ ima srednju prosečnu preciznost (mAP) koja iznosi 0.66 i srednju težinsku $F_1$-meru koja iznosi 0.69. Kod predviđanja modela $\yolo_{coco}$ možemo da zaključimo da dobro prepoznaje objekte klase \textit{car} i \textit{truck}. Problem koji se uočava kod predviđanja tih klasa je da postoje objekti koji imaju slične karakteristike. Takav problem se može uočiti na slici \ref{fig:YOLO4_COCO_car_vs_truck}. Model $\yolo_{coco}$ je uspešno klasifikovao 40\% instanci klase \textit{motorbike} iz test skupa \bvs. Instanca klase \textit{bus} se ne klasifikuje ispravno modelom  $\yolo_{coco}$.
+Preciznost klasa u odnosu na IoU prag je prikazana na slici \ref{fig:YOLO4_COCO_prc}. Model $\yolo_{coco}$ ima srednju prosečnu preciznost (mAP) koja iznosi 0.50 i srednju težinsku $F_1$-meru koja iznosi 0.69. Kod predviđanja modela $\yolo_{coco}$ možemo da zaključimo da dobro prepoznaje objekte klase \textit{car} i \textit{truck}. Problem koji se uočava kod predviđanja tih klasa je da postoje objekti koji imaju slične karakteristike. Takav problem se može uočiti na slici \ref{fig:YOLO4_COCO_car_vs_truck}. Model $\yolo_{coco}$ je uspešno klasifikovao 40\% instanci klase \textit{motorbike} iz test skupa \bvs. Instanca klase \textit{bus} se ne klasifikuje ispravno modelom  $\yolo_{coco}$.
 
 \begin{figure}[!ht]
     \centering
@@ -1071,8 +1072,8 @@ Za detekciju objekata koristi se model YOLO koji je obučen na skupu podataka \b
 
 Iz rezultata matrice konfuzije (tabela \ref{tab:YOLO4_BVS_confusion_matrix}) i metoda evaluacije modela (tabela \ref{tab:YOLO4_BVS_results}) zaključuje se sledeće:
 \begin{itemize}
-    \item instance klase \textit{car} model $\yolo_{\bvs}$ uspešno predviđa u 100\% slučajeva. Predviđeno je osamdeset devet od osamdeset devet instanci. Prosečna preciznost za klasu \textit{car} iznosi 1.00 i srednja $F_1$-mera iznosi 0.99.
-    \item instance klase \textit{motorbike} model takođe uspešno predviđa u 100\% slučajeva. Prosečna preciznost iznosi 1.00 i srednja $F_1$-mera iznosi 0.99, kao i kod klase \textit{car}.
+    \item instance klase \textit{car} model $\yolo_{\bvs}$ uspešno predviđa u 100\% slučajeva. Predviđeno je osamdeset devet od osamdeset devet instanci. Prosečna preciznost za klasu \textit{car} iznosi 0.93 i srednja $F_1$-mera iznosi 0.99.
+    \item instance klase \textit{motorbike} model takođe uspešno predviđa u 100\% slučajeva. Prosečna preciznost iznosi 0.89 i srednja $F_1$-mera iznosi 0.99, kao i kod klase \textit{car}.
     \item instanca klase \textit{bus} se predviđa kao instanca klase \textit{motorbike}.
     \item instanca klase \textit{truck} se predviđa kao instanca klase \textit{car}.
 \end{itemize}
@@ -1101,19 +1102,19 @@ Iz rezultata matrice konfuzije (tabela \ref{tab:YOLO4_BVS_confusion_matrix}) i m
         \toprule
         klasa     & prosečna preciznost (jedn.~\ref{eq:ap}) & srednja $F_1$-mera (jedn.~\ref{eq:f1a})  \\ \hline
         \midrule
-        car       & 1.00  & 0.99 \\ \hline
-        motorbike & 1.00  & 0.99 \\ \hline
+        car       & 0.93  & 0.99 \\ \hline
+        motorbike & 0.89  & 0.99 \\ \hline
         bus       & 0.00  & 0.00 \\ \hline
         truck     & 0.00  & 0.00 \\ \hline
         \bottomrule
-        Srednja prosečna preciznost (jedn.~\ref{eq:map}) & \multicolumn{2}{c|}{0.5}  \\ \hline
+        Srednja prosečna preciznost (jedn.~\ref{eq:map}) & \multicolumn{2}{c|}{0.46}  \\ \hline
         Srednja težinska $F_1$-mera (jedn.~\ref{eq:f1wa}) & \multicolumn{2}{c|}{0.97}  \\ \hline
     \end{tabular}
     \label{tab:YOLO4_BVS_results}
     \end{center}
 \end{table}
 
-Preciznost klasa u odnosu na IoU prag je prikazana na slici \ref{fig:YOLO4_BVS_prc}. Model $\yolo_{bvs}$ ima srednju prosečnu preciznost (mAP), koja iznosi 0.5 i srednju težinsku $F_1$-meru koja iznosi 0.97. 
+Preciznost klasa u odnosu na IoU prag je prikazana na slici \ref{fig:YOLO4_BVS_prc}. Model $\yolo_{bvs}$ ima srednju prosečnu preciznost (mAP), koja iznosi 0.46 i srednju težinsku $F_1$-meru koja iznosi 0.97. 
 Srednja prosečna preciznost je manja u odnosu na model $\yolo_{coco}$. Srednja težinska $F_1$-mera je veća nego kod modela $\yolo_{coco}$ što predstavlja izuzetno poboljšanje. Može se zaključiti da se model ponaša odlično pri detekciji instanci klasa \textit{car} i \textit{motorbike}, dok je za instancu klase \textit{bus} predviđanje pogrešno. Može se primetiti da se problem, pomenut kod modela $\yolo_{coco}$, za neke instance klase \textit{car} i \textit{truck} i dalje javlja. Primer rezultata detekcije je prikazan na slici \ref{fig:YOLO4_BVS_predictions}. Može se zaključiti da model $\yolo_{\bvs}$ daje bolje rezultate od modela $\yolo_{coco}$.
 
 
@@ -1157,8 +1158,8 @@ Za detekciju objekata koristi se model YOLO koji je obučen na skupu podataka \b
 
 Iz rezultata matrice konfuzije (tabela \ref{tab:YOLO4_BVSstandard_confusion_mat}) i metoda evaluacije modela (tabela \ref{tab:YOLO4_BVSstandard_results}) zaključuje se sledeće:
 \begin{itemize}
-    \item instance klase \textit{car} model $\yolo_{\bvs{standard}}$ predviđa uspešno u 100\% slučajeva (tj.~predviđeno je osamdeset devet od osamdeset devet instanci). Prosečna preciznost za klasu \textit{car} iznosi 1.00, dok srednja $F_1$-mera iznosi 0.99. Ovi rezultati ukazuju na veoma dobro predviđanje modela  $\yolo_{\bvs{standard}}$ nad klasom \textit{car}.
-    \item instance klase \textit{motorbike} model predviđa uspešno kao i instance klase \textit{car}. Model  $\yolo_{\bvs{standard}}$ predviđa devedeset sedam od devedeset sedam instanci. Prosečna preciznost iznosi 1.00 i srednja $F_1$-mera iznosi 0.99.
+    \item instance klase \textit{car} model $\yolo_{\bvs{standard}}$ predviđa uspešno u 100\% slučajeva (tj.~predviđeno je osamdeset devet od osamdeset devet instanci). Prosečna preciznost za klasu \textit{car} iznosi 0.88, dok srednja $F_1$-mera iznosi 0.99. Ovi rezultati ukazuju na veoma dobro predviđanje modela  $\yolo_{\bvs{standard}}$ nad klasom \textit{car}.
+    \item instance klase \textit{motorbike} model predviđa uspešno kao i instance klase \textit{car}. Model $\yolo_{\bvs{standard}}$ predviđa devedeset sedam od devedeset sedam instanci. Prosečna preciznost iznosi 0.88 i srednja $F_1$-mera iznosi 0.99.
     \item instanca klase \textit{bus} nije predviđena modelom  $\yolo_{\bvs{standard}}$, tačnije ocena pouzdanosti je manja od 0.5.
     \item instanca klasa \textit{truck} se pogrešno predviđa kao instanca klasa \textit{car}. 
 \end{itemize}
@@ -1188,12 +1189,12 @@ Iz rezultata matrice konfuzije (tabela \ref{tab:YOLO4_BVSstandard_confusion_mat}
         \toprule
         klasa     & prosečna preciznost (jedn.~\ref{eq:ap}) & srednja $F_1$-mera (jedn.~\ref{eq:f1a})  \\ \hline
         \midrule
-        car       & 1.00   & 0.99 \\ \hline
-        motorbike & 1.00   & 0.99 \\ \hline
+        car       & 0.88   & 0.99 \\ \hline
+        motorbike & 0.88   & 0.99 \\ \hline
         bus       & 0.00   & 0.00 \\ \hline
         truck     & 0.00   & 0.00 \\ \hline
         \bottomrule
-        Srednja prosečna preciznost (jedn.~\ref{eq:map}) & \multicolumn{2}{c|}{0.50}  \\ \hline
+        Srednja prosečna preciznost (jedn.~\ref{eq:map}) & \multicolumn{2}{c|}{0.44}  \\ \hline
         Srednja težinska $F_1$-mera (jedn.~\ref{eq:f1wa}) & \multicolumn{2}{c|}{0.97}  \\ \hline
     \end{tabular}
     \label{tab:YOLO4_BVSstandard_results}
@@ -1201,7 +1202,7 @@ Iz rezultata matrice konfuzije (tabela \ref{tab:YOLO4_BVSstandard_confusion_mat}
 \end{table}
 
 \clearpage
-Preciznost klasa u odnosu na IoU prag je prikazana na slici \ref{fig:YOLO4_BVSstandard_prc}. Model $\yolo_{\bvs{standard}}$ ima srednju prosečnu preciznost (mAP), koja iznosi 0.50 i srednju težinsku $F_1$-meru koja iznosi 0.97. Kod predviđanja modela  $\yolo_{\bvs{standard}}$ možemo da zaključimo da dobro prepoznaje objekte klase \textit{car} i \textit{motorbike}. Srednja prosečna preciznost je manja u odnosu na model $\yolo_{coco}$. Rezultati dobijeni modelom $\yolo_{\bvs{standard}}$ su veoma slični sa rezultatima modela $\yolo_{\bvs}$. Primer rezultata detekcije je prikazan na slici \ref{fig:YOLO4_BVSstandard_predictions}. Može se zaključiti da model $\yolo_{\bvs{standard}}$ daje bolje rezultate od modela $\yolo_{coco}$.
+Preciznost klasa u odnosu na IoU prag je prikazana na slici \ref{fig:YOLO4_BVSstandard_prc}. Model $\yolo_{\bvs{standard}}$ ima srednju prosečnu preciznost (mAP), koja iznosi 0.44 i srednju težinsku $F_1$-meru koja iznosi 0.97. Kod predviđanja modela  $\yolo_{\bvs{standard}}$ možemo da zaključimo da dobro prepoznaje objekte klase \textit{car} i \textit{motorbike}. Srednja prosečna preciznost je manja u odnosu na model $\yolo_{coco}$ i model $\yolo_{\bvs}$ . Rezultati dobijeni modelom $\yolo_{\bvs{standard}}$ su slični sa rezultatima modela $\yolo_{\bvs}$, ali model $\yolo_{\bvs}$ daje bolje rezultate . Primer rezultata detekcije je prikazan na slici \ref{fig:YOLO4_BVSstandard_predictions}. Može se zaključiti da model $\yolo_{\bvs{standard}}$ daje bolje rezultate od modela $\yolo_{coco}$.
 
 
 \begin{figure}[!ht]
@@ -1228,7 +1229,7 @@ Preciznost klasa u odnosu na IoU prag je prikazana na slici \ref{fig:YOLO4_BVSst
 \subsubsection{Obuka modela pomoću prenosa znanja na skupu \bvs{style}}
 %_______________________________________________________________________________________
 
-Za detekciju objekata koristi se model YOLO koji je obučen na skupu podataka \bvs{style} koji sadrži četiri klase i 6952 slike. Dalje u radu model YOLO obučen na skupu podataka \bvs{style} se označava sa $\yolo_{\bvs{style}}$. Funkcija greške modela je prikazana na slici \ref{fig:YOLO4_BVSstyle_loss}. Iz funkcije greške se vidi da je došlo do ranog zaustavljanja obuke modela nakon pedeset sedam epoha. Obuka modela je trajala oko pet sati.
+Za detekciju objekata koristi se model YOLO, koji je obučen na skupu podataka \bvs{style} koji sadrži četiri klase i 6952 slike. Dalje u radu model YOLO obučen na skupu podataka \bvs{style} se označava sa $\yolo_{\bvs{style}}$. Funkcija greške modela je prikazana na slici \ref{fig:YOLO4_BVSstyle_loss}. Iz funkcije greške se vidi da je došlo do ranog zaustavljanja obuke modela nakon pedeset sedam epoha. Obuka modela je trajala oko pet sati.
 
 
 \begin{figure}[!ht]
@@ -1241,8 +1242,8 @@ Za detekciju objekata koristi se model YOLO koji je obučen na skupu podataka \b
 
 Iz rezultata matrice konfuzije (tabela \ref{tab:YOLO4_BVSstyle_confusion_mat}) i metoda evaluacije modela (tabela \ref{tab:YOLO4_BVSstyle_results}) zaključuje se sledeće:
 \begin{itemize}
-    \item instance klase \textit{car} model $\yolo_{\bvs{style}}$ predviđa uspešno u 100\% slučajeva (tj.~predviđeno je osamdeset devet od osamdeset devet instanci). Prosečna preciznost za klasu \textit{car} iznosi 1,0, dok srednja $F_1$-mera iznosi 0.99. Ovi rezultati ukazuju na savršeno predviđanje modela $\yolo_{\bvs{style}}$ nad klasom \textit{car}.
-    \item instance klase \textit{motorbike} se predviđaju podjednako dobro kao i instance klase \textit{car}. Model $\yolo_{\bvs{style}}$ predviđa devedeset sedam od devedeset sedam instanci. Prosečna preciznost iznosi 1.0 i srednja $F_1$-mera iznosi 0.98.
+    \item instance klase \textit{car} model $\yolo_{\bvs{style}}$ predviđa uspešno u 100\% slučajeva (tj.~predviđeno je osamdeset devet od osamdeset devet instanci). Prosečna preciznost za klasu \textit{car} iznosi 0.88, dok srednja $F_1$-mera iznosi 0.99. Ovi rezultati ukazuju na savršeno predviđanje modela $\yolo_{\bvs{style}}$ nad klasom \textit{car}.
+    \item instance klase \textit{motorbike} se predviđaju podjednako dobro kao i instance klase \textit{car}. Model $\yolo_{\bvs{style}}$ predviđa devedeset sedam od devedeset sedam instanci. Prosečna preciznost iznosi 0.82 i srednja $F_1$-mera iznosi 0.98.
     \item instancu klase \textit{bus} model $\yolo_{\bvs{style}}$ uspešno predviđa. Prosečna preciznost i srednja $F_1$-mera iznose 1.00.
     \item instancu klase \textit{truck} model pogrešno predviđa kao instancu klase \textit{car}. 
 \end{itemize}
@@ -1270,12 +1271,12 @@ Iz rezultata matrice konfuzije (tabela \ref{tab:YOLO4_BVSstyle_confusion_mat}) i
         \toprule
         klasa     & prosečna preciznost (jedn.~\ref{eq:ap}) & srednja $F_1$-mera (jedn.~\ref{eq:f1a})  \\ \hline
         \midrule
-        car       & 1.00   & 0.99 \\ \hline
-        motorbike & 1.00   & 0.98 \\ \hline
+        car       & 0.88   & 0.99 \\ \hline
+        motorbike & 0.82   & 0.98 \\ \hline
         bus       & 1.00   & 1.00 \\ \hline
         truck     & 0.00   & 0.00 \\ \hline
         \bottomrule
-        Srednja prosečna preciznost (jedn.~\ref{eq:map}) & \multicolumn{2}{c|}{0.75}  \\ \hline
+        Srednja prosečna preciznost (jedn.~\ref{eq:map}) & \multicolumn{2}{c|}{0.68}  \\ \hline
         Srednja težinska $F_1$-mera (jedn.~\ref{eq:f1wa}) & \multicolumn{2}{c|}{0.98}  \\
         \hline
     \end{tabular}
@@ -1285,7 +1286,7 @@ Iz rezultata matrice konfuzije (tabela \ref{tab:YOLO4_BVSstyle_confusion_mat}) i
 
 
 \clearpage
-Preciznost klasa u odnosu na IoU prag je prikazana na slici \ref{fig:YOLO4_BVSstyle_prc}. Model $\yolo_{\bvs{style}}$ ima srednju prosečnu preciznost (mAP), koja iznosi 0.75. Srednja prosečna preciznost je najveća u poređenju sa svim YOLO modelima. Srednja težinska $F_1$-mera iznosi 0.98 i ona takođe, predstavlja najbolji dobijeni rezultat. Kod predviđanja modela $\yolo_{\bvs{style}}$ možemo da zaključimo da dobro predviđa objekte klase \textit{car}, \textit{motorbike} i \textit{bus}. Model $\yolo_{\bvs{style}}$ daje najbolje rezultate. Gubitak, kao i kod modela $\yolo_{\bvs{standard}}$ i $\yolo_{\bvs}$, javlja se u predviđanju instanca klase \textit{truck}. Primer rezultata detekcije je prikazan na slici \ref{fig:YOLO4_BVSstyle_predictions}.
+Preciznost klasa u odnosu na IoU prag je prikazana na slici \ref{fig:YOLO4_BVSstyle_prc}. Model $\yolo_{\bvs{style}}$ ima srednju prosečnu preciznost (mAP), koja iznosi 0.68. Srednja prosečna preciznost je najveća u poređenju sa svim YOLO modelima. Srednja težinska $F_1$-mera iznosi 0.98 i ona takođe, predstavlja najbolji dobijeni rezultat. Kod predviđanja modela $\yolo_{\bvs{style}}$ možemo da zaključimo da dobro predviđa objekte klase \textit{car}, \textit{motorbike} i \textit{bus}. Model $\yolo_{\bvs{style}}$ daje najbolje rezultate. Gubitak, kao i kod modela $\yolo_{\bvs{standard}}$ i $\yolo_{\bvs}$, javlja se u predviđanju instanca klase \textit{truck}. Primer rezultata detekcije je prikazan na slici \ref{fig:YOLO4_BVSstyle_predictions}.
 
 
 
@@ -1322,11 +1323,11 @@ Model VGG16 je obučen na podacima \bvs{}, dok je model YOLO obučen na podacima
     \caption{Rezultati obučenih modela za detekciju objekata}
     \begin{tabular}{ l|c|c|}
                                 &  \pbox{5cm}{Srednja prosečna preciznost (jedn.~\ref{eq:map})}          & \pbox{5cm}{Srednja težinska $F_1$-mera (jedn.~\ref{eq:f1wa})}      \\ \hline \hline
-    VGG16                       & 0.24         & 0.27         \\ 
-    $\yolo_{coco}$              & 0.66         & 0.69         \\ 
-    $\yolo_{\bvs}$              & 0.50         & 0.97         \\ 
-    $\yolo_{\bvs{standard}}$    & 0.50         & 0.97         \\ 
-    $\yolo_{\bvs{style}}$       & 0.75         & 0.98         \\ 
+    VGG16                       & 0.04         & 0.27         \\ 
+    $\yolo_{coco}$              & 0.50         & 0.69         \\ 
+    $\yolo_{\bvs}$              & 0.45         & 0.97         \\ 
+    $\yolo_{\bvs{standard}}$    & 0.44         & 0.97         \\ 
+    $\yolo_{\bvs{style}}$       & 0.67         & 0.98         \\ 
     \hline
     \end{tabular}
     \label{tab:YOLO4_all_results}
@@ -1336,10 +1337,9 @@ Model VGG16 je obučen na podacima \bvs{}, dok je model YOLO obučen na podacima
 
 % Rezultati dobijeni modelom VGG16 imaju srednju prosečnu preciznost koja iznosti 0.24, dok srednja težinska $F_1$-mera iznosti 0.27. Model $\yolo_{coco}$ ima srednju prosečnu preciznost koja iznosti 0.66 i srednju težinsku $F_1$-meru koja iznosti 0.69. Model  $\yolo_{\bvs}$ i model $\yolo_{\bvs{standard}}$ imaju iste rezultate koji iznose za srednju prosečnu preciznost 0.50 i srendju težinsku $F_1$-meru 0.97. Model $\yolo_{\bvs{style}}$ za srednju prosečnu preciznost ima vrednost 0.75 i za srednju težinsku $F_1$-meru 0.98.
 
-Na osnovu srednje prosečne preciznosti, za modele navedene u tabeli  \ref{tab:YOLO4_all_results} može da se uoči da najbolje rezultate daje model 
-$\yolo_{\bvs{style}}$, dok model VGG16 ne daje zadovoljavajuće rezultate.
+Na osnovu srednje prosečne preciznosti, za modele navedene u tabeli  \ref{tab:YOLO4_all_results} može da se uoči da najbolje rezultate daje model $\yolo_{\bvs{style}}$, dok model VGG16 ne daje zadovoljavajuće rezultate.
 Neki od razloga koji utiču da model VGG16 daje nezadovoljavajuće rezultate je visoka neizbalansiranost između klasa i mala količina dostupnih podataka.
-Što se tiče modela $\yolo_{\bvs}$ i $\yolo_{\bvs{standard}}$, koji daju iste rezultate za metrike evaluacije, došlo je do neznatnog ali, nedovoljnog poboljšanja kod modela $\yolo_{\bvs{standard}}$ u odnosu na model $\yolo_{\bvs}$. Naime, došlo je do poboljšanja prepoznavanja instance klase \textit{bus}, ali ocena pouzdanosti nije prešla zadati prag (0.5).
+Što se tiče modela $\yolo_{\bvs}$ i $\yolo_{\bvs{standard}}$, koji daju veoma slične rezultate za metrike evaluacije, došlo je do neznatnog ali, nedovoljnog poboljšanja kod modela $\yolo_{\bvs{standard}}$ u odnosu na model $\yolo_{\bvs}$. Naime, došlo je do poboljšanja prepoznavanja instance klase \textit{bus}, ali ocena pouzdanosti nije prešla zadati prag (0.5).
 
 
 

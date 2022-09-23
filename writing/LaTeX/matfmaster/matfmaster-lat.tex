@@ -120,6 +120,7 @@ Tehnike nadgledanog mašinskog učenja podrazumevaju korišćenje velike količi
 U ovom radu se rešava problem dostupnosti male količine podataka, pri čemu su podaci slike sa obeleženim okvirima objekata. Za rešavanje problema male količine podataka koriste se dva pristupa: proširivanje skupa podataka i učenje sa prenosom znanja (eng.~\textit{transfer learning}).
 U radu je opisan postupak proširivanja skupa podataka, pri čemu se podaci proširuju standardnim transformacijama za augmentaciju slika i podacima dobijenim pomoću modela za generisanje sintetičkih slika.
 Proširivanje skupa podataka navedenim metodama i dalje ne rešava dovoljno dobro problem male količine podataka.
+
 U radu je opisana i tehnika učenja sa prenosom znanja \cite{zhuang2020comprehensive} na već obučenom modelu za detekciju objekta \cite{bochkovskiy2020yolov4}. Korišćenje učenja sa prenosom znanja za cilj ima da se upotrebi naučeno znanje iz jednog domena kako bi se bolje učilo u drugom \cite{bengio2012deep}. Indirektan doprinos korišćenja učenja sa prenosom znanja je i smanjivanje procesorkse snage potrebne za obuku modela.
 Korišćenjem navedenih metoda proširivanja skupa podataka i učenja sa prenosom znanja, dobija se model sa boljim karakteristikama.
 
@@ -150,8 +151,6 @@ Detekcija objekata se koristi u velikom broju aplikacija, kao što su, na primer
 
 Učinak detekcije objekata je značajno poboljšan zahvaljujući dubokoj konvolutivnoj neuronskoj mreži (eng.~\textit{convolutional neural networks, CNN}), što je dovelo do izuzetnih otkrića.
 Razvoj duboke konvolutivne neuronske mreže takođe je omogućio otkrivanje graničnih okvira\footnote{Granični okviri predstavljaju koordinate na delu ili celoj slici u okviru kojih se nalazi prepoznati objekat.} i značajnih delova objekta na slikama \cite{girshick2014rich, ren2015faster, kang2017t, amit2020object}.
-
-
 U eri dubokog učenja, detekcija objekata se može grupisati u dva tipa: \textit{dvostepena detekcija} i \textit{jednostepena detekcija}  \cite{zou2019object}.
 
 U okviru dvostepene detekcije, prva faza modela se koristi za izdvajanje regiona\footnote{Regioni predstavljaju delove slike koji mogu da sadrže objekte ili delove objekata}, dok se druga koristi za klasifikaciju i dalje preciziranje objekata. Ovakav metod detekcije objekata je relativno spor, ali daje veoma precizne rezultate.
@@ -1327,19 +1326,16 @@ Model VGG16 je obučen na podacima \bvs{}, dok je model YOLO obučen na podacima
     $\yolo_{coco}$              & 0.50         & 0.69         \\ 
     $\yolo_{\bvs}$              & 0.45         & 0.97         \\ 
     $\yolo_{\bvs{standard}}$    & 0.44         & 0.97         \\ 
-    $\yolo_{\bvs{style}}$       & 0.67         & 0.98         \\ 
+    $\yolo_{\bvs{style}}$       & 0.68         & 0.98         \\ 
     \hline
     \end{tabular}
     \label{tab:YOLO4_all_results}
     \end{center}
 \end{table}
 
-
-% Rezultati dobijeni modelom VGG16 imaju srednju prosečnu preciznost koja iznosti 0.24, dok srednja težinska $F_1$-mera iznosti 0.27. Model $\yolo_{coco}$ ima srednju prosečnu preciznost koja iznosti 0.66 i srednju težinsku $F_1$-meru koja iznosti 0.69. Model  $\yolo_{\bvs}$ i model $\yolo_{\bvs{standard}}$ imaju iste rezultate koji iznose za srednju prosečnu preciznost 0.50 i srendju težinsku $F_1$-meru 0.97. Model $\yolo_{\bvs{style}}$ za srednju prosečnu preciznost ima vrednost 0.75 i za srednju težinsku $F_1$-meru 0.98.
-
 Na osnovu srednje prosečne preciznosti, za modele navedene u tabeli  \ref{tab:YOLO4_all_results} može da se uoči da najbolje rezultate daje model $\yolo_{\bvs{style}}$, dok model VGG16 ne daje zadovoljavajuće rezultate.
 Neki od razloga koji utiču da model VGG16 daje nezadovoljavajuće rezultate je visoka neizbalansiranost između klasa i mala količina dostupnih podataka.
-Što se tiče modela $\yolo_{\bvs}$ i $\yolo_{\bvs{standard}}$, koji daju veoma slične rezultate za metrike evaluacije, došlo je do neznatnog ali, nedovoljnog poboljšanja kod modela $\yolo_{\bvs{standard}}$ u odnosu na model $\yolo_{\bvs}$. Naime, došlo je do poboljšanja prepoznavanja instance klase \textit{bus}, ali ocena pouzdanosti nije prešla zadati prag (0.5).
+Što se tiče modela $\yolo_{\bvs}$ i $\yolo_{\bvs{standard}}$, koji daju veoma slične rezultate za metrike evaluacije, nije došlo do poboljšanja kod modela $\yolo_{\bvs{standard}}$ u odnosu na model $\yolo_{\bvs}$. Naime, došlo je do neznatnog poboljšanja prepoznavanja instance klase \textit{bus}, ali ocena pouzdanosti nije prešla zadati prag (0.5).
 
 
 
